@@ -8,6 +8,25 @@
         Title="NI Updater"
         Height="550" Width="750"
         MinWidth="170">
+
+    <Window.Resources>
+
+        <VisualBrush
+            x:Key="splitterLine"
+                TileMode="None"
+                Viewport="0,100,100,100"
+                ViewportUnits="Absolute"
+                Viewbox="0,0,40,300"
+                ViewboxUnits="Absolute" >
+            <VisualBrush.Visual>
+                <Line X1="1" X2="3" Y1="1" Y2="5000" Stroke="Gray" />
+            </VisualBrush.Visual>
+        </VisualBrush>
+
+
+    </Window.Resources>
+    
+
     <Grid>
         <Grid.Background>
             <ImageBrush ImageSource="Resources/ni_parch_body_mobile.jpg" TileMode="Tile" Viewport="0,0,828,314" ViewportUnits="Absolute"/>
@@ -59,19 +78,24 @@
                 <ColumnDefinition Width="5" />
                 <ColumnDefinition Width="3*" />
             </Grid.ColumnDefinitions>
-            <ListBox Grid.Column="0" Grid.Row="0"/>
-            <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch" />
-            <RichTextBox Grid.Column="2">
+            <ListBox Grid.Column="0" Grid.Row="0" Opacity="0.75" BorderBrush="#FFA2760A"/>
+
+
+            <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch" Background="{DynamicResource splitterLine}">
+                
+            </GridSplitter>
+                
+            <RichTextBox Grid.Column="2" Opacity="0.75" BorderBrush="#FFA2760A">
                 <FlowDocument>
                     <Paragraph>
-                        <Run Text="RichTextBox"/>
+                        <Run Text=""/>
                     </Paragraph>
                 </FlowDocument>
             </RichTextBox>
         </Grid>
 
-        <ProgressBar Grid.Column="1" Grid.Row="6" Grid.ColumnSpan="1"/>
-        <Button Content="Update" Grid.Column="3" Grid.Row="6"/>
+        <ProgressBar Grid.Column="1" Grid.Row="6" Grid.ColumnSpan="1" Foreground="DarkGoldenrod" Background="#FFF7F3E4" BorderBrush="#FFA2760A"/>
+        <Button Content="Update" Grid.Column="3" Grid.Row="6" Click="Button_Click" Background="DarkGoldenrod" Foreground="White" BorderBrush="#FFA2760A"/>
 
     </Grid>
 </Window>
