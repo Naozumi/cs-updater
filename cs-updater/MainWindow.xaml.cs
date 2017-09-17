@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -27,22 +28,47 @@ namespace cs_updater
         {
             InitializeComponent();
 
+            web_news.NavigateToString(BlankWebpage());
+        }
+
+        private string BlankWebpage()
+        {
+            return "<html><head><style>html{background-color:'#fff'}</style></head><body oncontextmenu='return false; '></body></html>";
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
+            //note: currently this button just does "useful" features required in/to prove the final version.
+
+            //set the directory
+            DirectoryInfo dir = new DirectoryInfo("C:\\cstest2\\");
+
+            //build the json Object which contains all the files and folders
+            List<Node> jsonObject = BuildStructure(dir);
+
+            //count the number of items
+            int count = jsonObject.Count();
+            foreach (Node i in jsonObject)
+            {
+                count += i.getChildrenCount();
+            }
             
+            //convert the json object to a json string
+            string jobjString = JsonConvert.SerializeObject(jsonObject, Formatting.Indented, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
 
-            DirectoryInfo dir = new DirectoryInfo("C:\\cstest\\");
+            //convert the json string to an object
+            dynamic jObj = JsonConvert.DeserializeObject(jobjString);
 
-            var jsonObject = BuildStructure(dir);
+            //count the number of items in the deserialised string
+            int c2 = jsonObject.Count();
+            foreach (Node i in jsonObject)
+            {
+                c2 += i.getChildrenCount();
+            }
 
-            string output = JsonConvert.SerializeObject(jsonObject, Formatting.Indented, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
-
-            rtf_news.Document.Blocks.Clear();
-            rtf_news.Document.Blocks.Add(new Paragraph(new Run(output)));
-
-
+            //display the json file in the web browser window.
+            string output = "<html><body oncontextmenu='return false; '><pre>" + jobjString + "</pre></body</html>";
+            web_news.NavigateToString(output);
         }
 
         private static List<Node> BuildStructure(DirectoryInfo directory)

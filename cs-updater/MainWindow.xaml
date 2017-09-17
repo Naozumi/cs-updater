@@ -11,46 +11,8 @@
 
     <Window.Resources>
 
-        <VisualBrush
-            x:Key="splitterLine"
-                TileMode="None"
-                Viewport="0,100,100,100"
-                ViewportUnits="Absolute"
-                Viewbox="0,0,40,300"
-                ViewboxUnits="Absolute" >
-            <VisualBrush.Visual>
-                <Line X1="1" X2="3" Y1="1" Y2="5000" Stroke="Gray" />
-            </VisualBrush.Visual>
-        </VisualBrush>
-
-        <Style x:Key="btn_update" TargetType="Button">
-            <Setter Property="Background" Value="DarkGoldenrod"/>
-            <Setter Property="Button.Effect">
-                <Setter.Value>
-                    <DropShadowEffect Color="Black" Direction="320" ShadowDepth="3" BlurRadius="5" Opacity="0.5" />
-                </Setter.Value>
-            </Setter>
-            <Style.Triggers>
-                <MultiTrigger>
-                    <MultiTrigger.Conditions>
-                        <Condition Property="IsPressed" Value="False" />
-                        <Condition Property="IsMouseOver" Value="True" />
-                    </MultiTrigger.Conditions>
-                    <Setter Property="Background" Value="Green" />
-                </MultiTrigger>
-                <Trigger Property="IsPressed" Value="True">
-                    <Setter Property="Button.Background" Value="Purple" />
-                    <Setter Property="Button.Effect">
-                        <Setter.Value>
-                            <DropShadowEffect Color="Black" Direction="320" ShadowDepth="0" BlurRadius="0" Opacity="0" />
-                        </Setter.Value>
-                    </Setter>
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-
     </Window.Resources>
-    
+
 
     <Grid>
         <Grid.Background>
@@ -97,27 +59,22 @@
 
 
         <Image Grid.Column="1" Height="Auto" Grid.Row="2" VerticalAlignment="Top" Width="Auto" Grid.ColumnSpan="5" Source="Resources/new_banner.png"/>
-        <Grid Grid.Column="1" Grid.Row="4" Grid.ColumnSpan="3">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="5" />
-                <ColumnDefinition Width="3*" />
-            </Grid.ColumnDefinitions>
-            <ListBox Grid.Column="0" Grid.Row="0" Opacity="0.75" BorderBrush="#FFA2760A"/>
+        <Border BorderBrush="#FFA2760A" BorderThickness="1" Grid.Column="1" Grid.Row="4" Grid.ColumnSpan="3">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="5" />
+                    <ColumnDefinition Width="3*" />
+                </Grid.ColumnDefinitions>
+                <ListBox Grid.Column="0" Grid.Row="0" Opacity="1" BorderThickness="0" />
 
 
-            <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch" Background="{DynamicResource splitterLine}">
-                
-            </GridSplitter>
-                
-            <RichTextBox x:Name="rtf_news" Grid.Column="2" Opacity="0.75" BorderBrush="#FFA2760A">
-                <FlowDocument>
-                    <Paragraph>
-                        <Run Text=""/>
-                    </Paragraph>
-                </FlowDocument>
-            </RichTextBox>
-        </Grid>
+                <GridSplitter Grid.Column="1" Width="4" HorizontalAlignment="Stretch" Background="#FFA2760A" />
+
+                <WebBrowser x:Name="web_news" Grid.Column="2" Opacity="0.75"/>
+            </Grid>
+        </Border>
+        
 
         <ProgressBar Grid.Column="1" Grid.Row="6" Grid.ColumnSpan="1" Foreground="DarkGoldenrod" Background="#FFF7F3E4" BorderBrush="#FFA2760A"/>
         <!--<Button x:Name="btn_update" Content="Update" Grid.Column="3" Grid.Row="6" Click="Button_Click" Background="DarkGoldenrod" Foreground="White" BorderBrush="#FFA2760A" Style="{DynamicResource btn_update}" />-->
