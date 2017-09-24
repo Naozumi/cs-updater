@@ -1,23 +1,16 @@
 ﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.Windows.Forms;
-using MahApps.Metro.Controls;
+using ICSharpCode.SharpZipLib.GZip;
+using ICSharpCode.SharpZipLib.Tar;
+using Microsoft.WindowsAPICodePack.Dialogs;
+using System.Threading;
+using System.Threading.Tasks;
+
 
 namespace cs_updater
 {
@@ -26,15 +19,12 @@ namespace cs_updater
     /// </summary>
     public partial class MainWindow
     {
-        List<Node> jsonObject = null;
+        UpdateHash hashObject = new UpdateHash();
 
         public MainWindow()
         {
             InitializeComponent();
-
             web_news.NavigateToString(BlankWebpage());
-
-
         }
 
         private string BlankWebpage()
@@ -47,9 +37,20 @@ namespace cs_updater
 
         }
 
-        private static List<Node> BuildStructure(DirectoryInfo directory)
+        private UpdateHash BuildStructure(DirectoryInfo directory)
         {
-            var jsonObject = new List<Node>();
+            var hash = new UpdateHash
+            {
+                Module = "NordInvasion",
+                Files = BuildFileStructure(directory)
+            };
+
+            return hash;
+        }
+
+        private static List<UpdateHashFiles> BuildFileStructure(DirectoryInfo directory)
+        {
+            var jsonObject = new List<UpdateHashFiles>();
 
             try
             {
@@ -66,7 +67,7 @@ namespace cs_updater
                                     .Replace("-", string.Empty).ToLower();
                             }
                         }
-                        jsonObject.Add(new Node("file", file.Name, crc));
+                        jsonObject.Add(new UpdateHashFiles(file.Name, crc));
                     }
                 }
             }
@@ -78,47 +79,38 @@ namespace cs_updater
 
             foreach (var folder in directory.GetDirectories())
             {
-                jsonObject.Add(new Node("folder", folder.Name, BuildStructure(new DirectoryInfo(folder.FullName))));
+                jsonObject.Add(new UpdateHashFiles(folder.Name, BuildFileStructure(new DirectoryInfo(folder.FullName))));
             }
 
             return jsonObject;
         }
 
-        private void Modules_Build_Click(object sender, RoutedEventArgs e)
+        private async void Modules_Build_Click(object sender, RoutedEventArgs e)
         {
             //note: currently this button just does "useful" features required in/to prove the final version.
 
             //set the directory
             DirectoryInfo dir = null;
 
-            using (var fbd = new FolderBrowserDialog())
+            CommonOpenFileDialog dialog = new CommonOpenFileDialog
             {
-                fbd.SelectedPath = @"C:\";
-                DialogResult result = fbd.ShowDialog();
-                if (result == System.Windows.Forms.DialogResult.OK && !string.IsNullOrWhiteSpace(fbd.SelectedPath))
-                {
-                    dir = new DirectoryInfo(fbd.SelectedPath);
-                }
+                InitialDirectory = "C:\\",
+                IsFolderPicker = true
+            };
+            if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
+            {
+                dir = new DirectoryInfo(dialog.FileName);
             }
 
             if (dir == null) return;
 
             //build the json Object which contains all the files and folders
-            jsonObject = BuildStructure(dir);
-            if (jsonObject == null) return;
-
-            //count the number of items
-            int count = jsonObject.Count();
-            foreach (Node i in jsonObject)
-            {
-                count += i.getChildrenCount();
-            }
+            hashObject = await Task.Run(() => BuildStructure(dir));
+            hashObject.Source = dir.FullName;
+            if (hashObject.Files == null) return;
 
             //convert the json object to a json string
-            string jobjString = JsonConvert.SerializeObject(jsonObject, Formatting.Indented, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
-
-            //convert the json string to an object
-            dynamic jObj = JsonConvert.DeserializeObject(jobjString);
+            string jobjString = await Task.Run(() => JsonConvert.SerializeObject(hashObject, Formatting.Indented, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore }));
 
             //display the json file in the web browser window.
             string output = "<html><body oncontextmenu='return false; '><pre>" + jobjString + "</pre></body</html>";
@@ -127,16 +119,64 @@ namespace cs_updater
 
         private void Modules_Child_Count_Click(object sender, RoutedEventArgs e)
         {
-            if (jsonObject != null)
-            {
-                //count the number of items in the deserialised string
-                int count = jsonObject.Count();
-                foreach (Node i in jsonObject)
-                {
-                    count += i.getChildrenCount();
-                }
+            System.Windows.Forms.MessageBox.Show("Files & Folders found: " + hashObject.getFileCount().ToString(), "F&F Count");
+        }
 
-                System.Windows.Forms.MessageBox.Show("Files & Folders found: " + count.ToString(), "F&F Count");
+        private void Modules_Compress_Click(object sender, RoutedEventArgs e)
+        {
+            if (hashObject.Source == null) return;
+
+            //set the directory
+            DirectoryInfo dir = null;
+
+            CommonOpenFileDialog dialog = new CommonOpenFileDialog
+            {
+                InitialDirectory = "C:\\",
+                IsFolderPicker = true
+            };
+            if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
+            {
+                dir = new DirectoryInfo(dialog.FileName);
+            }
+
+            if (dir == null) return;
+
+            CompressFiles(dir.FullName, null, hashObject.Files);
+        }
+
+        private void CompressFiles(string baseDirectory, string subDirectory, List<UpdateHashFiles> files)
+        {
+            if (!baseDirectory.EndsWith("\\")) baseDirectory += "\\";
+            if (subDirectory!=null && !subDirectory.EndsWith("\\")) subDirectory += "\\";
+
+            if (files == null) return;
+            foreach (var f in files)
+            {
+                if (f.isFolder())
+                {
+                    Directory.CreateDirectory(baseDirectory + subDirectory + f.Name);
+                    if (f.Files != null) CompressFiles(baseDirectory, subDirectory + f.Name + "\\", f.Files);
+                }
+                else
+                {
+                    CreateTarGZ(baseDirectory + subDirectory + f.Name, hashObject.Source + "\\" + subDirectory + f.Name);
+                }
+            }
+        }
+
+        private void CreateTarGZ(string tgzFilename, string fileName)
+        {
+            using (var outStream = File.Create(tgzFilename + ".tgz"))
+            using (var gzoStream = new GZipOutputStream(outStream))
+            using (var tarArchive = TarArchive.CreateOutputTarArchive(gzoStream))
+            {
+                gzoStream.SetLevel(9);
+                tarArchive.RootPath = System.IO.Path.GetDirectoryName(fileName);
+
+                var tarEntry = TarEntry.CreateEntryFromFile(fileName);
+                tarEntry.Name = System.IO.Path.GetFileName(fileName);
+
+                tarArchive.WriteEntry(tarEntry, true);
             }
         }
     }
