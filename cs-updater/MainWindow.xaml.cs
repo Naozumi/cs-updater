@@ -10,7 +10,7 @@ using ICSharpCode.SharpZipLib.Tar;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using System.Threading;
 using System.Threading.Tasks;
-
+using System.Net;
 
 namespace cs_updater
 {
@@ -30,11 +30,6 @@ namespace cs_updater
         private string BlankWebpage()
         {
             return "<html><head><style>html{background-color:'#fff'}</style></head><body oncontextmenu='return false; '></body></html>";
-        }
-
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-
         }
 
         private UpdateHash BuildStructure(DirectoryInfo directory)
@@ -178,6 +173,41 @@ namespace cs_updater
 
                 tarArchive.WriteEntry(tarEntry, true);
             }
+        }
+
+        private async void Button_Update_Click(object sender, RoutedEventArgs e)
+        {
+            await Task.Run(() => Download_File("http://ipv4.download.thinkbroadband.com/50MB.zip"));
+
+            web_news.NavigateToString("<html><head><style>html{background-color:'#fff'}</style></head><body oncontextmenu='return false; '>Download completed</body></html>");
+        }
+
+        private void Download_File(string file)
+        {
+            //TODO: convert to HTTP Request.
+            using (WebClient wc = new WebClient())
+            {
+                var notifier = new AutoResetEvent(false);
+                wc.DownloadProgressChanged += wc_DownloadProgressChanged;
+                
+                wc.OpenReadCompleted += delegate (object sender, OpenReadCompletedEventArgs e)
+                {
+                    // Indicate that things are done
+                    notifier.Set();
+                };
+
+                wc.DownloadFileAsync(new System.Uri(file), "C:\\cstest\\50MB.zip");
+                notifier.WaitOne();
+            }
+        }
+
+        void wc_DownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
+        {
+            this.Dispatcher.Invoke(() =>
+            {
+                progressBar.Value = e.ProgressPercentage;
+            });
+            
         }
     }
 }

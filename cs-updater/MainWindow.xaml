@@ -74,9 +74,9 @@
         </Border>
 
 
-        <ProgressBar Grid.Column="1" Grid.Row="6" Grid.ColumnSpan="1" Foreground="DarkGoldenrod" Background="#FFF7F3E4" Height="Auto" BorderBrush="#FFA2760A"/>
+        <ProgressBar x:Name="progressBar" Grid.Column="1" Grid.Row="6" Grid.ColumnSpan="1" Foreground="DarkGoldenrod" Background="#FFF7F3E4" Height="Auto" BorderBrush="#FFA2760A"/>
         <!--<Button x:Name="btn_update" Content="Update" Grid.Column="3" Grid.Row="6" Click="Button_Click" Background="DarkGoldenrod" Foreground="White" BorderBrush="#FFA2760A" Style="{DynamicResource btn_update}" />-->
-        <Button x:Name="btn_update" Content="Update" Grid.Column="3" Grid.Row="6" Click="Button_Click" BorderBrush="#FFA2760A" />
+        <Button x:Name="btn_update" Content="Update" Grid.Column="3" Grid.Row="6" Click="Button_Update_Click" BorderBrush="#FFA2760A" />
     </Grid>
 
 </Window>
