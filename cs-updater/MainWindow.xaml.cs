@@ -11,6 +11,7 @@ using Microsoft.WindowsAPICodePack.Dialogs;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Net;
+using System.Net.Http;
 
 namespace cs_updater
 {
@@ -20,6 +21,7 @@ namespace cs_updater
     public partial class MainWindow
     {
         UpdateHash hashObject = new UpdateHash();
+        HttpClient client = new HttpClient();
 
         public MainWindow()
         {
@@ -142,7 +144,7 @@ namespace cs_updater
         private void CompressFiles(string baseDirectory, string subDirectory, List<UpdateHashFiles> files)
         {
             if (!baseDirectory.EndsWith("\\")) baseDirectory += "\\";
-            if (subDirectory!=null && !subDirectory.EndsWith("\\")) subDirectory += "\\";
+            if (subDirectory != null && !subDirectory.EndsWith("\\")) subDirectory += "\\";
 
             if (files == null) return;
             foreach (var f in files)
@@ -177,28 +179,29 @@ namespace cs_updater
 
         private async void Button_Update_Click(object sender, RoutedEventArgs e)
         {
-            await Task.Run(() => Download_File("http://ipv4.download.thinkbroadband.com/50MB.zip"));
+            var urls = new List<string>();
+            urls.Add("http://ipv4.download.thinkbroadband.com/10MB.zip");
+            urls.Add("http://ipv4.download.thinkbroadband.com/10MB.zip");
+            urls.Add("http://ipv4.download.thinkbroadband.com/10MB.zip");
+            urls.Add("http://ipv4.download.thinkbroadband.com/10MB.zip");
+            urls.Add("http://ipv4.download.thinkbroadband.com/10MB.zip");
+
+
+            await Task.Run(() => Download_File("http://ipv4.download.thinkbroadband.com/20MB.zip", "c:\\cstest\\20MB.zip"));
 
             web_news.NavigateToString("<html><head><style>html{background-color:'#fff'}</style></head><body oncontextmenu='return false; '>Download completed</body></html>");
         }
 
-        private void Download_File(string file)
+        private async Task<Boolean> Download_File(string url, string filename)
         {
-            //TODO: convert to HTTP Request.
-            using (WebClient wc = new WebClient())
-            {
-                var notifier = new AutoResetEvent(false);
-                wc.DownloadProgressChanged += wc_DownloadProgressChanged;
-                
-                wc.OpenReadCompleted += delegate (object sender, OpenReadCompletedEventArgs e)
-                {
-                    // Indicate that things are done
-                    notifier.Set();
-                };
+            HttpResponseMessage response = await client.GetAsync(url);
+            response.EnsureSuccessStatusCode();
 
-                wc.DownloadFileAsync(new System.Uri(file), "C:\\cstest\\50MB.zip");
-                notifier.WaitOne();
+            using (FileStream fileStream = new FileStream(filename, FileMode.Create, FileAccess.Write, FileShare.None))
+            {
+                await response.Content.CopyToAsync(fileStream);
             }
+            return true;
         }
 
         void wc_DownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
@@ -207,7 +210,7 @@ namespace cs_updater
             {
                 progressBar.Value = e.ProgressPercentage;
             });
-            
+
         }
     }
 }
