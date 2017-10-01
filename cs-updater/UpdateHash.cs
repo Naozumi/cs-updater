@@ -16,6 +16,20 @@ namespace cs_updater
         [Newtonsoft.Json.JsonIgnore]
         public string Source { get; set; }
 
+        public UpdateHash()
+        {
+        }
+
+        public UpdateHash(string module, string moduleVersion, string updaterVersion, string host, List<UpdateHashFiles> files, string source)
+        {
+            Module = module;
+            ModuleVersion = moduleVersion;
+            UpdaterVersion = updaterVersion;
+            Host = host;
+            Files = files;
+            Source = source;
+        }
+
         public int getFileCount()
         {
             if (this.Files == null) return 0;
@@ -25,6 +39,40 @@ namespace cs_updater
                 count += i.getFilesCount();
             }
             return count;
+        }
+
+        public List<UpdateHashFiles> getFolders()
+        {
+            var l = new List<UpdateHashFiles>();
+            if (this.Files == null) return null;
+            foreach (UpdateHashFiles f in this.Files)
+            {
+                if (f.isFolder())
+                {
+                    f.Path = "";
+                    l.Add(f);
+                    l.AddRange(f.getFolders(f.Name + "\\"));
+                }
+            }
+            return l;
+        }
+
+        public List<UpdateHashFiles> getFiles()
+        {
+            var l = new List<UpdateHashFiles>();
+            if (this.Files == null) return null;
+            foreach (UpdateHashFiles f in this.Files)
+            {
+                if (!f.isFolder())
+                {
+                    f.Path = f.Name;
+                    l.Add(f);
+                }
+                else {
+                    l.AddRange(f.getFiles(f.Name + "\\"));
+                }
+            }
+            return l;
         }
     }
 }

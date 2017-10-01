@@ -30,7 +30,7 @@
             <RowDefinition Height="10"/>
             <RowDefinition/>
             <RowDefinition Height="10" />
-            <RowDefinition Height="40" />
+            <RowDefinition Height="30" />
             <RowDefinition Height="20" />
         </Grid.RowDefinitions>
 
@@ -56,7 +56,7 @@
         </DockPanel>
 
 
-        <Image Grid.Column="1" Height="Auto" Grid.Row="2" VerticalAlignment="Top" Width="Auto" Grid.ColumnSpan="5" Source="Resources/new_banner.png"/>
+        <Image Grid.Column="1" Height="Auto" Grid.Row="2" VerticalAlignment="Top" Width="Auto" Grid.ColumnSpan="3" Source="Resources/new_banner.png"/>
         <Border BorderBrush="#FFA2760A" BorderThickness="1" Grid.Column="1" Grid.Row="4" Grid.ColumnSpan="3">
             <Grid>
                 <Grid.ColumnDefinitions>

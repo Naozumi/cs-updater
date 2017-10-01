@@ -12,6 +12,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Net;
 using System.Net.Http;
+using System.Collections;
 
 namespace cs_updater
 {
@@ -179,17 +180,53 @@ namespace cs_updater
 
         private async void Button_Update_Click(object sender, RoutedEventArgs e)
         {
-            var urls = new List<string>();
-            urls.Add("http://ipv4.download.thinkbroadband.com/10MB.zip");
-            urls.Add("http://ipv4.download.thinkbroadband.com/10MB.zip");
-            urls.Add("http://ipv4.download.thinkbroadband.com/10MB.zip");
-            urls.Add("http://ipv4.download.thinkbroadband.com/10MB.zip");
-            urls.Add("http://ipv4.download.thinkbroadband.com/10MB.zip");
-
-
-            await Task.Run(() => Download_File("http://ipv4.download.thinkbroadband.com/20MB.zip", "c:\\cstest\\20MB.zip"));
-
+            btn_update.IsEnabled = false;
+            string jobjString = await Task.Run(() => Download_File_Return("https://nordinvasion.com/mod/cs.json"));
+            hashObject = await Task.Run(() => JsonConvert.DeserializeObject<UpdateHash>(jobjString));
+            var t = await Task.Run(() => Download_Game_Files());
             web_news.NavigateToString("<html><head><style>html{background-color:'#fff'}</style></head><body oncontextmenu='return false; '>Download completed</body></html>");
+            btn_update.IsEnabled = true;
+        }
+
+        private async Task<Boolean> Download_Game_Files()
+        {
+            var urls = new List<string>();
+
+            Queue pending = new Queue(hashObject.getFiles());
+            List<Task> working = new List<Task>();
+            var i = 0.0;
+            var count = hashObject.getFileCount();
+            var urlbase = "https://nordinvasion.com/mod/1.6.3/";
+            var installBase = "C:\\cstest\\ni\\";
+
+            foreach (UpdateHashFiles f in hashObject.getFolders())
+            {
+                if (f.Path == null)
+                {
+                    System.IO.Directory.CreateDirectory(installBase + f.Name);
+                }
+                System.IO.Directory.CreateDirectory(installBase + f.Path + "\\" + f.Name);
+            }
+
+            while (pending.Count + working.Count != 0)
+            {
+                if (working.Count < 4 && pending.Count != 0)
+                {
+                    var item = (UpdateHashFiles)pending.Dequeue();
+                    working.Add(Task.Run(async () => await Download_File(urlbase + (String)item.Path + ".gz", installBase + (String)item.Path + ".gz")));
+                }
+                else
+                {
+                    await Task.WhenAny(working);
+                    working.RemoveAll(x => x.IsCompleted);
+                    i++;
+                    this.Dispatcher.Invoke(() =>
+                    {
+                        progressBar.Value = (i / count) * 100;
+                    });
+                }
+            }
+            return true;
         }
 
         private async Task<Boolean> Download_File(string url, string filename)
@@ -204,13 +241,12 @@ namespace cs_updater
             return true;
         }
 
-        void wc_DownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
+        private async Task<String> Download_File_Return(string url)
         {
-            this.Dispatcher.Invoke(() =>
-            {
-                progressBar.Value = e.ProgressPercentage;
-            });
+            HttpResponseMessage response = await client.GetAsync(url);
+            response.EnsureSuccessStatusCode();
 
+            return response.Content.ReadAsStringAsync().Result;
         }
     }
 }
