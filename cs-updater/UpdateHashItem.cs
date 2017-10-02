@@ -6,32 +6,39 @@ using System.Threading.Tasks;
 
 namespace cs_updater
 {
-    class UpdateHashFiles
+    class UpdateHashItem
     {
         public string Name { get; set; }
         public string Crc { get; set; }
-        public List<UpdateHashFiles> Files { get; set; }
+        public List<UpdateHashItem> Files { get; set; }
+
         [Newtonsoft.Json.JsonIgnore]
         public string Path { get; set; }
+        [Newtonsoft.Json.JsonIgnore]
+        public Boolean Downloaded { get; set; }
+        [Newtonsoft.Json.JsonIgnore]
+        public int Attempts { get; set; }
+        [Newtonsoft.Json.JsonIgnore]
+        public int Verified { get; set; }
 
-        public UpdateHashFiles()
+        public UpdateHashItem()
         {
         }
 
-        public UpdateHashFiles(string name, string crc)
+        public UpdateHashItem(string name, string crc)
         {
             this.Name = name;
             this.Crc = crc;
         }
 
-        public UpdateHashFiles(string name, string crc, List<UpdateHashFiles> files)
+        public UpdateHashItem(string name, string crc, List<UpdateHashItem> files)
         {
             Name = name;
             Crc = crc;
             Files = files;
         }
 
-        public UpdateHashFiles(string name, List<UpdateHashFiles> files)
+        public UpdateHashItem(string name, List<UpdateHashItem> files)
         {
             this.Name = name;
             this.Files = files;
@@ -43,7 +50,7 @@ namespace cs_updater
             if (this.Files != null)
             {
                 c += this.Files.Count();
-                foreach (UpdateHashFiles sub in this.Files)
+                foreach (UpdateHashItem sub in this.Files)
                 {
                     c += sub.getFilesCount();
                 }
@@ -65,27 +72,27 @@ namespace cs_updater
             return false;
         }
 
-        public List<UpdateHashFiles> getFolders(String path)
+        public List<UpdateHashItem> getFolders(String path)
         {
-            var l = new List<UpdateHashFiles>();
+            var l = new List<UpdateHashItem>();
             if (this.Files == null) return null;
-            foreach (UpdateHashFiles f in this.Files)
+            foreach (UpdateHashItem f in this.Files)
             {
                 if (f.isFolder())
                 {
-                    f.Path = path;
+                    f.Path = path + f.Name;
                     l.Add(f);
-                    f.getFolders(path + "\\" + f.Name + "\\");
+                    f.getFolders(path + "\\");
                 }
             }
             return l;
         }
 
-        public List<UpdateHashFiles> getFiles(String path)
+        public List<UpdateHashItem> getFiles(String path)
         {
-            var l = new List<UpdateHashFiles>();
+            var l = new List<UpdateHashItem>();
             if (this.Files == null) return null;
-            foreach (UpdateHashFiles f in this.Files)
+            foreach (UpdateHashItem f in this.Files)
             {
                 if (f.Crc != null)
                 {

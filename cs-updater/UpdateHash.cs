@@ -11,8 +11,9 @@ namespace cs_updater
         public string Module { get; set; }
         public string ModuleVersion { get; set; }
         public string UpdaterVersion { get; set; }
+        public Boolean SelfUpdate { get; set; }
         public string Host { get; set; }
-        public List<UpdateHashFiles> Files { get; set; }
+        public List<UpdateHashItem> Files { get; set; }
         [Newtonsoft.Json.JsonIgnore]
         public string Source { get; set; }
 
@@ -20,7 +21,7 @@ namespace cs_updater
         {
         }
 
-        public UpdateHash(string module, string moduleVersion, string updaterVersion, string host, List<UpdateHashFiles> files, string source)
+        public UpdateHash(string module, string moduleVersion, string updaterVersion, string host, List<UpdateHashItem> files, string source)
         {
             Module = module;
             ModuleVersion = moduleVersion;
@@ -34,34 +35,34 @@ namespace cs_updater
         {
             if (this.Files == null) return 0;
             int count = this.Files.Count();
-            foreach (UpdateHashFiles i in this.Files)
+            foreach (UpdateHashItem i in this.Files)
             {
                 count += i.getFilesCount();
             }
             return count;
         }
 
-        public List<UpdateHashFiles> getFolders()
+        public List<UpdateHashItem> getFolders()
         {
-            var l = new List<UpdateHashFiles>();
+            var l = new List<UpdateHashItem>();
             if (this.Files == null) return null;
-            foreach (UpdateHashFiles f in this.Files)
+            foreach (UpdateHashItem f in this.Files)
             {
                 if (f.isFolder())
                 {
-                    f.Path = "";
+                    f.Path = f.Name;
                     l.Add(f);
-                    l.AddRange(f.getFolders(f.Name + "\\"));
+                    l.AddRange(f.getFolders(f.Path + "\\"));
                 }
             }
             return l;
         }
 
-        public List<UpdateHashFiles> getFiles()
+        public List<UpdateHashItem> getFiles()
         {
-            var l = new List<UpdateHashFiles>();
+            var l = new List<UpdateHashItem>();
             if (this.Files == null) return null;
-            foreach (UpdateHashFiles f in this.Files)
+            foreach (UpdateHashItem f in this.Files)
             {
                 if (!f.isFolder())
                 {

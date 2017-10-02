@@ -23,6 +23,8 @@ namespace cs_updater
     {
         UpdateHash hashObject = new UpdateHash();
         HttpClient client = new HttpClient();
+        String urlBase = "";
+        String installBase = "";
 
         public MainWindow()
         {
@@ -46,9 +48,9 @@ namespace cs_updater
             return hash;
         }
 
-        private static List<UpdateHashFiles> BuildFileStructure(DirectoryInfo directory)
+        private static List<UpdateHashItem> BuildFileStructure(DirectoryInfo directory)
         {
-            var jsonObject = new List<UpdateHashFiles>();
+            var jsonObject = new List<UpdateHashItem>();
 
             try
             {
@@ -65,7 +67,7 @@ namespace cs_updater
                                     .Replace("-", string.Empty).ToLower();
                             }
                         }
-                        jsonObject.Add(new UpdateHashFiles(file.Name, crc));
+                        jsonObject.Add(new UpdateHashItem(file.Name, crc));
                     }
                 }
             }
@@ -77,7 +79,7 @@ namespace cs_updater
 
             foreach (var folder in directory.GetDirectories())
             {
-                jsonObject.Add(new UpdateHashFiles(folder.Name, BuildFileStructure(new DirectoryInfo(folder.FullName))));
+                jsonObject.Add(new UpdateHashItem(folder.Name, BuildFileStructure(new DirectoryInfo(folder.FullName))));
             }
 
             return jsonObject;
@@ -142,7 +144,7 @@ namespace cs_updater
             CompressFiles(dir.FullName, null, hashObject.Files);
         }
 
-        private void CompressFiles(string baseDirectory, string subDirectory, List<UpdateHashFiles> files)
+        private void CompressFiles(string baseDirectory, string subDirectory, List<UpdateHashItem> files)
         {
             if (!baseDirectory.EndsWith("\\")) baseDirectory += "\\";
             if (subDirectory != null && !subDirectory.EndsWith("\\")) subDirectory += "\\";
@@ -181,10 +183,18 @@ namespace cs_updater
         private async void Button_Update_Click(object sender, RoutedEventArgs e)
         {
             btn_update.IsEnabled = false;
-            string jobjString = await Task.Run(() => Download_File_Return("https://nordinvasion.com/mod/cs.json"));
-            hashObject = await Task.Run(() => JsonConvert.DeserializeObject<UpdateHash>(jobjString));
-            var t = await Task.Run(() => Download_Game_Files());
-            web_news.NavigateToString("<html><head><style>html{background-color:'#fff'}</style></head><body oncontextmenu='return false; '>Download completed</body></html>");
+            try
+            {
+                string jobjString = await Task.Run(() => Download_File_Return("https://nordinvasion.com/mod/cs.json"));
+                hashObject = await Task.Run(() => JsonConvert.DeserializeObject<UpdateHash>(jobjString));
+                web_news.NavigateToString("<html><head><style>html{background-color:'#fff'}</style></head><body oncontextmenu='return false; '>Downloading version: " + hashObject.ModuleVersion + "</body></html>");
+                var t = await Task.Run(() => Download_Game_Files());
+                web_news.NavigateToString("<html><head><style>html{background-color:'#fff'}</style></head><body oncontextmenu='return false; '>Download completed</body></html>");
+            }
+            catch (Exception ex)
+            {
+                web_news.NavigateToString("<html><head><style>html{background-color:'#fff'}</style></head><body oncontextmenu='return false; '>Unable to complete download.<nr /><br />" + ex.InnerException.Message + "</body></html>");
+            }
             btn_update.IsEnabled = true;
         }
 
@@ -193,52 +203,76 @@ namespace cs_updater
             var urls = new List<string>();
 
             Queue pending = new Queue(hashObject.getFiles());
-            List<Task> working = new List<Task>();
+            List<Task<UpdateHashItem>> working = new List<Task<UpdateHashItem>>();
             var i = 0.0;
             var count = hashObject.getFileCount();
-            var urlbase = "https://nordinvasion.com/mod/1.6.3/";
-            var installBase = "C:\\cstest\\ni\\";
+            urlBase = "https://nordinvasion.com/mod/" + hashObject.ModuleVersion + "/";
+            installBase = "C:\\cstest\\ni\\";
 
-            foreach (UpdateHashFiles f in hashObject.getFolders())
+            foreach (UpdateHashItem f in hashObject.getFolders())
             {
-                if (f.Path == null)
-                {
-                    System.IO.Directory.CreateDirectory(installBase + f.Name);
-                }
-                System.IO.Directory.CreateDirectory(installBase + f.Path + "\\" + f.Name);
+                System.IO.Directory.CreateDirectory(installBase + f.Path);
             }
 
             while (pending.Count + working.Count != 0)
             {
                 if (working.Count < 4 && pending.Count != 0)
                 {
-                    var item = (UpdateHashFiles)pending.Dequeue();
-                    working.Add(Task.Run(async () => await Download_File(urlbase + (String)item.Path + ".gz", installBase + (String)item.Path + ".gz")));
+                    var item = (UpdateHashItem)pending.Dequeue();
+                    working.Add(Task.Run(async () => await Download_File(item)));
                 }
                 else
                 {
-                    await Task.WhenAny(working);
+                    Task<UpdateHashItem> t = await Task.WhenAny(working);
                     working.RemoveAll(x => x.IsCompleted);
-                    i++;
-                    this.Dispatcher.Invoke(() =>
+                    if (t.Result.Downloaded)
                     {
-                        progressBar.Value = (i / count) * 100;
-                    });
+                        i++;
+                        this.Dispatcher.Invoke(() =>
+                        {
+                            progressBar.Value = (i / count) * 100;
+                        });
+                    }
+                    else
+                    {
+                        pending.Enqueue(t.Result);
+                        var x = i;
+                    }
                 }
             }
             return true;
         }
 
-        private async Task<Boolean> Download_File(string url, string filename)
+        private async Task<UpdateHashItem> Download_File(UpdateHashItem item)
         {
-            HttpResponseMessage response = await client.GetAsync(url);
-            response.EnsureSuccessStatusCode();
+            HttpResponseMessage response = await client.GetAsync(urlBase + item.Path + ".gz");
+            //response.EnsureSuccessStatusCode();
 
-            using (FileStream fileStream = new FileStream(filename, FileMode.Create, FileAccess.Write, FileShare.None))
+            if (response.IsSuccessStatusCode)
             {
-                await response.Content.CopyToAsync(fileStream);
+                try
+                {
+                    using (FileStream fileStream = new FileStream(installBase + item.Path + ".gz", FileMode.Create, FileAccess.Write, FileShare.None))
+                    {
+                        await response.Content.CopyToAsync(fileStream);
+                    }
+                    item.Downloaded = true;
+                    return item;
+                }
+                catch (Exception ex)
+                {
+                    if (item.Attempts >= 2) throw new Exception(ex.InnerException.Message);
+                    item.Attempts++;
+                    return item;
+                }
+
             }
-            return true;
+            else
+            {
+                if (item.Attempts >= 2) throw new Exception(response.ReasonPhrase);
+                item.Attempts++;
+                return item;
+            }
         }
 
         private async Task<String> Download_File_Return(string url)
