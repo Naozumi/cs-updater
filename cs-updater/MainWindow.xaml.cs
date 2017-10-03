@@ -193,7 +193,15 @@ namespace cs_updater
             }
             catch (Exception ex)
             {
-                web_news.NavigateToString("<html><head><style>html{background-color:'#fff'}</style></head><body oncontextmenu='return false; '>Unable to complete download.<nr /><br />" + ex.InnerException.Message + "</body></html>");
+                if (ex.InnerException.Message != null)
+                {
+                    System.Windows.Forms.MessageBox.Show("Unabled to download update.: \n\n" + ex.InnerException.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+                else
+                {
+                    System.Windows.Forms.MessageBox.Show("Unabled to download update.: \n\n" + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+                
             }
             btn_update.IsEnabled = true;
         }
@@ -261,7 +269,7 @@ namespace cs_updater
                 }
                 catch (Exception ex)
                 {
-                    if (item.Attempts >= 2) throw new Exception(ex.InnerException.Message);
+                    if (item.Attempts >= 2) throw new Exception("Error:" + ex.InnerException.Message);
                     item.Attempts++;
                     return item;
                 }
@@ -269,7 +277,7 @@ namespace cs_updater
             }
             else
             {
-                if (item.Attempts >= 2) throw new Exception(response.ReasonPhrase);
+                if (item.Attempts >= 2) throw new Exception("Error Code: " + response.ReasonPhrase + "\nFile: " + item.Name);
                 item.Attempts++;
                 return item;
             }
