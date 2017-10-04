@@ -19,7 +19,7 @@ namespace cs_updater
         [Newtonsoft.Json.JsonIgnore]
         public int Attempts { get; set; }
         [Newtonsoft.Json.JsonIgnore]
-        public int Verified { get; set; }
+        public Boolean Verified { get; set; }
 
         public UpdateHashItem()
         {
