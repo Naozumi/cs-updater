@@ -185,12 +185,10 @@ namespace cs_updater
             btn_update.IsEnabled = false;
             try
             {
-                string jobjString = await Task.Run(() => Download_File_Return("https://nordinvasion.com/mod/cs.json"));
+                string jobjString = await Task.Run(() => Download_JSON_File("https://nordinvasion.com/mod/cs.json"));
                 hashObject = await Task.Run(() => JsonConvert.DeserializeObject<UpdateHash>(jobjString));
-                web_news.NavigateToString("<html><head><style>html{background-color:'#fff'}</style></head><body oncontextmenu='return false; '>Verifying files: " + hashObject.ModuleVersion + "</body></html>");
-                await Task.Run(() => verifyFiles());
                 web_news.NavigateToString("<html><head><style>html{background-color:'#fff'}</style></head><body oncontextmenu='return false; '>Downloading version: " + hashObject.ModuleVersion + "</body></html>");
-                var t = await Task.Run(() => Download_Game_Files());
+                var t = await Task.Run(() => Update_Game_Files());
                 web_news.NavigateToString("<html><head><style>html{background-color:'#fff'}</style></head><body oncontextmenu='return false; '>Download completed</body></html>");
             }
             catch (Exception ex)
@@ -208,50 +206,15 @@ namespace cs_updater
             btn_update.IsEnabled = true;
         }
 
-        private async void verifyFiles()
-        {
-            Queue pending = new Queue(hashObject.getFiles());
-            List<Task<UpdateHashItem>> working = new List<Task<UpdateHashItem>>();
-            var i = 0.0;
-            var count = pending.Count;
-            installBase = "C:\\cstest\\ni\\";
-
-            while (pending.Count + working.Count != 0)
-            {
-                if (working.Count < 4 && pending.Count != 0)
-                {
-                    var item = (UpdateHashItem)pending.Dequeue();
-                    working.Add(Task.Run(async () => await verifyHash(item)));
-                }
-                else
-                {
-                    Task<UpdateHashItem> t = await Task.WhenAny(working);
-                    working.RemoveAll(x => x.IsCompleted);
-                    if (t.Result.Downloaded)
-                    {
-                        i++;
-                        this.Dispatcher.Invoke(() =>
-                        {
-                            progressBar.Value = (i / count) * 100;
-                        });
-                    }
-                    else
-                    {
-                        pending.Enqueue(t.Result);
-                        var x = i;
-                    }
-                }
-            }
-        }
-
-        private async Task<Boolean> Download_Game_Files()
+        private async Task<Boolean> Update_Game_Files()
         {
             Queue pending = new Queue(hashObject.getFiles());
             List<Task<UpdateHashItem>> working = new List<Task<UpdateHashItem>>();
             var i = 0.0;
             var count = pending.Count;
             urlBase = "https://nordinvasion.com/mod/" + hashObject.ModuleVersion + "/";
-            installBase = "C:\\cstest\\ni\\";
+            installBase = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\MountBlade Warband\\Modules\\NordInvasion2\\";
+            hashObject.Source = installBase;
 
             foreach (UpdateHashItem f in hashObject.getFolders())
             {
@@ -263,13 +226,13 @@ namespace cs_updater
                 if (working.Count < 4 && pending.Count != 0)
                 {
                     var item = (UpdateHashItem)pending.Dequeue();
-                    working.Add(Task.Run(async () => await Download_File(item)));
+                    working.Add(Task.Run(async () => await Update_Item(item)));
                 }
                 else
                 {
                     Task<UpdateHashItem> t = await Task.WhenAny(working);
                     working.RemoveAll(x => x.IsCompleted);
-                    if (t.Result.Downloaded)
+                    if (t.Result.Verified)
                     {
                         i++;
                         this.Dispatcher.Invoke(() =>
@@ -287,61 +250,78 @@ namespace cs_updater
             return true;
         }
 
-        private async Task<UpdateHashItem> Download_File(UpdateHashItem item)
+        private async Task<UpdateHashItem> Update_Item(UpdateHashItem item)
         {
-            HttpResponseMessage response = await client.GetAsync(urlBase + item.Path + ".gz");
-
-            if (response.IsSuccessStatusCode)
+            if (File.Exists(hashObject.Source + item.Path))
             {
-                try
-                {
-                    using (FileStream fileStream = new FileStream(installBase + item.Path + ".gz", FileMode.Create, FileAccess.Write, FileShare.None))
-                    {
-                        await response.Content.CopyToAsync(fileStream);
-                    }
-                    item.Downloaded = true;
-                    return item;
-                }
-                catch (Exception ex)
-                {
-                    if (item.Attempts >= 2) throw new Exception("Error:" + ex.InnerException.Message);
-                    item.Attempts++;
-                    return item;
-                }
-
-            }
-            else
-            {
-                if (item.Attempts >= 2) throw new Exception("Error Code: " + response.ReasonPhrase + "\nFile: " + item.Name);
-                item.Attempts++;
-                return item;
-            }
-        }
-
-        private async Task<String> Download_File_Return(string url)
-        {
-            HttpResponseMessage response = await client.GetAsync(url);
-            response.EnsureSuccessStatusCode();
-
-            return response.Content.ReadAsStringAsync().Result;
-        }
-
-        private async Task<UpdateHashItem> verifyHash(UpdateHashItem item)
-        {
-            item.Verified = false;
-            if (File.Exists(item.Path))
-            {
-                using (FileStream stream = new FileStream(item.Path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)) // File.OpenRead(file.FullName))
+                using (FileStream stream = new FileStream(hashObject.Source + item.Path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
                 using (SHA1Managed sha = new SHA1Managed())
                 {
                     byte[] checksum = sha.ComputeHash(stream);
                     if (BitConverter.ToString(checksum).Replace("-", string.Empty).ToLower() == item.Crc)
                     {
                         item.Verified = true;
+                        return item;
+                    }
+                    else
+                    {
+                        return item;
                     }
                 }
             }
-            return item;
+            else
+            {
+                HttpResponseMessage response = await client.GetAsync(urlBase + item.Path + ".gz");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    try
+                    {
+                        using (FileStream fileStream = new FileStream(installBase + item.Path + ".gz", FileMode.Create, FileAccess.Write, FileShare.None))
+                        {
+                            await response.Content.CopyToAsync(fileStream);
+                        }
+
+                        //TODO: Uncompress file
+
+                        using (FileStream stream = new FileStream(item.Path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                        using (SHA1Managed sha = new SHA1Managed())
+                        {
+                            byte[] checksum = sha.ComputeHash(stream);
+                            if (BitConverter.ToString(checksum).Replace("-", string.Empty).ToLower() == item.Crc)
+                            {
+                                item.Verified = true;
+                                return item;
+                            }
+                            else
+                            {
+                                return item;
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        if (item.Attempts >= 2) throw new Exception("Error:" + ex.InnerException.Message);
+                        item.Attempts++;
+                        return item;
+                    }
+
+                }
+                else
+                {
+                    if (item.Attempts >= 2) throw new Exception("Error Code: " + response.ReasonPhrase + "\nFile: " + item.Name);
+                    item.Attempts++;
+                    return item;
+                }
+            }
+        }
+
+        private async Task<String> Download_JSON_File(string url)
+        {
+            HttpResponseMessage response = await client.GetAsync(url);
+            response.EnsureSuccessStatusCode();
+
+            return response.Content.ReadAsStringAsync().Result;
         }
     }
 }
