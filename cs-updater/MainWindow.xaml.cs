@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Security.Cryptography;
 using System.Windows;
 using System.Windows.Forms;
@@ -22,7 +23,7 @@ namespace cs_updater
     public partial class MainWindow
     {
         UpdateHash hashObject = new UpdateHash();
-        HttpClient client = new HttpClient();
+        HttpClient client;
         String urlBase = "";
         String installBase = "";
 
@@ -30,6 +31,11 @@ namespace cs_updater
         {
             InitializeComponent();
             web_news.NavigateToString(BlankWebpage());
+            HttpClientHandler handler = new HttpClientHandler()
+            {
+                AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate
+            };
+            client = new HttpClient(handler);
         }
 
         private string BlankWebpage()
@@ -124,6 +130,7 @@ namespace cs_updater
 
         private void Modules_Compress_Click(object sender, RoutedEventArgs e)
         {
+            var watch = System.Diagnostics.Stopwatch.StartNew();
             if (hashObject.Source == null) return;
 
             //set the directory
@@ -142,11 +149,13 @@ namespace cs_updater
             if (dir == null) return;
 
             CompressFiles(dir.FullName, null, hashObject.Files);
+            watch.Stop();
+            System.Windows.Forms.MessageBox.Show("Done - " + watch.ElapsedMilliseconds.ToString(), "Finished", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
-        private void CompressFiles(string baseDirectory, string subDirectory, List<UpdateHashItem> files)
+        private void CompressFiles(string outputDirectory, string subDirectory, List<UpdateHashItem> files)
         {
-            if (!baseDirectory.EndsWith("\\")) baseDirectory += "\\";
+            if (!outputDirectory.EndsWith("\\")) outputDirectory += "\\";
             if (subDirectory != null && !subDirectory.EndsWith("\\")) subDirectory += "\\";
 
             if (files == null) return;
@@ -154,35 +163,32 @@ namespace cs_updater
             {
                 if (f.isFolder())
                 {
-                    Directory.CreateDirectory(baseDirectory + subDirectory + f.Name);
-                    if (f.Files != null) CompressFiles(baseDirectory, subDirectory + f.Name + "\\", f.Files);
+                    Directory.CreateDirectory(outputDirectory + subDirectory + f.Name);
+                    if (f.Files != null) CompressFiles(outputDirectory, subDirectory + f.Name + "\\", f.Files, tgz);
                 }
                 else
                 {
-                    CreateTarGZ(baseDirectory + subDirectory + f.Name, hashObject.Source + "\\" + subDirectory + f.Name);
+                    CreateGz(hashObject.Source + "\\" + subDirectory + f.Name, outputDirectory + subDirectory + f.Name);
                 }
             }
         }
 
-        private void CreateTarGZ(string tgzFilename, string fileName)
+
+        private void CreateGz(String inputFile, String outputFile)
         {
-            using (var outStream = File.Create(tgzFilename + ".tgz"))
-            using (var gzoStream = new GZipOutputStream(outStream))
-            using (var tarArchive = TarArchive.CreateOutputTarArchive(gzoStream))
+            using (FileStream originalFileStream = new FileStream(inputFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+            using (FileStream compressedFileStream = File.Create(outputFile + ".gz"))
+            using (GZipStream compressionStream = new GZipStream(compressedFileStream, CompressionMode.Compress))
             {
-                gzoStream.SetLevel(9);
-                tarArchive.RootPath = System.IO.Path.GetDirectoryName(fileName);
-
-                var tarEntry = TarEntry.CreateEntryFromFile(fileName);
-                tarEntry.Name = System.IO.Path.GetFileName(fileName);
-
-                tarArchive.WriteEntry(tarEntry, true);
+                originalFileStream.CopyTo(compressionStream);
             }
         }
 
         private async void Button_Update_Click(object sender, RoutedEventArgs e)
         {
             btn_update.IsEnabled = false;
+
+
             try
             {
                 string jobjString = await Task.Run(() => Download_JSON_File("https://nordinvasion.com/mod/cs.json"));
@@ -213,7 +219,8 @@ namespace cs_updater
             var i = 0.0;
             var count = pending.Count;
             urlBase = "https://nordinvasion.com/mod/" + hashObject.ModuleVersion + "/";
-            installBase = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\MountBlade Warband\\Modules\\NordInvasion2\\";
+            //installBase = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\MountBlade Warband\\Modules\\NordInvasion2\\";
+            installBase = "C:\\cstest5\\";
             hashObject.Source = installBase;
 
             foreach (UpdateHashItem f in hashObject.getFolders())
@@ -254,7 +261,7 @@ namespace cs_updater
         {
             if (File.Exists(hashObject.Source + item.Path))
             {
-                using (FileStream stream = new FileStream(hashObject.Source + item.Path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                using (FileStream stream = new FileStream(installBase + item.Path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
                 using (SHA1Managed sha = new SHA1Managed())
                 {
                     byte[] checksum = sha.ComputeHash(stream);
@@ -271,20 +278,32 @@ namespace cs_updater
             }
             else
             {
-                HttpResponseMessage response = await client.GetAsync(urlBase + item.Path + ".gz");
+                HttpResponseMessage response;
+                try
+                {
+                    response = await client.GetAsync(urlBase + item.Path + ".gz");
+                }
+                catch (Exception ex)
+                {
+                    //web server fucked up
+                    item.Attempts++;
+                    if (item.Attempts > 10) throw;
+                    return item;
+                }
+
 
                 if (response.IsSuccessStatusCode)
                 {
                     try
                     {
-                        using (FileStream fileStream = new FileStream(installBase + item.Path + ".gz", FileMode.Create, FileAccess.Write, FileShare.None))
+                        using (FileStream fileStream = new FileStream(installBase + item.Path, FileMode.Create, FileAccess.Write, FileShare.None))
+                        using (Stream stream = await response.Content.ReadAsStreamAsync())
+                        using (GZipStream decompressedStream = new GZipStream(stream, CompressionMode.Decompress))
                         {
-                            await response.Content.CopyToAsync(fileStream);
+                            decompressedStream.CopyTo(fileStream);
                         }
 
-                        //TODO: Uncompress file
-
-                        using (FileStream stream = new FileStream(item.Path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                        using (FileStream stream = new FileStream(installBase + item.Path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
                         using (SHA1Managed sha = new SHA1Managed())
                         {
                             byte[] checksum = sha.ComputeHash(stream);
@@ -301,6 +320,7 @@ namespace cs_updater
                     }
                     catch (Exception ex)
                     {
+                        // something odd went wrong
                         if (item.Attempts >= 2) throw new Exception("Error:" + ex.InnerException.Message);
                         item.Attempts++;
                         return item;
@@ -309,6 +329,7 @@ namespace cs_updater
                 }
                 else
                 {
+                    // server said no
                     if (item.Attempts >= 2) throw new Exception("Error Code: " + response.ReasonPhrase + "\nFile: " + item.Name);
                     item.Attempts++;
                     return item;
@@ -316,12 +337,27 @@ namespace cs_updater
             }
         }
 
-        private async Task<String> Download_JSON_File(string url)
+        /// <summary>
+        /// Downloads the requested JSON file. Attempts 3 times then will throw and exception
+        /// </summary>
+        /// <param name="url">File to download</param>
+        /// <param name="count">Number of times to try</param>
+        /// <returns></returns>
+        private async Task<String> Download_JSON_File(string url, int count = 3)
         {
-            HttpResponseMessage response = await client.GetAsync(url);
-            response.EnsureSuccessStatusCode();
-
-            return response.Content.ReadAsStringAsync().Result;
+            try
+            {
+                HttpResponseMessage response = await client.GetAsync(url);
+                response.EnsureSuccessStatusCode();
+                return response.Content.ReadAsStringAsync().Result;
+            }
+            catch
+            {
+                if (count <= 1) return null;
+                var s = Download_JSON_File(url, count--);
+                if (s.Result == null) throw;
+                return null;
+            }
         }
     }
 }
