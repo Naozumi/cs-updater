@@ -6,12 +6,8 @@ using System.IO.Compression;
 using System.Security.Cryptography;
 using System.Windows;
 using System.Windows.Forms;
-using ICSharpCode.SharpZipLib.GZip;
-using ICSharpCode.SharpZipLib.Tar;
 using Microsoft.WindowsAPICodePack.Dialogs;
-using System.Threading;
 using System.Threading.Tasks;
-using System.Net;
 using System.Net.Http;
 using System.Collections;
 
@@ -23,19 +19,14 @@ namespace cs_updater
     public partial class MainWindow
     {
         UpdateHash hashObject = new UpdateHash();
-        HttpClient client;
-        String urlBase = "";
+        HttpClient client = new HttpClient();
+        String rootUrl = "";
         String installBase = "";
 
         public MainWindow()
         {
             InitializeComponent();
             web_news.NavigateToString(BlankWebpage());
-            HttpClientHandler handler = new HttpClientHandler()
-            {
-                AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate
-            };
-            client = new HttpClient(handler);
         }
 
         private string BlankWebpage()
@@ -164,7 +155,7 @@ namespace cs_updater
                 if (f.isFolder())
                 {
                     Directory.CreateDirectory(outputDirectory + subDirectory + f.Name);
-                    if (f.Files != null) CompressFiles(outputDirectory, subDirectory + f.Name + "\\", f.Files, tgz);
+                    if (f.Files != null) CompressFiles(outputDirectory, subDirectory + f.Name + "\\", f.Files);
                 }
                 else
                 {
@@ -188,18 +179,80 @@ namespace cs_updater
         {
             btn_update.IsEnabled = false;
 
-
             try
             {
-                string jobjString = await Task.Run(() => Download_JSON_File("https://nordinvasion.com/mod/cs.json"));
-                hashObject = await Task.Run(() => JsonConvert.DeserializeObject<UpdateHash>(jobjString));
+                //Download JSON and decide on best host
+                var hashObject1 = new UpdateHash();
+                var hashObject2 = new UpdateHash();
+
+                var watch1 = System.Diagnostics.Stopwatch.StartNew();
+                string jobjString1 = await Task.Run(() => Download_JSON_File(Properties.Settings.Default.host1 + Properties.Settings.Default.updateFile));
+                watch1.Stop();
+                if (jobjString1 != null && jobjString1.StartsWith("{")) hashObject1 = await Task.Run(() => JsonConvert.DeserializeObject<UpdateHash>(jobjString1));
+
+                var watch2 = System.Diagnostics.Stopwatch.StartNew();
+                string jobjString2 = await Task.Run(() => Download_JSON_File(Properties.Settings.Default.host2 + Properties.Settings.Default.updateFile));
+                watch2.Stop();
+                if (jobjString2 != null && jobjString2.StartsWith("{")) hashObject2 = await Task.Run(() => JsonConvert.DeserializeObject<UpdateHash>(jobjString2));
+
+                //Check we got JSON files OK
+                if (hashObject1.ModuleVersion == null && hashObject2.ModuleVersion == null)
+                {
+                    writeLog("Unable to download JSON files. Host1: " + Environment.NewLine + jobjString1 + "Host2: " + Environment.NewLine + jobjString2);
+                    throw new Exception("Unable to connect to Update Servers.");
+                }
+                //If only one server returned file then use that
+                else if (hashObject1.ModuleVersion != null && hashObject2.ModuleVersion == null)
+                {
+                    rootUrl = Properties.Settings.Default.host1 + hashObject1.ModuleVersion + "/";
+                    hashObject = hashObject1;
+                }
+                else if (hashObject1.ModuleVersion == null && hashObject2.ModuleVersion != null)
+                {
+                    rootUrl = Properties.Settings.Default.host2 + hashObject1.ModuleVersion + "/";
+                    hashObject = hashObject2;
+                }
+                //Which server is more up to date?
+                else if (Version.Parse(hashObject1.ModuleVersion) > Version.Parse(hashObject2.ModuleVersion))
+                {
+                    rootUrl = Properties.Settings.Default.host1 + hashObject1.ModuleVersion + "/";
+                    hashObject = hashObject1;
+                }
+                else if (Version.Parse(hashObject1.ModuleVersion) < Version.Parse(hashObject2.ModuleVersion))
+                {
+                    rootUrl = Properties.Settings.Default.host2 + hashObject2.ModuleVersion + "/";
+                    hashObject = hashObject2;
+                }
+                //Which server was faster - if a match, pick host1?
+                else if (watch1.ElapsedMilliseconds <= watch2.ElapsedMilliseconds)
+                {
+                    rootUrl = Properties.Settings.Default.host1 + hashObject1.ModuleVersion + "/";
+                    hashObject = hashObject1;
+                }
+                else if (watch1.ElapsedMilliseconds > watch2.ElapsedMilliseconds)
+                {
+                    rootUrl = Properties.Settings.Default.host2 + hashObject2.ModuleVersion + "/";
+                    hashObject = hashObject2;
+                }
+                else
+                {
+                    // impossible condition. But better safe than sorry.
+                    writeLog("No JSON file. Wtf??");
+                    throw new Exception("No json file to work with.");
+                }
+                // Cleanup
+                hashObject1 = null;
+                hashObject2 = null;
+
+
                 web_news.NavigateToString("<html><head><style>html{background-color:'#fff'}</style></head><body oncontextmenu='return false; '>Downloading version: " + hashObject.ModuleVersion + "</body></html>");
                 var t = await Task.Run(() => Update_Game_Files());
                 web_news.NavigateToString("<html><head><style>html{background-color:'#fff'}</style></head><body oncontextmenu='return false; '>Download completed</body></html>");
             }
             catch (Exception ex)
             {
-                if (ex.InnerException.Message != null)
+                writeLog(ex);
+                if (ex.InnerException != null)
                 {
                     System.Windows.Forms.MessageBox.Show("Unabled to download update.: \n\n" + ex.InnerException.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
@@ -218,9 +271,9 @@ namespace cs_updater
             List<Task<UpdateHashItem>> working = new List<Task<UpdateHashItem>>();
             var i = 0.0;
             var count = pending.Count;
-            urlBase = "https://nordinvasion.com/mod/" + hashObject.ModuleVersion + "/";
+
             //installBase = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\MountBlade Warband\\Modules\\NordInvasion2\\";
-            installBase = "C:\\cstest5\\";
+            installBase = "C:\\cstest4\\";
             hashObject.Source = installBase;
 
             foreach (UpdateHashItem f in hashObject.getFolders())
@@ -281,13 +334,14 @@ namespace cs_updater
                 HttpResponseMessage response;
                 try
                 {
-                    response = await client.GetAsync(urlBase + item.Path + ".gz");
+                    response = await client.GetAsync(rootUrl + item.Path + ".gz");
                 }
                 catch (Exception ex)
                 {
-                    //web server fucked up
+                    //web server sent an error message
+                    writeLog(ex);
                     item.Attempts++;
-                    if (item.Attempts > 10) throw;
+                    if (item.Attempts > 3) throw;
                     return item;
                 }
 
@@ -321,6 +375,7 @@ namespace cs_updater
                     catch (Exception ex)
                     {
                         // something odd went wrong
+                        writeLog(ex);
                         if (item.Attempts >= 2) throw new Exception("Error:" + ex.InnerException.Message);
                         item.Attempts++;
                         return item;
@@ -330,6 +385,10 @@ namespace cs_updater
                 else
                 {
                     // server said no
+                    writeLog("Failed to download: " + item.Name +
+                        Environment.NewLine + " Attempt: " + item.Attempts.ToString() +
+                        Environment.NewLine + "Reason: " + response.ReasonPhrase +
+                        Environment.NewLine + "Request: " + response.RequestMessage);
                     if (item.Attempts >= 2) throw new Exception("Error Code: " + response.ReasonPhrase + "\nFile: " + item.Name);
                     item.Attempts++;
                     return item;
@@ -351,12 +410,34 @@ namespace cs_updater
                 response.EnsureSuccessStatusCode();
                 return response.Content.ReadAsStringAsync().Result;
             }
-            catch
+            catch (Exception ex)
             {
+                writeLog(ex);
                 if (count <= 1) return null;
                 var s = Download_JSON_File(url, count--);
-                if (s.Result == null) throw;
                 return null;
+            }
+        }
+
+        private void writeLog(Exception ex)
+        {
+            var directory = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+            if (!Directory.Exists(Path.Combine(directory, "NordInvasion"))) Directory.CreateDirectory(Path.Combine(directory, "NordInvasion"));
+            using (StreamWriter sw = File.AppendText(Path.Combine(directory, "NordInvasion", "error.txt")))
+            {
+                sw.WriteLine("Date :" + DateTime.Now.ToString() + Environment.NewLine + "Message :" + ex.Message + Environment.NewLine + "StackTrace :" + ex.StackTrace +
+                   "" + Environment.NewLine);
+                sw.WriteLine(Environment.NewLine + "-----------------------------------------------------------------------------" + Environment.NewLine);
+            }
+        }
+        private void writeLog(String ex)
+        {
+            var directory = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+            if (!Directory.Exists(Path.Combine(directory, "NordInvasion"))) Directory.CreateDirectory(Path.Combine(directory, "NordInvasion"));
+            using (StreamWriter sw = File.AppendText(Path.Combine(directory, "NordInvasion", "error.txt")))
+            {
+                sw.WriteLine("Date :" + DateTime.Now.ToString() + Environment.NewLine + "Message :" + ex + "" + Environment.NewLine);
+                sw.WriteLine(Environment.NewLine + "-----------------------------------------------------------------------------" + Environment.NewLine);
             }
         }
     }
