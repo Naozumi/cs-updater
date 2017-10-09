@@ -35,20 +35,10 @@ namespace cs_updater.Properties {
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.SpecialSettingAttribute(global::System.Configuration.SpecialSetting.WebServiceUrl)]
-        [global::System.Configuration.DefaultSettingValueAttribute("http://odin.nordinvasion.com/mod/")]
-        public string host1 {
+        [global::System.Configuration.DefaultSettingValueAttribute("http://odin.nordinvasion.com/mod/,http://thor.nordinvasion.com/mod/")]
+        public string urls {
             get {
-                return ((string)(this["host1"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.SpecialSettingAttribute(global::System.Configuration.SpecialSetting.WebServiceUrl)]
-        [global::System.Configuration.DefaultSettingValueAttribute("http://thor.nordinvasion.com/mod/")]
-        public string host2 {
-            get {
-                return ((string)(this["host2"]));
+                return ((string)(this["urls"]));
             }
         }
     }

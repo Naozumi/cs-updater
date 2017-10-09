@@ -5,11 +5,8 @@
     <Setting Name="updateFile" Type="System.String" Scope="Application">
       <Value Profile="(Default)">cs.json</Value>
     </Setting>
-    <Setting Name="host1" Type="(Web Service URL)" Scope="Application">
-      <Value Profile="(Default)">http://odin.nordinvasion.com/mod/</Value>
-    </Setting>
-    <Setting Name="host2" Type="(Web Service URL)" Scope="Application">
-      <Value Profile="(Default)">http://thor.nordinvasion.com/mod/</Value>
+    <Setting Name="urls" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">http://odin.nordinvasion.com/mod/,http://thor.nordinvasion.com/mod/</Value>
     </Setting>
   </Settings>
 </SettingsFile>

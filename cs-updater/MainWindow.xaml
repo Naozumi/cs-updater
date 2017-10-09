@@ -3,7 +3,6 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
         xmlns:local="clr-namespace:cs_updater"
         mc:Ignorable="d"
         Title="NI Updater"
@@ -36,17 +35,12 @@
 
         <DockPanel Grid.Column="0" Grid.ColumnSpan="7">
             <Menu DockPanel.Dock="Top" Background="#00000000">
-                <MenuItem Header="_File">
-                    <MenuItem Header="_Open"/>
-                    <MenuItem Header="_Close"/>
-                    <MenuItem Header="_Save"/>
-                </MenuItem>
                 <MenuItem Header="_Settings">
                     <MenuItem Header="_Open"/>
                     <MenuItem Header="_Close"/>
                     <MenuItem Header="_Save"/>
                 </MenuItem>
-                <MenuItem Header="_Modules">
+                <MenuItem Header="_Dev">
                     <MenuItem Header="_Build" Click="Modules_Build_Click"/>
                     <MenuItem Header="_Count" Click="Modules_Child_Count_Click"/>
                     <MenuItem Header="_Compress" Click="Modules_Compress_Click"/>

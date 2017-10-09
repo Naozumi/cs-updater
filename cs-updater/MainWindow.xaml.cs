@@ -10,6 +10,8 @@ using Microsoft.WindowsAPICodePack.Dialogs;
 using System.Threading.Tasks;
 using System.Net.Http;
 using System.Collections;
+using System.Reflection;
+using Microsoft.Win32;
 
 namespace cs_updater
 {
@@ -182,69 +184,40 @@ namespace cs_updater
             try
             {
                 //Download JSON and decide on best host
-                var hashObject1 = new UpdateHash();
-                var hashObject2 = new UpdateHash();
+                List<HostServer> hosts = new List<HostServer>();
 
-                var watch1 = System.Diagnostics.Stopwatch.StartNew();
-                string jobjString1 = await Task.Run(() => Download_JSON_File(Properties.Settings.Default.host1 + Properties.Settings.Default.updateFile));
-                watch1.Stop();
-                if (jobjString1 != null && jobjString1.StartsWith("{")) hashObject1 = await Task.Run(() => JsonConvert.DeserializeObject<UpdateHash>(jobjString1));
+                foreach (var url in Properties.Settings.Default.urls.Split(','))
+                {
+                    hosts.Add(await Task.Run(() => VerifyHostServer(url)));
+                }
 
-                var watch2 = System.Diagnostics.Stopwatch.StartNew();
-                string jobjString2 = await Task.Run(() => Download_JSON_File(Properties.Settings.Default.host2 + Properties.Settings.Default.updateFile));
-                watch2.Stop();
-                if (jobjString2 != null && jobjString2.StartsWith("{")) hashObject2 = await Task.Run(() => JsonConvert.DeserializeObject<UpdateHash>(jobjString2));
+                HostServer master = new HostServer();
+                master.Json = new UpdateHash();
+                master.Json.ModuleVersion = "0.0.0";
+                foreach (HostServer host in hosts)
+                {
+                    if (host.Working)
+                    {
+                        if (Version.Parse(host.Json.ModuleVersion) > Version.Parse(master.Json.ModuleVersion))
+                        {
+                            master = host;
+                        }
+                        else if (Version.Parse(host.Json.ModuleVersion) == Version.Parse(master.Json.ModuleVersion))
+                        {
+                            if (host.Time > master.Time)
+                            {
+                                master = host;
+                            }
+                        }
+                    }
+                }
+                if (!master.Working)
+                {
+                    writeLog("Unable to connect to download servers.");
+                    throw new Exception("Unable to connect to download servers.");
+                }
 
-                //Check we got JSON files OK
-                if (hashObject1.ModuleVersion == null && hashObject2.ModuleVersion == null)
-                {
-                    writeLog("Unable to download JSON files. Host1: " + Environment.NewLine + jobjString1 + "Host2: " + Environment.NewLine + jobjString2);
-                    throw new Exception("Unable to connect to Update Servers.");
-                }
-                //If only one server returned file then use that
-                else if (hashObject1.ModuleVersion != null && hashObject2.ModuleVersion == null)
-                {
-                    rootUrl = Properties.Settings.Default.host1 + hashObject1.ModuleVersion + "/";
-                    hashObject = hashObject1;
-                }
-                else if (hashObject1.ModuleVersion == null && hashObject2.ModuleVersion != null)
-                {
-                    rootUrl = Properties.Settings.Default.host2 + hashObject1.ModuleVersion + "/";
-                    hashObject = hashObject2;
-                }
-                //Which server is more up to date?
-                else if (Version.Parse(hashObject1.ModuleVersion) > Version.Parse(hashObject2.ModuleVersion))
-                {
-                    rootUrl = Properties.Settings.Default.host1 + hashObject1.ModuleVersion + "/";
-                    hashObject = hashObject1;
-                }
-                else if (Version.Parse(hashObject1.ModuleVersion) < Version.Parse(hashObject2.ModuleVersion))
-                {
-                    rootUrl = Properties.Settings.Default.host2 + hashObject2.ModuleVersion + "/";
-                    hashObject = hashObject2;
-                }
-                //Which server was faster - if a match, pick host1?
-                else if (watch1.ElapsedMilliseconds <= watch2.ElapsedMilliseconds)
-                {
-                    rootUrl = Properties.Settings.Default.host1 + hashObject1.ModuleVersion + "/";
-                    hashObject = hashObject1;
-                }
-                else if (watch1.ElapsedMilliseconds > watch2.ElapsedMilliseconds)
-                {
-                    rootUrl = Properties.Settings.Default.host2 + hashObject2.ModuleVersion + "/";
-                    hashObject = hashObject2;
-                }
-                else
-                {
-                    // impossible condition. But better safe than sorry.
-                    writeLog("No JSON file. Wtf??");
-                    throw new Exception("No json file to work with.");
-                }
-                // Cleanup
-                hashObject1 = null;
-                hashObject2 = null;
-
-
+                hashObject = master.Json;
                 web_news.NavigateToString("<html><head><style>html{background-color:'#fff'}</style></head><body oncontextmenu='return false; '>Downloading version: " + hashObject.ModuleVersion + "</body></html>");
                 var t = await Task.Run(() => Update_Game_Files());
                 web_news.NavigateToString("<html><head><style>html{background-color:'#fff'}</style></head><body oncontextmenu='return false; '>Download completed</body></html>");
@@ -254,11 +227,11 @@ namespace cs_updater
                 writeLog(ex);
                 if (ex.InnerException != null)
                 {
-                    System.Windows.Forms.MessageBox.Show("Unabled to download update.: \n\n" + ex.InnerException.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    System.Windows.Forms.MessageBox.Show("Unabled to download update. \n\n" + ex.InnerException.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
                 else
                 {
-                    System.Windows.Forms.MessageBox.Show("Unabled to download update.: \n\n" + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    System.Windows.Forms.MessageBox.Show("Unabled to download update. \n\n" + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
 
             }
@@ -396,6 +369,33 @@ namespace cs_updater
             }
         }
 
+        private async Task<HostServer> VerifyHostServer(String url)
+        {
+            var hostinfo = new HostServer();
+            hostinfo.Working = false;
+
+            if (!url.EndsWith("/")) url += "/";
+            hostinfo.Url = url;
+            var watch = System.Diagnostics.Stopwatch.StartNew();
+            var jsonString = (await Task.Run(() => Download_JSON_File(url + Properties.Settings.Default.updateFile)));
+            watch.Stop();
+            hostinfo.Time = watch.ElapsedMilliseconds;
+
+            if (jsonString != null && jsonString.StartsWith("{"))
+            {
+                try
+                {
+                    hostinfo.Json = await Task.Run(() => JsonConvert.DeserializeObject<UpdateHash>(jsonString));
+                    hostinfo.Working = true;
+                }
+                catch (Exception ex)
+                {
+                    writeLog(ex);
+                }
+            }
+            return hostinfo;
+        }
+
         /// <summary>
         /// Downloads the requested JSON file. Attempts 3 times then will throw and exception
         /// </summary>
@@ -434,11 +434,84 @@ namespace cs_updater
         {
             var directory = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
             if (!Directory.Exists(Path.Combine(directory, "NordInvasion"))) Directory.CreateDirectory(Path.Combine(directory, "NordInvasion"));
-            using (StreamWriter sw = File.AppendText(Path.Combine(directory, "NordInvasion", "error.txt")))
+            using (StreamWriter sw = File.AppendText(Path.Combine(directory, "NordInvasion", "updater_" + DateTime.Now.ToString("dd-MM-yyyy") + ".sterr")))
             {
-                sw.WriteLine("Date :" + DateTime.Now.ToString() + Environment.NewLine + "Message :" + ex + "" + Environment.NewLine);
+                sw.WriteLine("Date: " + DateTime.Now.ToString() + Environment.NewLine + GetPublishedVersion() + Environment.NewLine + "Message: " + ex + "" + Environment.NewLine);
                 sw.WriteLine(Environment.NewLine + "-----------------------------------------------------------------------------" + Environment.NewLine);
             }
+        }
+
+        private string GetPublishedVersion()
+        {
+            var ver = Assembly.GetExecutingAssembly().GetName().Version;
+            return string.Format("Product Name: {4}, Version: {0}.{1}.{2}.{3}", ver.Major, ver.Minor, ver.Build, ver.Revision, Assembly.GetEntryAssembly().GetName().Name);
+        }
+
+        private List<Installs> getInstallationDirectories()
+        {
+            var installs = new List<Installs>();
+            List<String> registry_key = new List<string>
+            {
+                @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall",
+                @"HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall"
+            };
+
+            foreach (string reg in registry_key)
+            {
+                using (Microsoft.Win32.RegistryKey key = Registry.LocalMachine.OpenSubKey(reg))
+                {
+                    foreach (string subkey_name in key.GetSubKeyNames())
+                    {
+                        using (RegistryKey subkey = key.OpenSubKey(subkey_name))
+                        {
+                            if (subkey.GetValue("DisplayName").ToString().Contains("Mount") && subkey.GetValue("DisplayName").ToString().Contains("Warband"))
+                            {
+                                installs.Add(new Installs(subkey.GetValue("DisplayName").ToString(), subkey.GetValue("InstallLocation").ToString()));
+                            }
+                        }
+                    }
+                }
+            }
+
+            var steampath = Environment.GetEnvironmentVariable("SteamPath");
+            if (steampath == null) steampath = ProgramFilesx86() + "Steam";
+            if (File.Exists(Path.Combine(steampath, "Config", "config.vdf")))
+            {
+                //BaseInstallFolder
+                string line;
+                List<String> steamDirs = new List<string>();
+                using (StreamReader file = new StreamReader(Path.Combine(steampath, "Config", "config.vdf")))
+                {
+                    while ((line = file.ReadLine()) != null)
+                    {
+                        if (line.Contains("BaseInstallFolder_"))
+                        {
+                            steamDirs.Add(line.Trim().Replace("BaseInstallFolder_","").Replace("\"","").Remove(0,1).Trim());
+                        }
+                    }
+                }
+
+                foreach (String dirs in steamDirs)
+                {
+                    foreach (String f in Directory.GetDirectories(dirs))
+                    {
+                        if (f.Contains("Mount") && f.Contains("Warband")) installs.Add(new Installs("Steam", Path.Combine(dirs, f)));
+                    }
+                }
+            }
+
+            return installs;
+        }
+
+        static string ProgramFilesx86()
+        {
+            if (8 == IntPtr.Size
+                || (!String.IsNullOrEmpty(Environment.GetEnvironmentVariable("PROCESSOR_ARCHITEW6432"))))
+            {
+                return Environment.GetEnvironmentVariable("ProgramFiles(x86)");
+            }
+
+            return Environment.GetEnvironmentVariable("ProgramFiles");
         }
     }
 }
