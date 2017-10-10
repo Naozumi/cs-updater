@@ -6,10 +6,11 @@ using System.Threading.Tasks;
 
 namespace cs_updater
 {
-    class news_feed
+    class News
     {
 
-
+        public int tid { get; set; }
+        public string message { get; set; }
 
     }
 }

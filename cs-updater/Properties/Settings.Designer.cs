@@ -35,10 +35,23 @@ namespace cs_updater.Properties {
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.SpecialSettingAttribute(global::System.Configuration.SpecialSetting.WebServiceUrl)]
-        [global::System.Configuration.DefaultSettingValueAttribute("http://odin.nordinvasion.com/mod/,http://thor.nordinvasion.com/mod/")]
+        [global::System.Configuration.DefaultSettingValueAttribute("https://odin.nordinvasion.com/mod/,http://thor.nordinvasion.com/mod/")]
         public string urls {
             get {
                 return ((string)(this["urls"]));
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.SpecialSettingAttribute(global::System.Configuration.SpecialSetting.WebServiceUrl)]
+        [global::System.Configuration.DefaultSettingValueAttribute("https://forum-api.nordinvasion.com/news.php")]
+        public string newsUrl {
+            get {
+                return ((string)(this["newsUrl"]));
+            }
+            set {
+                this["newsUrl"] = value;
             }
         }
     }
