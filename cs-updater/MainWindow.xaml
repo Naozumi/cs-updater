@@ -58,7 +58,7 @@
                     <ColumnDefinition Width="5" />
                     <ColumnDefinition Width="3*" />
                 </Grid.ColumnDefinitions>
-                <ListBox Grid.Column="0" Grid.Row="0" Opacity="1" BorderThickness="0" />
+                <ListBox Grid.Column="0" Grid.Row="0" Opacity="1" BorderThickness="0" Name="list_news"/>
 
 
                 <GridSplitter Grid.Column="1" Width="4" HorizontalAlignment="Stretch" Background="#FFA2760A" />

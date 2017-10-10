@@ -24,11 +24,28 @@ namespace cs_updater
         HttpClient client = new HttpClient();
         String rootUrl = "";
         String installBase = "";
+        List<News> news = new List<News>();
 
         public MainWindow()
         {
             InitializeComponent();
             web_news.NavigateToString(BlankWebpage());
+            LoadNews();
+        }
+
+        public async void LoadNews()
+        {
+            String newsString = await Task.Run(() => Download_JSON_File(Properties.Settings.Default.newsUrl));
+
+            if (newsString != null && (newsString.StartsWith("[") || newsString.StartsWith("{")))
+            {
+                news = await Task.Run(() => JsonConvert.DeserializeObject<List<News>>(newsString));
+                foreach(var item in news)
+                {
+                    list_news.Items.Add(item.subject);
+                }
+                web_news.NavigateToString(news[6].message);
+            }
         }
 
         private string BlankWebpage()
@@ -217,6 +234,10 @@ namespace cs_updater
                     throw new Exception("Unable to connect to download servers.");
                 }
 
+                rootUrl = master.Url;
+                if (!rootUrl.EndsWith("/")) rootUrl += "/";
+                rootUrl += master.Json.ModuleVersion;
+                if (!rootUrl.EndsWith("/")) rootUrl += "/";
                 hashObject = master.Json;
                 web_news.NavigateToString("<html><head><style>html{background-color:'#fff'}</style></head><body oncontextmenu='return false; '>Downloading version: " + hashObject.ModuleVersion + "</body></html>");
                 var t = await Task.Run(() => Update_Game_Files());
@@ -312,6 +333,7 @@ namespace cs_updater
                 catch (Exception ex)
                 {
                     //web server sent an error message
+                    writeLog(item.Name + "  " + item.Path);
                     writeLog(ex);
                     item.Attempts++;
                     if (item.Attempts > 3) throw;
@@ -348,6 +370,7 @@ namespace cs_updater
                     catch (Exception ex)
                     {
                         // something odd went wrong
+                        writeLog(item.Name + "  " + item.Path);
                         writeLog(ex);
                         if (item.Attempts >= 2) throw new Exception("Error:" + ex.InnerException.Message);
                         item.Attempts++;
@@ -371,8 +394,10 @@ namespace cs_updater
 
         private async Task<HostServer> VerifyHostServer(String url)
         {
-            var hostinfo = new HostServer();
-            hostinfo.Working = false;
+            var hostinfo = new HostServer
+            {
+                Working = false
+            };
 
             if (!url.EndsWith("/")) url += "/";
             hostinfo.Url = url;
@@ -390,6 +415,7 @@ namespace cs_updater
                 }
                 catch (Exception ex)
                 {
+                    writeLog(url);
                     writeLog(ex);
                 }
             }
@@ -414,7 +440,7 @@ namespace cs_updater
             {
                 writeLog(ex);
                 if (count <= 1) return null;
-                var s = Download_JSON_File(url, count--);
+                var s = Download_JSON_File(url, count-1);
                 return null;
             }
         }
@@ -423,7 +449,7 @@ namespace cs_updater
         {
             var directory = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
             if (!Directory.Exists(Path.Combine(directory, "NordInvasion"))) Directory.CreateDirectory(Path.Combine(directory, "NordInvasion"));
-            using (StreamWriter sw = File.AppendText(Path.Combine(directory, "NordInvasion", "error.txt")))
+            using (StreamWriter sw = File.AppendText(Path.Combine(directory, "NordInvasion", "updater_" + DateTime.Now.ToString("dd-MM-yyyy") + ".stderr")))
             {
                 sw.WriteLine("Date :" + DateTime.Now.ToString() + Environment.NewLine + "Message :" + ex.Message + Environment.NewLine + "StackTrace :" + ex.StackTrace +
                    "" + Environment.NewLine);
@@ -434,7 +460,7 @@ namespace cs_updater
         {
             var directory = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
             if (!Directory.Exists(Path.Combine(directory, "NordInvasion"))) Directory.CreateDirectory(Path.Combine(directory, "NordInvasion"));
-            using (StreamWriter sw = File.AppendText(Path.Combine(directory, "NordInvasion", "updater_" + DateTime.Now.ToString("dd-MM-yyyy") + ".sterr")))
+            using (StreamWriter sw = File.AppendText(Path.Combine(directory, "NordInvasion", "updater_" + DateTime.Now.ToString("dd-MM-yyyy") + ".stderr")))
             {
                 sw.WriteLine("Date: " + DateTime.Now.ToString() + Environment.NewLine + GetPublishedVersion() + Environment.NewLine + "Message: " + ex + "" + Environment.NewLine);
                 sw.WriteLine(Environment.NewLine + "-----------------------------------------------------------------------------" + Environment.NewLine);

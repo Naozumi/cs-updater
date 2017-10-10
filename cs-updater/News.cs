@@ -10,6 +10,7 @@ namespace cs_updater
     {
 
         public int tid { get; set; }
+        public string subject { get; set; }
         public string message { get; set; }
 
     }
