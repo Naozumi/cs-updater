@@ -10,6 +10,8 @@
         MinWidth="170"
         >
 
+    
+
 
     <Grid>
         <Grid.Background>
@@ -36,7 +38,14 @@
         <DockPanel Grid.Column="0" Grid.ColumnSpan="7">
             <Menu DockPanel.Dock="Top" Background="#00000000">
                 <MenuItem Header="_Settings">
-                    <MenuItem Header="_Open"/>
+                    <MenuItem Header="_Language">
+                        <MenuItem Header="_English"/>
+                        <MenuItem Header="_French"/>
+                        <MenuItem Header="E_spañol"/>
+                        <MenuItem Header="_German"/>
+                        <MenuItem Header="_Norwegian"/>
+                        <MenuItem Header="_Danish"/>
+                    </MenuItem>
                     <MenuItem Header="_Close"/>
                     <MenuItem Header="_Save"/>
                 </MenuItem>
@@ -58,19 +67,47 @@
                     <ColumnDefinition Width="5" />
                     <ColumnDefinition Width="3*" />
                 </Grid.ColumnDefinitions>
-                <ListBox Grid.Column="0" Grid.Row="0" Opacity="1" BorderThickness="0" Name="list_news"/>
-
-
+                <ListBox Grid.Column="0" Grid.Row="0" Opacity="1" BorderThickness="0" Name="list_news" SelectionChanged="list_news_SelectionChanged"/>
                 <GridSplitter Grid.Column="1" Width="4" HorizontalAlignment="Stretch" Background="#FFA2760A" />
-
-                <WebBrowser x:Name="web_news" Grid.Column="2" Opacity="1" Height="Auto" Width="Auto"/>
+                <WebBrowser x:Name="Web_News" Grid.Column="2" Opacity="1" Height="Auto" Width="Auto" Navigating="Web_News_Navigating"/>
             </Grid>
         </Border>
 
 
-        <ProgressBar x:Name="progressBar" Grid.Column="1" Grid.Row="6" Grid.ColumnSpan="1" Foreground="DarkGoldenrod" Background="#FFF7F3E4" Height="Auto" BorderBrush="#FFA2760A"/>
-        <!--<Button x:Name="btn_update" Content="Update" Grid.Column="3" Grid.Row="6" Click="Button_Click" Background="DarkGoldenrod" Foreground="White" BorderBrush="#FFA2760A" Style="{DynamicResource btn_update}" />-->
-        <Button x:Name="btn_update" Content="Update" Grid.Column="3" Grid.Row="6" Click="Button_Update_Click" BorderBrush="#FFA2760A" />
+        <Grid Grid.Column="1" Grid.Row="6" Grid.ColumnSpan="1">
+            <ProgressBar x:Name="progressBar"  Foreground="DarkGoldenrod" Background="#FFF7F3E4" Height="Auto" BorderBrush="#FFA2760A"/>
+            <Label x:Name="progressBarText" HorizontalAlignment="Center" VerticalAlignment="Center">
+            </Label>
+        </Grid>
+        <Button x:Name="btn_update" Content="Update" Grid.Column="3" Grid.Row="6" Click="Button_Update_Click">
+            <Button.Style>
+                <Style TargetType="{x:Type Button}">
+                    <Setter Property="Background" Value="#b8860b"/>
+                    <Setter Property="BorderBrush" Value="#FFA2760A"/>
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="{x:Type Button}">
+                                <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}">
+                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                    <Style.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" Value="#c8860b"/>
+                        </Trigger>
+                        <Trigger Property="IsPressed"  Value="True">
+                            <Setter Property="BorderBrush" Value="#e8c366"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled"  Value="False">
+                            <Setter Property="Background" Value="#ccc"/>
+                            <Setter Property="Foreground" Value="#888"/>
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </Button.Style>
+        </Button>
     </Grid>
 
 </Window>

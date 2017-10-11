@@ -12,6 +12,8 @@ using System.Net.Http;
 using System.Collections;
 using System.Reflection;
 using Microsoft.Win32;
+using System.Diagnostics;
+using System.Text.RegularExpressions;
 
 namespace cs_updater
 {
@@ -25,11 +27,12 @@ namespace cs_updater
         String rootUrl = "";
         String installBase = "";
         List<News> news = new List<News>();
+        Boolean allowWebNavigation = true;
 
         public MainWindow()
         {
             InitializeComponent();
-            web_news.NavigateToString(BlankWebpage());
+            SetNews("Loading news...");
             LoadNews();
         }
 
@@ -44,13 +47,36 @@ namespace cs_updater
                 {
                     list_news.Items.Add(item.subject);
                 }
-                web_news.NavigateToString(news[6].message);
+                SetNews(news[0].message);
             }
         }
 
-        private string BlankWebpage()
+        private void SetNews(string body)
         {
-            return "<html><head><style>html{background-color:'#fff'}</style></head><body oncontextmenu='return false; '></body></html>";
+            allowWebNavigation = true;
+            Web_News.NavigateToString("<html><head><style>html{background-color:'#fff'; font-family: Tahoma, Verdana, Arial, Sans-Serif; font-size: 14px;} a:link {color: #d97b33;" +
+                "text-decoration: none;}a:visited{color:#d97b33;text-decoration:none;}a:hover,a:active{color: #886203;text-decoration: underline;}img{border:none}</style>" +
+                "</head><body oncontextmenu='return false; '>" + body + "</body></html>");
+        }
+
+        private void Web_News_Navigating(object sender, System.Windows.Navigation.NavigatingCancelEventArgs e)
+        {
+            // first page needs to be loaded in webBrowser control
+            if (allowWebNavigation)
+            {
+                allowWebNavigation = false;
+                return;
+            }
+
+            // cancel navigation to the clicked link in the webBrowser control
+            e.Cancel = true;
+
+            var startInfo = new ProcessStartInfo
+            {
+                FileName = e.Uri.ToString()
+            };
+
+            Process.Start(startInfo);
         }
 
         private UpdateHash BuildStructure(DirectoryInfo directory)
@@ -130,7 +156,7 @@ namespace cs_updater
 
             //display the json file in the web browser window.
             string output = "<html><body oncontextmenu='return false; '><pre>" + jobjString + "</pre></body</html>";
-            web_news.NavigateToString(output);
+            SetNews("<pre>" + jobjString + "</pre>");
         }
 
         private void Modules_Child_Count_Click(object sender, RoutedEventArgs e)
@@ -197,6 +223,10 @@ namespace cs_updater
         private async void Button_Update_Click(object sender, RoutedEventArgs e)
         {
             btn_update.IsEnabled = false;
+            btn_update.Content = "Updating...";
+            progressBar.Value = 0;
+            progressBarText.Content = "Starting download...";
+            var failed = false;
 
             try
             {
@@ -208,9 +238,13 @@ namespace cs_updater
                     hosts.Add(await Task.Run(() => VerifyHostServer(url)));
                 }
 
-                HostServer master = new HostServer();
-                master.Json = new UpdateHash();
-                master.Json.ModuleVersion = "0.0.0";
+                HostServer master = new HostServer
+                {
+                    Json = new UpdateHash
+                    {
+                        ModuleVersion = "0.0.0"
+                    }
+                };
                 foreach (HostServer host in hosts)
                 {
                     if (host.Working)
@@ -239,23 +273,29 @@ namespace cs_updater
                 rootUrl += master.Json.ModuleVersion;
                 if (!rootUrl.EndsWith("/")) rootUrl += "/";
                 hashObject = master.Json;
-                web_news.NavigateToString("<html><head><style>html{background-color:'#fff'}</style></head><body oncontextmenu='return false; '>Downloading version: " + hashObject.ModuleVersion + "</body></html>");
                 var t = await Task.Run(() => Update_Game_Files());
-                web_news.NavigateToString("<html><head><style>html{background-color:'#fff'}</style></head><body oncontextmenu='return false; '>Download completed</body></html>");
             }
             catch (Exception ex)
             {
                 writeLog(ex);
-                if (ex.InnerException != null)
+                if (!failed)
                 {
-                    System.Windows.Forms.MessageBox.Show("Unabled to download update. \n\n" + ex.InnerException.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    failed = true;
+                    if (ex.InnerException != null)
+                    {
+                        System.Windows.Forms.MessageBox.Show("Unabled to download update. \n\n" + ex.InnerException.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        
+                    }
+                    else
+                    {
+                        System.Windows.Forms.MessageBox.Show("Unabled to download update. \n\n" + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                    progressBarText.Content = "Error downloading files";
+                    progressBar.Value = 0;
                 }
-                else
-                {
-                    System.Windows.Forms.MessageBox.Show("Unabled to download update. \n\n" + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-
             }
+            if (!failed) progressBarText.Content = "Current version: " + hashObject.ModuleVersion + " - Ready to play";
+            btn_update.Content = "Update";
             btn_update.IsEnabled = true;
         }
 
@@ -263,8 +303,7 @@ namespace cs_updater
         {
             Queue pending = new Queue(hashObject.getFiles());
             List<Task<UpdateHashItem>> working = new List<Task<UpdateHashItem>>();
-            var i = 0.0;
-            var count = pending.Count;
+            float count = pending.Count;
 
             //installBase = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\MountBlade Warband\\Modules\\NordInvasion2\\";
             installBase = "C:\\cstest4\\";
@@ -288,16 +327,15 @@ namespace cs_updater
                     working.RemoveAll(x => x.IsCompleted);
                     if (t.Result.Verified)
                     {
-                        i++;
                         this.Dispatcher.Invoke(() =>
                         {
-                            progressBar.Value = (i / count) * 100;
+                            progressBarText.Content = "Current version: " + hashObject.ModuleVersion + " - " + (count - pending.Count) + " / " + count;
+                            progressBar.Value = ((count - pending.Count) / count) * 100;
                         });
                     }
                     else
                     {
                         pending.Enqueue(t.Result);
-                        var x = i;
                     }
                 }
             }
@@ -538,6 +576,14 @@ namespace cs_updater
             }
 
             return Environment.GetEnvironmentVariable("ProgramFiles");
+        }
+
+        private void list_news_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        {
+            if (list_news.SelectedIndex > -1 && list_news.SelectedIndex < news.Count)
+            {
+                SetNews(news[list_news.SelectedIndex].message);
+            }
         }
     }
 }
