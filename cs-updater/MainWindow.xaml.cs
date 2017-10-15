@@ -14,6 +14,7 @@ using System.Reflection;
 using Microsoft.Win32;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
+using NLog;
 
 namespace cs_updater
 {
@@ -28,6 +29,7 @@ namespace cs_updater
         String installBase = "";
         List<News> news = new List<News>();
         Boolean allowWebNavigation = true;
+        private static Logger logger = LogManager.GetCurrentClassLogger();
 
         public MainWindow()
         {
@@ -43,7 +45,7 @@ namespace cs_updater
             if (newsString != null && (newsString.StartsWith("[") || newsString.StartsWith("{")))
             {
                 news = await Task.Run(() => JsonConvert.DeserializeObject<List<News>>(newsString));
-                foreach(var item in news)
+                foreach (var item in news)
                 {
                     list_news.Items.Add(item.subject);
                 }
@@ -264,7 +266,7 @@ namespace cs_updater
                 }
                 if (!master.Working)
                 {
-                    writeLog("Unable to connect to download servers.");
+                    logger.Error("Unable to connect to download servers.");
                     throw new Exception("Unable to connect to download servers.");
                 }
 
@@ -275,14 +277,15 @@ namespace cs_updater
             }
             catch (Exception ex)
             {
-                writeLog(ex);
+                //log all errors, but only display the first fatal error to the user (threads can terminate after initial throw).
+                logger.Error(ex);
                 if (!failed)
                 {
                     failed = true;
                     if (ex.InnerException != null)
                     {
                         System.Windows.Forms.MessageBox.Show("Unabled to download update. \n\n" + ex.InnerException.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        
+
                     }
                     else
                     {
@@ -302,6 +305,7 @@ namespace cs_updater
             Queue pending = new Queue(hashObject.getFiles());
             List<Task<UpdateHashItem>> working = new List<Task<UpdateHashItem>>();
             float count = pending.Count;
+            var errors = 0;
 
             //installBase = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\MountBlade Warband\\Modules\\NordInvasion2\\";
             installBase = "C:\\cstest4\\";
@@ -312,7 +316,7 @@ namespace cs_updater
                 System.IO.Directory.CreateDirectory(installBase + f.Path);
             }
 
-            while (pending.Count + working.Count != 0)
+            while (pending.Count + working.Count != 0 && errors < 30)
             {
                 if (working.Count < 4 && pending.Count != 0)
                 {
@@ -333,9 +337,14 @@ namespace cs_updater
                     }
                     else
                     {
+                        errors++;
                         pending.Enqueue(t.Result);
                     }
                 }
+            }
+            if (errors >= 30)
+            {
+                throw new Exception("Unable to download files from server. Please contact NI Support.");
             }
             return true;
         }
@@ -344,6 +353,7 @@ namespace cs_updater
         {
             if (File.Exists(hashObject.Source + item.Path))
             {
+                if (item.Attempts > 3) throw new Exception("Unable to verify file: " + item.Path);
                 using (FileStream stream = new FileStream(installBase + item.Path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
                 using (SHA1Managed sha = new SHA1Managed())
                 {
@@ -355,77 +365,74 @@ namespace cs_updater
                     }
                     else
                     {
-                        return item;
+                        item.Attempts++;
                     }
                 }
             }
-            else
+
+            HttpResponseMessage response;
+            try
             {
-                HttpResponseMessage response;
+                response = await client.GetAsync(rootUrl + "files/" + item.Crc + ".gz");
+            }
+            catch (Exception ex)
+            {
+                //web server sent an error message
+                logger.Error(new Exception("Error downloading the file: " + rootUrl + "files/" + item.Crc + ".gz" + "  " + item.Path, ex));
+                item.Attempts++;
+                if (item.Attempts > 3) throw;
+                return item;
+            }
+
+
+            if (response.IsSuccessStatusCode)
+            {
                 try
                 {
-                    response = await client.GetAsync(rootUrl + "files/" + item.Crc + ".gz");
+                    using (FileStream fileStream = new FileStream(installBase + item.Path, FileMode.Create, FileAccess.Write, FileShare.None))
+                    using (Stream stream = await response.Content.ReadAsStreamAsync())
+                    using (GZipStream decompressedStream = new GZipStream(stream, CompressionMode.Decompress))
+                    {
+                        decompressedStream.CopyTo(fileStream);
+                    }
+
+                    using (FileStream stream = new FileStream(installBase + item.Path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                    using (SHA1Managed sha = new SHA1Managed())
+                    {
+                        byte[] checksum = sha.ComputeHash(stream);
+                        if (BitConverter.ToString(checksum).Replace("-", string.Empty).ToLower() == item.Crc)
+                        {
+                            item.Verified = true;
+                            return item;
+                        }
+                        else
+                        {
+                            return item;
+                        }
+                    }
                 }
                 catch (Exception ex)
                 {
-                    //web server sent an error message
-                    writeLog(item.Name + "  " + item.Path);
-                    writeLog(ex);
-                    item.Attempts++;
-                    if (item.Attempts > 3) throw;
-                    return item;
-                }
-
-
-                if (response.IsSuccessStatusCode)
-                {
-                    try
-                    {
-                        using (FileStream fileStream = new FileStream(installBase + item.Path, FileMode.Create, FileAccess.Write, FileShare.None))
-                        using (Stream stream = await response.Content.ReadAsStreamAsync())
-                        using (GZipStream decompressedStream = new GZipStream(stream, CompressionMode.Decompress))
-                        {
-                            decompressedStream.CopyTo(fileStream);
-                        }
-
-                        using (FileStream stream = new FileStream(installBase + item.Path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
-                        using (SHA1Managed sha = new SHA1Managed())
-                        {
-                            byte[] checksum = sha.ComputeHash(stream);
-                            if (BitConverter.ToString(checksum).Replace("-", string.Empty).ToLower() == item.Crc)
-                            {
-                                item.Verified = true;
-                                return item;
-                            }
-                            else
-                            {
-                                return item;
-                            }
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        // something odd went wrong
-                        writeLog(item.Name + "  " + item.Path);
-                        writeLog(ex);
-                        if (item.Attempts >= 2) throw new Exception("Error:" + ex.InnerException.Message);
-                        item.Attempts++;
-                        return item;
-                    }
-
-                }
-                else
-                {
-                    // server said no
-                    writeLog("Failed to download: " + item.Name +
-                        Environment.NewLine + " Attempt: " + item.Attempts.ToString() +
-                        Environment.NewLine + "Reason: " + response.ReasonPhrase +
-                        Environment.NewLine + "Request: " + response.RequestMessage);
-                    if (item.Attempts >= 2) throw new Exception("Error Code: " + response.ReasonPhrase + "\nFile: " + item.Name);
+                    // something odd went wrong
+                    logger.Error(new Exception("Error verifying the file: " + item.Name + "  " + item.Path, ex));
+                    if (item.Attempts >= 2) throw new Exception("Error:" + ex.InnerException.Message);
                     item.Attempts++;
                     return item;
                 }
+
             }
+            else
+            {
+                // server said no
+                logger.Error("Failed to download: " + item.Name +
+                    Environment.NewLine + " Attempt: " + item.Attempts.ToString() +
+                    Environment.NewLine + "Reason: " + response.ReasonPhrase +
+                    Environment.NewLine + "Request: " + response.RequestMessage);
+                if (item.Attempts >= 2) throw new Exception("Error Code: " + response.ReasonPhrase + "\nFile: " + item.Name);
+                item.Attempts++;
+                return item;
+            }
+
         }
 
         private async Task<HostServer> VerifyHostServer(String url)
@@ -451,8 +458,8 @@ namespace cs_updater
                 }
                 catch (Exception ex)
                 {
-                    writeLog(url);
-                    writeLog(ex);
+                    logger.Info(url);
+                    logger.Error(ex);
                 }
             }
             return hostinfo;
@@ -474,33 +481,19 @@ namespace cs_updater
             }
             catch (Exception ex)
             {
-                writeLog(ex);
-                if (count <= 1) return null;
-                var s = Download_JSON_File(url, count-1);
+                if (count <= 1)
+                {
+                    Exception e = new Exception("Could not download json from: " + url, ex);
+                    logger.Error(e);
+                    return null;
+                }
+                var s = Download_JSON_File(url, count - 1);
                 return null;
             }
         }
+        private void WriteToLog(string log)
+        {
 
-        private void writeLog(Exception ex)
-        {
-            var directory = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-            if (!Directory.Exists(Path.Combine(directory, "NordInvasion"))) Directory.CreateDirectory(Path.Combine(directory, "NordInvasion"));
-            using (StreamWriter sw = File.AppendText(Path.Combine(directory, "NordInvasion", "updater_" + DateTime.Now.ToString("dd-MM-yyyy") + ".stderr")))
-            {
-                sw.WriteLine("Date :" + DateTime.Now.ToString() + Environment.NewLine + "Message :" + ex.Message + Environment.NewLine + "StackTrace :" + ex.StackTrace +
-                   "" + Environment.NewLine);
-                sw.WriteLine(Environment.NewLine + "-----------------------------------------------------------------------------" + Environment.NewLine);
-            }
-        }
-        private void writeLog(String ex)
-        {
-            var directory = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-            if (!Directory.Exists(Path.Combine(directory, "NordInvasion"))) Directory.CreateDirectory(Path.Combine(directory, "NordInvasion"));
-            using (StreamWriter sw = File.AppendText(Path.Combine(directory, "NordInvasion", "updater_" + DateTime.Now.ToString("dd-MM-yyyy") + ".stderr")))
-            {
-                sw.WriteLine("Date: " + DateTime.Now.ToString() + Environment.NewLine + GetPublishedVersion() + Environment.NewLine + "Message: " + ex + "" + Environment.NewLine);
-                sw.WriteLine(Environment.NewLine + "-----------------------------------------------------------------------------" + Environment.NewLine);
-            }
         }
 
         private string GetPublishedVersion()
@@ -548,7 +541,7 @@ namespace cs_updater
                     {
                         if (line.Contains("BaseInstallFolder_"))
                         {
-                            steamDirs.Add(line.Trim().Replace("BaseInstallFolder_","").Replace("\"","").Remove(0,1).Trim());
+                            steamDirs.Add(line.Trim().Replace("BaseInstallFolder_", "").Replace("\"", "").Remove(0, 1).Trim());
                         }
                     }
                 }
