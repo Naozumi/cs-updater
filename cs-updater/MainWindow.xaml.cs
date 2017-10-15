@@ -270,8 +270,6 @@ namespace cs_updater
 
                 rootUrl = master.Url;
                 if (!rootUrl.EndsWith("/")) rootUrl += "/";
-                rootUrl += master.Json.ModuleVersion;
-                if (!rootUrl.EndsWith("/")) rootUrl += "/";
                 hashObject = master.Json;
                 var t = await Task.Run(() => Update_Game_Files());
             }
@@ -366,7 +364,7 @@ namespace cs_updater
                 HttpResponseMessage response;
                 try
                 {
-                    response = await client.GetAsync(rootUrl + item.Path + ".gz");
+                    response = await client.GetAsync(rootUrl + "files/" + item.Crc + ".gz");
                 }
                 catch (Exception ex)
                 {
