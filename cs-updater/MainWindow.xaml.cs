@@ -5,6 +5,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Security.Cryptography;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Forms;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using System.Threading.Tasks;
@@ -26,16 +27,115 @@ namespace cs_updater
         UpdateHash hashObject = new UpdateHash();
         HttpClient client = new HttpClient();
         String rootUrl = "";
-        String installBase = "";
+        List<InstallPath> installDirs = new List<InstallPath>();
+        InstallPath ActiveInstall = new InstallPath();
         List<News> news = new List<News>();
         Boolean allowWebNavigation = true;
         private static Logger logger = LogManager.GetCurrentClassLogger();
 
         public MainWindow()
         {
+
             InitializeComponent();
+
+            if (Properties.Settings.Default.UpgradeRequired)
+            {
+                Properties.Settings.Default.Upgrade();
+                Properties.Settings.Default.UpgradeRequired = false;
+                Properties.Settings.Default.Save();
+            }
+
+            if (Properties.Settings.Default.Dev == true)
+            {
+                DevMenu.Visibility = Visibility.Visible;
+            }
+
             SetNews("Loading news...");
+            LoadInstallDirs();
             LoadNews();
+        }
+
+        private void LoadInstallDirs()
+        {
+            menuInstallDirs.Items.Clear();
+            try
+            {
+                installDirs = JsonConvert.DeserializeObject<List<InstallPath>>(Properties.Settings.Default.installDirs);
+            }
+            catch
+            {
+                Properties.Settings.Default.installDirs = null;
+            }
+            foreach (InstallPath install in installDirs)
+            {
+                System.Windows.Controls.MenuItem mi = new System.Windows.Controls.MenuItem
+                {
+                    Header = install.Name,
+                };
+                mi.Click += new RoutedEventHandler(InstallDir_Click);
+                mi.IsCheckable = true;
+                mi.Tag = install;
+                if (install.IsDefault)
+                {
+                    ActiveInstall = install;
+                    mi.IsChecked = true;
+                }
+                menuInstallDirs.Items.Add(mi);
+            }
+
+            //Add the extra options at bottom
+            menuInstallDirs.Items.Add(new Separator());
+            System.Windows.Controls.MenuItem miAdd = new System.Windows.Controls.MenuItem
+            {
+                Header = "Edit paths..."
+            };
+            miAdd.Click += new RoutedEventHandler(OpenPathEditor);
+            miAdd.IsCheckable = false;
+            menuInstallDirs.Items.Add(miAdd);
+
+            //System.Windows.Controls.MenuItem miAuto = new System.Windows.Controls.MenuItem
+            //{
+            //    Header = "Automatically locate installations..."
+            //};
+            //miAuto.Click += new RoutedEventHandler(AutomaticallyAddInstalls);
+            //miAuto.IsCheckable = false;
+            //menuInstallDirs.Items.Add(miAuto);
+        }
+
+        private void InstallDir_Click(Object sender, RoutedEventArgs e)
+        {
+            foreach (Object item in menuInstallDirs.Items)
+            {
+                if (item.GetType() == typeof(System.Windows.Controls.MenuItem))
+                {
+                    System.Windows.Controls.MenuItem i = (System.Windows.Controls.MenuItem)item;
+                    i.IsChecked = false;
+                }
+            }
+            System.Windows.Controls.MenuItem mi = sender as System.Windows.Controls.MenuItem;
+            ActiveInstall = (InstallPath)mi.Tag;
+            mi.IsChecked = true;
+        }
+
+        private void OpenPathEditor(Object sender, RoutedEventArgs e)
+        {
+            InstallPathWindow ipw = new InstallPathWindow(installDirs);
+            if ((bool)ipw.ShowDialog())
+            {
+                Properties.Settings.Default.installDirs = JsonConvert.SerializeObject(installDirs);
+                Properties.Settings.Default.Save();
+            }
+            LoadInstallDirs();
+        }
+
+        private void AutomaticallyAddInstalls(Object sender, RoutedEventArgs e)
+        {
+            List<InstallPath> autoPaths = getInstallationDirectories();
+            installDirs.AddRange(autoPaths);
+            Properties.Settings.Default.installDirs = JsonConvert.SerializeObject(installDirs);
+            Properties.Settings.Default.Save();
+            LoadInstallDirs();
+            OpenPathEditor(sender, e);
         }
 
         public async void LoadNews()
@@ -224,6 +324,7 @@ namespace cs_updater
 
         private async void Button_Update_Click(object sender, RoutedEventArgs e)
         {
+
             btn_update.IsEnabled = false;
             btn_update.Content = "Updating...";
             progressBar.Value = 0;
@@ -232,12 +333,22 @@ namespace cs_updater
 
             try
             {
+                if (ActiveInstall.Path == "")
+                {
+                    throw new Exception("Install directory not set.");
+                }
+                else if (!Directory.Exists(ActiveInstall.Path))
+                {
+                    throw new Exception("Install directory " + ActiveInstall.Path + " does not exist.");
+                }
+
                 //Download JSON and decide on best host
                 List<HostServer> hosts = new List<HostServer>();
 
-                foreach (var url in Properties.Settings.Default.urls.Split(','))
+                String[] hostUrls = Properties.Settings.Default.urls.Split(',');
+                foreach (var url in hostUrls)
                 {
-                    hosts.Add(await Task.Run(() => VerifyHostServer(url)));
+                    hosts.Add(await Task.Run(() => VerifyHostServer(url, ActiveInstall.Password)));
                 }
 
                 HostServer master = new HostServer
@@ -266,6 +377,13 @@ namespace cs_updater
                 }
                 if (!master.Working)
                 {
+                    foreach (HostServer host in hosts)
+                    {
+                        if (host.InvalidPassword)
+                        {
+                            throw new Exception("401");
+                        }
+                    }
                     logger.Error("Unable to connect to download servers.");
                     throw new Exception("Unable to connect to download servers.");
                 }
@@ -282,17 +400,25 @@ namespace cs_updater
                 if (!failed)
                 {
                     failed = true;
-                    if (ex.InnerException != null)
+                    if (ex.Message == "401")
                     {
-                        System.Windows.Forms.MessageBox.Show("Unabled to download update. \n\n" + ex.InnerException.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-
+                        System.Windows.Forms.MessageBox.Show("Unabled to download update.\n\nBeta password is incorrect.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        progressBarText.Content = "Incorrect beta password";
+                        progressBar.Value = 0;
                     }
                     else
                     {
-                        System.Windows.Forms.MessageBox.Show("Unabled to download update. \n\n" + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        if (ex.InnerException != null)
+                        {
+                            System.Windows.Forms.MessageBox.Show("Unabled to download update. \n\n" + ex.InnerException.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
+                        else
+                        {
+                            System.Windows.Forms.MessageBox.Show("Unabled to download update. \n\n" + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
+                        progressBarText.Content = "Error downloading files";
+                        progressBar.Value = 0;
                     }
-                    progressBarText.Content = "Error downloading files";
-                    progressBar.Value = 0;
                 }
             }
             if (!failed) progressBarText.Content = "Current version: " + hashObject.ModuleVersion + " - Ready to play";
@@ -307,13 +433,11 @@ namespace cs_updater
             float count = pending.Count;
             var errors = 0;
 
-            //installBase = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\MountBlade Warband\\Modules\\NordInvasion2\\";
-            installBase = "C:\\cstest4\\";
-            hashObject.Source = installBase;
+            hashObject.Source = ActiveInstall.Path;
 
             foreach (UpdateHashItem f in hashObject.getFolders())
             {
-                System.IO.Directory.CreateDirectory(installBase + f.Path);
+                System.IO.Directory.CreateDirectory(ActiveInstall.Path + f.Path);
             }
 
             while (pending.Count + working.Count != 0 && errors < 30)
@@ -354,7 +478,7 @@ namespace cs_updater
             if (File.Exists(hashObject.Source + item.Path))
             {
                 if (item.Attempts > 3) throw new Exception("Unable to verify file: " + item.Path);
-                using (FileStream stream = new FileStream(installBase + item.Path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                using (FileStream stream = new FileStream(ActiveInstall.Path + item.Path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
                 using (SHA1Managed sha = new SHA1Managed())
                 {
                     byte[] checksum = sha.ComputeHash(stream);
@@ -389,14 +513,14 @@ namespace cs_updater
             {
                 try
                 {
-                    using (FileStream fileStream = new FileStream(installBase + item.Path, FileMode.Create, FileAccess.Write, FileShare.None))
+                    using (FileStream fileStream = new FileStream(ActiveInstall.Path + item.Path, FileMode.Create, FileAccess.Write, FileShare.None))
                     using (Stream stream = await response.Content.ReadAsStreamAsync())
                     using (GZipStream decompressedStream = new GZipStream(stream, CompressionMode.Decompress))
                     {
                         decompressedStream.CopyTo(fileStream);
                     }
 
-                    using (FileStream stream = new FileStream(installBase + item.Path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                    using (FileStream stream = new FileStream(ActiveInstall.Path + item.Path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
                     using (SHA1Managed sha = new SHA1Managed())
                     {
                         byte[] checksum = sha.ComputeHash(stream);
@@ -435,7 +559,7 @@ namespace cs_updater
 
         }
 
-        private async Task<HostServer> VerifyHostServer(String url)
+        private async Task<HostServer> VerifyHostServer(String url, String password)
         {
             var hostinfo = new HostServer
             {
@@ -445,7 +569,30 @@ namespace cs_updater
             if (!url.EndsWith("/")) url += "/";
             hostinfo.Url = url;
             var watch = System.Diagnostics.Stopwatch.StartNew();
-            var jsonString = (await Task.Run(() => Download_JSON_File(url + Properties.Settings.Default.updateFile)));
+            string filename = "";
+            var jsonString = "";
+            try
+            {
+                if (password == "" || password == null)
+                {
+                    filename = "cs.json";
+                }
+                else
+                {
+                    var jsonStringBeta = (await Task.Run(() => Download_Beta_JSON_File(url, password)));
+                    var betaInfo = JsonConvert.DeserializeObject<BetaInfo>(jsonStringBeta);
+                    filename = betaInfo.filename;
+                }
+                jsonString = (await Task.Run(() => Download_JSON_File(url + filename)));
+            }
+            catch (Exception ex)
+            {
+                watch.Stop();
+                hostinfo.Time = watch.ElapsedMilliseconds;
+                if (ex.Message == "401") hostinfo.InvalidPassword = true;
+                hostinfo.DownloadException = ex;
+                return hostinfo;
+            }
             watch.Stop();
             hostinfo.Time = watch.ElapsedMilliseconds;
 
@@ -460,6 +607,7 @@ namespace cs_updater
                 {
                     logger.Info(url);
                     logger.Error(ex);
+                    hostinfo.DownloadException = ex;
                 }
             }
             return hostinfo;
@@ -491,9 +639,44 @@ namespace cs_updater
                 return null;
             }
         }
-        private void WriteToLog(string log)
-        {
 
+        /// <summary>
+        /// Downloads the requested JSON file. Attempts 3 times then will throw and exception
+        /// </summary>
+        /// <param name="url">File to download</param>
+        /// <param name="password">Password for the beta download</param>
+        /// <param name="count">Number of times to try</param>
+        /// <returns></returns>
+        private async Task<String> Download_Beta_JSON_File(string url, String password, int count = 3)
+        {
+            try
+            {
+                Dictionary<string, string> pairs = new Dictionary<string, string>();
+                pairs.Add("password", password);
+                FormUrlEncodedContent formContent = new FormUrlEncodedContent(pairs);
+
+
+                HttpResponseMessage response = await client.PostAsync(url + "beta-check.ajax.php", formContent);
+                response.EnsureSuccessStatusCode();
+                return response.Content.ReadAsStringAsync().Result;
+            }
+            catch (Exception ex)
+            {
+                if (ex.Message.Contains("401"))
+                {
+                    Exception e = new Exception("Beta password is incorrect.", ex);
+                    logger.Error(e);
+                    throw new Exception("401");
+                }
+                else if (count <= 1)
+                {
+                    Exception e = new Exception("Could not download json from: " + url, ex);
+                    logger.Error(e);
+                    return null;
+                }
+                var s = Download_JSON_File(url, count - 1);
+                return null;
+            }
         }
 
         private string GetPublishedVersion()
@@ -502,55 +685,64 @@ namespace cs_updater
             return string.Format("Product Name: {4}, Version: {0}.{1}.{2}.{3}", ver.Major, ver.Minor, ver.Build, ver.Revision, Assembly.GetEntryAssembly().GetName().Name);
         }
 
-        private List<Installs> getInstallationDirectories()
+        private List<InstallPath> getInstallationDirectories()
         {
-            var installs = new List<Installs>();
+            var installs = new List<InstallPath>();
             List<String> registry_key = new List<string>
             {
                 @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall",
-                @"HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall"
+                @"SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall"
             };
 
-            foreach (string reg in registry_key)
+            if (Environment.Is64BitOperatingSystem)
             {
-                using (Microsoft.Win32.RegistryKey key = Registry.LocalMachine.OpenSubKey(reg))
+                foreach (string reg in registry_key)
                 {
-                    foreach (string subkey_name in key.GetSubKeyNames())
+                    using (var hklm = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64))
+                    using (Microsoft.Win32.RegistryKey key = hklm.OpenSubKey(reg))
                     {
-                        using (RegistryKey subkey = key.OpenSubKey(subkey_name))
+                        if (key != null)
                         {
-                            if (subkey.GetValue("DisplayName").ToString().Contains("Mount") && subkey.GetValue("DisplayName").ToString().Contains("Warband"))
+                            foreach (string subkey_name in key.GetSubKeyNames())
                             {
-                                installs.Add(new Installs(subkey.GetValue("DisplayName").ToString(), subkey.GetValue("InstallLocation").ToString()));
+                                using (RegistryKey subkey = key.OpenSubKey(subkey_name))
+                                {
+                                    if (subkey.GetValue("DisplayName") != null)
+                                    {
+                                        if (subkey.GetValue("DisplayName").ToString().Contains("Mount") && subkey.GetValue("DisplayName").ToString().Contains("Warband"))
+                                        {
+                                            installs.Add(new InstallPath(subkey.GetValue("DisplayName").ToString(), subkey.GetValue("InstallLocation").ToString(), "", false));
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
                 }
             }
-
-            var steampath = Environment.GetEnvironmentVariable("SteamPath");
-            if (steampath == null) steampath = ProgramFilesx86() + "Steam";
-            if (File.Exists(Path.Combine(steampath, "Config", "config.vdf")))
+            else
             {
-                //BaseInstallFolder
-                string line;
-                List<String> steamDirs = new List<string>();
-                using (StreamReader file = new StreamReader(Path.Combine(steampath, "Config", "config.vdf")))
+                foreach (string reg in registry_key)
                 {
-                    while ((line = file.ReadLine()) != null)
+                    using (var hklm = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32))
+                    using (Microsoft.Win32.RegistryKey key = hklm.OpenSubKey(reg))
                     {
-                        if (line.Contains("BaseInstallFolder_"))
+                        if (key != null)
                         {
-                            steamDirs.Add(line.Trim().Replace("BaseInstallFolder_", "").Replace("\"", "").Remove(0, 1).Trim());
+                            foreach (string subkey_name in key.GetSubKeyNames())
+                            {
+                                using (RegistryKey subkey = key.OpenSubKey(subkey_name))
+                                {
+                                    if (subkey.GetValue("DisplayName") != null)
+                                    {
+                                        if (subkey.GetValue("DisplayName").ToString().Contains("Mount") && subkey.GetValue("DisplayName").ToString().Contains("Warband"))
+                                        {
+                                            installs.Add(new InstallPath(subkey.GetValue("DisplayName").ToString(), subkey.GetValue("InstallLocation").ToString(), "", false));
+                                        }
+                                    }
+                                }
+                            }
                         }
-                    }
-                }
-
-                foreach (String dirs in steamDirs)
-                {
-                    foreach (String f in Directory.GetDirectories(dirs))
-                    {
-                        if (f.Contains("Mount") && f.Contains("Warband")) installs.Add(new Installs("Steam", Path.Combine(dirs, f)));
                     }
                 }
             }
@@ -578,3 +770,4 @@ namespace cs_updater
         }
     }
 }
+

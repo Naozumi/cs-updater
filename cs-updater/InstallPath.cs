@@ -6,17 +6,21 @@ using System.Threading.Tasks;
 
 namespace cs_updater
 {
-    class Installs
+    public class InstallPath
     {
         public String Name { get; set; }
         public String Path { get; set; }
+        public String Password { get; set; }
+        public Boolean IsDefault { get; set; }
 
-        public Installs() { }
+        public InstallPath() { }
 
-        public Installs(String Name, String Path)
+        public InstallPath(String Name, String Path, String Password, Boolean IsDefault)
         {
             this.Name = Name;
             this.Path = Path;
+            this.Password = Password;
+            this.IsDefault = IsDefault;
         }
     }
 }

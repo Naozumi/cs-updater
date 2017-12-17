@@ -12,5 +12,7 @@ namespace cs_updater
         public long Time { get; set; }
         public UpdateHash Json { get; set; }
         public bool Working { get; set; }
+        public bool InvalidPassword { get; set; }
+        public Exception DownloadException { get; set; }
     }
 }

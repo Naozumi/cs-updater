@@ -10,9 +10,6 @@
         MinWidth="170"
         >
 
-    
-
-
     <Grid>
         <Grid.Background>
             <ImageBrush ImageSource="Resources/ni_parch_body_mobile.jpg" TileMode="Tile" Viewport="0,0,828,314" ViewportUnits="Absolute"/>
@@ -32,24 +29,27 @@
             <RowDefinition/>
             <RowDefinition Height="10" />
             <RowDefinition Height="30" />
+            <RowDefinition Height="10" />
             <RowDefinition Height="20" />
         </Grid.RowDefinitions>
 
         <DockPanel Grid.Column="0" Grid.ColumnSpan="7">
             <Menu DockPanel.Dock="Top" Background="#00000000">
                 <MenuItem Header="_Settings">
-                    <MenuItem Header="_Language">
+                    <!--<MenuItem Header="_Language">
                         <MenuItem Header="_English"/>
                         <MenuItem Header="_French"/>
                         <MenuItem Header="E_spañol"/>
                         <MenuItem Header="_German"/>
                         <MenuItem Header="_Norwegian"/>
                         <MenuItem Header="_Danish"/>
+                    </MenuItem>-->
+                    <MenuItem Header="_Install Directory" Name="menuInstallDirs">
+                        
                     </MenuItem>
-                    <MenuItem Header="_Close"/>
-                    <MenuItem Header="_Save"/>
                 </MenuItem>
-                <MenuItem Header="_Dev">
+            
+                <MenuItem x:Name="DevMenu" Header="_Dev" Visibility="Hidden">
                     <MenuItem Header="_Build" Click="Modules_Build_Click"/>
                     <MenuItem Header="_Count" Click="Modules_Child_Count_Click"/>
                     <MenuItem Header="_Compress" Click="Modules_Compress_Click"/>
@@ -75,14 +75,15 @@
 
 
         <Grid Grid.Column="1" Grid.Row="6" Grid.ColumnSpan="1">
-            <ProgressBar x:Name="progressBar"  Foreground="DarkGoldenrod" Background="#FFF7F3E4" Height="Auto" BorderBrush="#FFA2760A"/>
-            <Label x:Name="progressBarText" HorizontalAlignment="Center" VerticalAlignment="Center">
-            </Label>
+            <Label x:Name="progressBarText" HorizontalAlignment="Center" VerticalAlignment="Center" Content="Ready to Update"/>
         </Grid>
-        <Button x:Name="btn_update" Content="Update" Grid.Column="3" Grid.Row="6" Click="Button_Update_Click">
+        <Grid Grid.Column="1" Grid.Row="7" Grid.ColumnSpan="1">
+            <ProgressBar x:Name="progressBar"  Foreground="DarkGoldenrod" Background="#FFF7F3E4" Height="Auto" BorderBrush="#FFA2760A" />
+        </Grid>
+        <Button x:Name="btn_update" Content="Update" Grid.Column="3" Grid.Row="6" Grid.RowSpan="2" Click="Button_Update_Click" Foreground="White">
             <Button.Style>
                 <Style TargetType="{x:Type Button}">
-                    <Setter Property="Background" Value="#b8860b"/>
+                    <Setter Property="Background" Value="#FF830606"/>
                     <Setter Property="BorderBrush" Value="#FFA2760A"/>
                     <Setter Property="Template">
                         <Setter.Value>
@@ -95,13 +96,13 @@
                     </Setter>
                     <Style.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Background" Value="#c8860b"/>
+                            <Setter Property="Background" Value="#FFA80303"/>
                         </Trigger>
                         <Trigger Property="IsPressed"  Value="True">
-                            <Setter Property="BorderBrush" Value="#e8c366"/>
+                            <Setter Property="BorderBrush" Value="#FF915252"/>
                         </Trigger>
                         <Trigger Property="IsEnabled"  Value="False">
-                            <Setter Property="Background" Value="#ccc"/>
+                            <Setter Property="Background" Value="#FF976B6B"/>
                             <Setter Property="Foreground" Value="#888"/>
                         </Trigger>
                     </Style.Triggers>

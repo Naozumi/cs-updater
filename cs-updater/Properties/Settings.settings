@@ -8,8 +8,17 @@
     <Setting Name="urls" Type="(Web Service URL)" Scope="Application">
       <Value Profile="(Default)">https://odin.nordinvasion.com/mod/,http://thor.nordinvasion.com/mod/</Value>
     </Setting>
-    <Setting Name="newsUrl" Type="(Web Service URL)" Scope="User">
+    <Setting Name="newsUrl" Type="(Web Service URL)" Scope="Application">
       <Value Profile="(Default)">https://forum-api.nordinvasion.com/news.php</Value>
+    </Setting>
+    <Setting Name="installDirs" Type="System.String" Scope="User">
+      <Value Profile="(Default)">{}</Value>
+    </Setting>
+    <Setting Name="UpgradeRequired" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="Dev" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
     </Setting>
   </Settings>
 </SettingsFile>
