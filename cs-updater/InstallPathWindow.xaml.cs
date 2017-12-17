@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -65,6 +66,77 @@ namespace cs_updater
         {
             DialogResult = false;
             this.Close();
+        }
+
+        private void AutomaticallyAddInstalls(Object sender, RoutedEventArgs e)
+        {
+            Installs.AddRange (getInstallationDirectories());
+            data.Items.Refresh();
+        }
+
+        private List<InstallPath> getInstallationDirectories()
+        {
+            var installs = new List<InstallPath>();
+            List<String> registry_key = new List<string>
+            {
+                @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall",
+                @"SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall"
+            };
+
+            if (Environment.Is64BitOperatingSystem)
+            {
+                foreach (string reg in registry_key)
+                {
+                    using (var hklm = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64))
+                    using (Microsoft.Win32.RegistryKey key = hklm.OpenSubKey(reg))
+                    {
+                        if (key != null)
+                        {
+                            foreach (string subkey_name in key.GetSubKeyNames())
+                            {
+                                using (RegistryKey subkey = key.OpenSubKey(subkey_name))
+                                {
+                                    if (subkey.GetValue("DisplayName") != null)
+                                    {
+                                        if (subkey.GetValue("DisplayName").ToString().Contains("Mount") && subkey.GetValue("DisplayName").ToString().Contains("Warband"))
+                                        {
+                                            installs.Add(new InstallPath(subkey.GetValue("DisplayName").ToString(), subkey.GetValue("InstallLocation").ToString() + @"\Modules\NordInvasion\", "", false));
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            else
+            {
+                foreach (string reg in registry_key)
+                {
+                    using (var hklm = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32))
+                    using (Microsoft.Win32.RegistryKey key = hklm.OpenSubKey(reg))
+                    {
+                        if (key != null)
+                        {
+                            foreach (string subkey_name in key.GetSubKeyNames())
+                            {
+                                using (RegistryKey subkey = key.OpenSubKey(subkey_name))
+                                {
+                                    if (subkey.GetValue("DisplayName") != null)
+                                    {
+                                        if (subkey.GetValue("DisplayName").ToString().Contains("Mount") && subkey.GetValue("DisplayName").ToString().Contains("Warband"))
+                                        {
+                                            installs.Add(new InstallPath(subkey.GetValue("DisplayName").ToString(), subkey.GetValue("InstallLocation").ToString(), "", false));
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            return installs;
         }
     }
 }
