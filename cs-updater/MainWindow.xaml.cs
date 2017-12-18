@@ -53,6 +53,17 @@ namespace cs_updater
             SetNews("Loading news...");
             LoadInstallDirs();
             LoadNews();
+
+            if (installDirs.Count == 0)
+            {
+                ShowFirstRun();
+            }
+        }
+
+        private void ShowFirstRun()
+        {
+            System.Windows.Forms.MessageBox.Show("Welcome to the NI Updater.\n\nPlease set the Installation Path to continue.", "Welcome", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            OpenPathEditor(null, null);
         }
 
         private void LoadInstallDirs()
@@ -100,6 +111,15 @@ namespace cs_updater
             //miAuto.Click += new RoutedEventHandler(AutomaticallyAddInstalls);
             //miAuto.IsCheckable = false;
             //menuInstallDirs.Items.Add(miAuto);
+
+            if (installDirs.Count > 0)
+            {
+                btn_update.IsEnabled = true;
+            }
+            else
+            {
+                btn_update.IsEnabled = false;
+            }
         }
 
         private void InstallDir_Click(Object sender, RoutedEventArgs e)

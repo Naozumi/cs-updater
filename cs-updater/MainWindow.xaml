@@ -80,7 +80,7 @@
         <Grid Grid.Column="1" Grid.Row="7" Grid.ColumnSpan="1">
             <ProgressBar x:Name="progressBar"  Foreground="DarkGoldenrod" Background="#FFF7F3E4" Height="Auto" BorderBrush="#FFA2760A" />
         </Grid>
-        <Button x:Name="btn_update" Content="Update" Grid.Column="3" Grid.Row="6" Grid.RowSpan="2" Click="Button_Update_Click" Foreground="White">
+        <Button x:Name="btn_update" Content="Update" Grid.Column="3" Grid.Row="6" Grid.RowSpan="2" Click="Button_Update_Click" Foreground="White" IsEnabled="False">
             <Button.Style>
                 <Style TargetType="{x:Type Button}">
                     <Setter Property="Background" Value="#FF830606"/>

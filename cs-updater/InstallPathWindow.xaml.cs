@@ -45,9 +45,13 @@ namespace cs_updater
                 if (install.IsDefault) d++;
                 if (!install.Path.EndsWith(@"\")) install.Path += @"\";
             }
-            
 
-            if (d == 1)
+
+            if (Installs.Count == 0)
+            {
+                System.Windows.Forms.MessageBox.Show("Please set a directory to continue.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            else if(d == 1)
             {
                 DialogResult = true;
                 this.Close();
