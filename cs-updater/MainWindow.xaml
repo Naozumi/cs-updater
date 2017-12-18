@@ -75,7 +75,7 @@
 
 
         <Grid Grid.Column="1" Grid.Row="6" Grid.ColumnSpan="1">
-            <Label x:Name="progressBarText" HorizontalAlignment="Center" VerticalAlignment="Center" Content="Ready to Update"/>
+            <Label x:Name="progressBarText" HorizontalAlignment="Center" VerticalAlignment="Center" Content="Loading..."/>
         </Grid>
         <Grid Grid.Column="1" Grid.Row="7" Grid.ColumnSpan="1">
             <ProgressBar x:Name="progressBar"  Foreground="DarkGoldenrod" Background="#FFF7F3E4" Height="Auto" BorderBrush="#FFA2760A" />

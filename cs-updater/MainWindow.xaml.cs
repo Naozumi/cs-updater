@@ -63,6 +63,7 @@ namespace cs_updater
         private void ShowFirstRun()
         {
             System.Windows.Forms.MessageBox.Show("Welcome to the NI Updater.\n\nPlease set the Installation Path to continue.", "Welcome", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            progressBarText.Content = "Please set an installation path.";
             OpenPathEditor(null, null);
         }
 
@@ -115,10 +116,12 @@ namespace cs_updater
             if (installDirs.Count > 0)
             {
                 btn_update.IsEnabled = true;
+                progressBarText.Content = "Ready to update.";
             }
             else
             {
                 btn_update.IsEnabled = false;
+                progressBarText.Content = "Please set an installation path.";
             }
         }
 

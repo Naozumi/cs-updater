@@ -12,7 +12,7 @@
         </Grid.Background>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="10"/>
-            <ColumnDefinition Width="100"/>
+            <ColumnDefinition Width="200"/>
             <ColumnDefinition Width="10"/>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="5"/>
@@ -39,7 +39,7 @@
         </DataGrid>
 
 
-        <Button Grid.Column="1" Grid.Row="3" Content="Find Installations" Click="AutomaticallyAddInstalls" />
+        <Button Grid.Column="1" Grid.Row="3" Content="Search For Installations" Click="AutomaticallyAddInstalls" />
         <Button Grid.Column="5" Grid.Row="3" Content="OK" Click="OK_Click" />
         <Button Grid.Column="7" Grid.Row="3" Content="Cancel" Click="Cancel_Click" />
 

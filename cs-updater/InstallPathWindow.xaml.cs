@@ -74,7 +74,26 @@ namespace cs_updater
 
         private void AutomaticallyAddInstalls(Object sender, RoutedEventArgs e)
         {
-            Installs.AddRange (getInstallationDirectories());
+            List<InstallPath> foundInstalls = getInstallationDirectories();
+            List<InstallPath> newInstalls = new List<InstallPath>();
+            foreach (InstallPath foundInstall in foundInstalls)
+            {
+                var item = Installs.FirstOrDefault(o => o.Path == foundInstall.Path);
+                if (item != null)
+                {
+                    newInstalls.Add(foundInstall);
+                }
+            }
+            if (newInstalls.Count > 0)
+            {
+                System.Windows.Forms.MessageBox.Show(newInstalls.Count +" new installs found and added to the list.", newInstalls.Count + " installs found.", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                Installs.AddRange(foundInstalls);
+            }
+            else
+            {
+                System.Windows.Forms.MessageBox.Show("No new installs found.", newInstalls.Count + " new installs found.", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            
             data.Items.Refresh();
         }
 
