@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         Title="NI Updater"
         Height="550" Width="750"
-        MinWidth="170"
+        MinWidth="170" KeyDown="windowKeyPress"
         >
 
     <Grid>
@@ -51,8 +51,9 @@
             
                 <MenuItem x:Name="DevMenu" Header="_Dev" Visibility="Hidden">
                     <MenuItem Header="_Build" Click="Modules_Build_Click"/>
-                    <MenuItem Header="_Count" Click="Modules_Child_Count_Click"/>
-                    <MenuItem Header="_Compress" Click="Modules_Compress_Click"/>
+                    <MenuItem Header="Count" Click="Modules_Child_Count_Click"/>
+                    <MenuItem Header="Compress" Click="Modules_Compress_Click"/>
+                    <MenuItem Header="_Clear Preferences" Click="Dev_Clear_Click"/>
                 </MenuItem>
             </Menu>
             <StackPanel></StackPanel>

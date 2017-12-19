@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:cs_updater"
         mc:Ignorable="d"
-        Title="Window1" Height="344.792" Width="908.316">
+        Title="Installation Path Editor" Height="345" Width="920">
     <Grid>
         <Grid.Background>
             <ImageBrush ImageSource="Resources/ni_parch_body_mobile.jpg" TileMode="Tile" Viewport="0,0,828,314" ViewportUnits="Absolute"/>
@@ -31,15 +31,33 @@
 
         <DataGrid x:Name="data" Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="7" ItemsSource="{Binding Installs}" AutoGenerateColumns="False">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Name"  Binding="{Binding Name}"/>
-                <DataGridTextColumn Header="Path to folder" Binding="{Binding Path}" />
+                <DataGridTextColumn Header="Name"  Binding="{Binding Name}" MinWidth="100"/>
+                <DataGridTemplateColumn Header="Path to folder" MinWidth="200">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Path}"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                    <DataGridTemplateColumn.CellEditingTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="20" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="{Binding Path}" Grid.Column="0" />
+                                <Button Width="Auto" Height="Auto" Grid.Column="1" FontSize="10px" Tag="{Binding Path}" Click="Browse_Click">...</Button>
+                            </Grid>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellEditingTemplate>
+                </DataGridTemplateColumn>
                 <DataGridTextColumn Header="Password (for NI Betas only)" Binding="{Binding Password}" />
                 <DataGridCheckBoxColumn Header="Default" Binding="{Binding IsDefault}" />
             </DataGrid.Columns>
         </DataGrid>
 
 
-        <Button Grid.Column="1" Grid.Row="3" Content="Search For Installations" Click="AutomaticallyAddInstalls" />
+        <Button Grid.Column="1" Grid.Row="3" Content="Automatically Find Installations" Click="AutomaticallyAddInstalls" />
         <Button Grid.Column="5" Grid.Row="3" Content="OK" Click="OK_Click" />
         <Button Grid.Column="7" Grid.Row="3" Content="Cancel" Click="Cancel_Click" />
 

@@ -16,6 +16,7 @@ using Microsoft.Win32;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 using NLog;
+using System.Windows.Input;
 
 namespace cs_updater
 {
@@ -35,6 +36,7 @@ namespace cs_updater
 
         public MainWindow()
         {
+
 
             InitializeComponent();
 
@@ -58,6 +60,7 @@ namespace cs_updater
             {
                 ShowFirstRun();
             }
+
         }
 
         private void ShowFirstRun()
@@ -76,7 +79,7 @@ namespace cs_updater
             }
             catch
             {
-                Properties.Settings.Default.installDirs = null;
+                installDirs = new List<InstallPath>();
             }
             foreach (InstallPath install in installDirs)
             {
@@ -151,7 +154,7 @@ namespace cs_updater
             LoadInstallDirs();
         }
 
-        
+
 
         public async void LoadNews()
         {
@@ -717,6 +720,22 @@ namespace cs_updater
             {
                 SetNews(news[list_news.SelectedIndex].message);
             }
+        }
+
+        private void windowKeyPress(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if ((Keyboard.Modifiers & ModifierKeys.Alt) == ModifierKeys.Alt) // Is Alt key pressed
+            {
+                if (Keyboard.IsKeyDown(Key.D) && Keyboard.IsKeyDown(Key.E) && Keyboard.IsKeyDown(Key.V))
+                {
+                    DevMenu.Visibility = Visibility.Visible;
+                }
+            }
+        }
+
+        private void Dev_Clear_Click(object sender, RoutedEventArgs e)
+        {
+            Properties.Settings.Default.Reset();
         }
     }
 }

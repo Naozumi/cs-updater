@@ -1,18 +1,12 @@
 ﻿using Microsoft.Win32;
+using Microsoft.WindowsAPICodePack.Dialogs;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Forms;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace cs_updater
 {
@@ -30,6 +24,92 @@ namespace cs_updater
         }
 
         public List<InstallPath> Installs { get; set; }
+
+        private void Browse_Click(object sender, RoutedEventArgs e)
+        {
+            System.Windows.Controls.Button btn = sender as System.Windows.Controls.Button;
+            string initialPath = null;
+            if (btn.Tag == null || (string)btn.Tag == "")
+            {
+                initialPath = @"C:\";
+            }
+            else
+            {
+                initialPath = (string)btn.Tag;
+            }
+            DirectoryInfo dir = null;
+
+            CommonOpenFileDialog dialog = new CommonOpenFileDialog
+            {
+                InitialDirectory = initialPath,
+                IsFolderPicker = true,
+                Title = "Select the Warband Modules folder"
+            };
+            if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
+            {
+                dir = new DirectoryInfo(dialog.FileName);
+            }
+
+            if (dir == null)
+            {
+                this.Activate();
+                return;
+            }
+
+            if (!(dir.FullName.ToUpper().EndsWith(@"\MODULES") || dir.FullName.ToUpper().EndsWith(@"\MODULES\NORDINVASION")))
+            {
+                DialogResult sure = System.Windows.Forms.MessageBox.Show("This does not appear to be the Modules folder.\n\nAre you sure you want to download here?", "Are you sure?", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+                if (sure == System.Windows.Forms.DialogResult.No)
+                {
+                    this.Activate();
+                    return;
+                }
+            }
+
+            string path = "";
+            if (dir.FullName.ToUpper().EndsWith(@"\MODULES"))
+            {
+                path = dir.FullName + @"\NordInvasion";
+            }
+            else
+            {
+                path = dir.FullName;
+            }
+
+
+            //Sends the enter event - on a datagrid, this auto adds a new blank row. Generally, it just looks a bit better.
+            InstallPath selected = (InstallPath)data.CurrentCell.Item;
+            selected.Path = path;
+
+
+            this.data.CommitEdit();
+            var key = Key.Enter;
+            var target = Keyboard.FocusedElement;
+            var routedEvent = Keyboard.KeyDownEvent;
+
+            target.RaiseEvent(
+              new System.Windows.Input.KeyEventArgs(
+                Keyboard.PrimaryDevice,
+                PresentationSource.FromVisual(this),
+                0,
+                key)
+              { RoutedEvent = routedEvent }
+            );
+
+            this.data.CommitEdit();
+            key = Key.Up;
+            target = Keyboard.FocusedElement;
+            routedEvent = Keyboard.KeyDownEvent;
+            target.RaiseEvent(
+              new System.Windows.Input.KeyEventArgs(
+                Keyboard.PrimaryDevice,
+                PresentationSource.FromVisual(this),
+                0,
+                key)
+              { RoutedEvent = routedEvent }
+            );
+            this.Activate();
+        }
 
         private void OK_Click(object sender, RoutedEventArgs e)
         {

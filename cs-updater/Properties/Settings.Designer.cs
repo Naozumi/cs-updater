@@ -87,5 +87,17 @@ namespace cs_updater.Properties {
                 this["Dev"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool AdminNetworked {
+            get {
+                return ((bool)(this["AdminNetworked"]));
+            }
+            set {
+                this["AdminNetworked"] = value;
+            }
+        }
     }
 }
