@@ -57,9 +57,9 @@ namespace cs_updater
                 return;
             }
 
-            if (!(dir.FullName.ToUpper().EndsWith(@"\MODULES") || dir.FullName.ToUpper().EndsWith(@"\MODULES\NORDINVASION")))
+            if (!(dir.FullName.ToUpper().Contains(@"\MODULES") || dir.FullName.ToUpper().EndsWith(@"\MODULES\NORDINVASION")))
             {
-                DialogResult sure = System.Windows.Forms.MessageBox.Show("This does not appear to be the Modules folder.\n\nAre you sure you want to download here?", "Are you sure?", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+                DialogResult sure = System.Windows.Forms.MessageBox.Show("This does not appear to be the Modules or NordInvasion folder.\n\nAre you sure you want to download here?", "Are you sure?", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
                 if (sure == System.Windows.Forms.DialogResult.No)
                 {
                     this.Activate();

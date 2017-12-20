@@ -201,13 +201,13 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\updater-installer\updater-installer.csproj">
-      <Project>{15a07ed3-b7eb-4bc9-8af9-e22afc889e30}</Project>
-      <Name>updater-installer</Name>
-    </ProjectReference>
     <ProjectReference Include="..\updater-lib\updater-lib.csproj">
       <Project>{7fc769e8-a64c-4237-bf8d-e2b332ea147b}</Project>
       <Name>updater-lib</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\updater-permissions\updater-permissions.csproj">
+      <Project>{260fe2d8-8bad-41b2-844b-6f2a7701894e}</Project>
+      <Name>updater-permissions</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

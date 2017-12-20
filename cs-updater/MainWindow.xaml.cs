@@ -16,6 +16,7 @@ using NLog;
 using System.Windows.Input;
 using cs_updater_lib;
 using System.IO.Pipes;
+using System.Windows.Threading;
 
 namespace cs_updater
 {
@@ -35,6 +36,9 @@ namespace cs_updater
         private bool updateRequired = false;
         private bool filesVerified = false;
 
+        private double progress = 0;
+        private string progressText = "Loading...";
+
         public MainWindow()
         {
             InitializeComponent();
@@ -53,6 +57,7 @@ namespace cs_updater
 
             SetNews("Loading news...");
             LoadInstallDirs();
+            this.Show();
             LoadNews();
 
             if (installDirs.Count == 0)
@@ -60,6 +65,20 @@ namespace cs_updater
                 ShowFirstRun();
             }
 
+            var timer = new DispatcherTimer
+            {
+                Interval = TimeSpan.FromMilliseconds(5)
+            };
+            timer.Tick += OnTimerTick;
+            timer.Start();
+
+            progressText = "Ready to check for updates.";
+        }
+
+        void OnTimerTick(object sender, EventArgs e)
+        {
+            progressBar.Value = progress;
+            progressBarText.Content = progressText;
         }
 
         private void ShowFirstRun()
@@ -110,12 +129,12 @@ namespace cs_updater
             if (installDirs.Count > 0)
             {
                 btn_update.IsEnabled = true;
-                progressBarText.Content = "Ready to update.";
+                progressText = "Ready to check for updates.";
             }
             else
             {
                 btn_update.IsEnabled = false;
-                progressBarText.Content = "Please set an installation path.";
+                progressText = "Please set an installation path.";
             }
         }
 
@@ -151,7 +170,6 @@ namespace cs_updater
 
 
         #region News
-
         public async void LoadNews()
         {
             String newsString = await Task.Run(() => Download_JSON_File(Properties.Settings.Default.newsUrl));
@@ -211,7 +229,7 @@ namespace cs_updater
             if (updateRequired)
             {
                 //DO UPDATE
-                UpdateGameFiles();
+                await UpdateGameFilesAsync();
             }
             else if (filesVerified)
             {
@@ -220,20 +238,23 @@ namespace cs_updater
             else
             {
                 //VERIFY FILES
-                await Task.Run(() => VerifyGameFiles());
+                await VerifyGameFiles();
             }
         }
 
         private async Task<Boolean> VerifyGameFiles()
         {
+            
             filesVerified = false;
             updateRequired = false;
+            progress = 0;
+            progressText = "Starting verification...";
             this.Dispatcher.Invoke(() =>
             {
                 btn_update.IsEnabled = false;
                 btn_update.Content = "Verifying...";
-                progressBar.Value = 0;
-                progressBarText.Content = "Starting verification...";
+                //progressBar.Value = 0;
+                //progressBarText.Content = ;
             });
             var failed = false;
 
@@ -245,7 +266,15 @@ namespace cs_updater
                 }
                 else if (!Directory.Exists(ActiveInstall.Path))
                 {
-                    throw new Exception("Install directory " + ActiveInstall.Path + " does not exist.");
+                    updateRequired = true;
+                    progressText = "Update is required";
+                    this.Dispatcher.Invoke(() =>
+                    {
+                        //progressBarText.Content = "Update is required";
+                        btn_update.Content = "Update";
+                        btn_update.IsEnabled = true;
+                    });
+                    return true;
                 }
 
                 //Download JSON and decide on best host
@@ -322,11 +351,14 @@ namespace cs_updater
                         Task<UpdateHashItem> t = await Task.WhenAny(working);
                         working.RemoveAll(x => x.IsCompleted);
                         if (!t.Result.Verified) updateRequired = true;
-                        this.Dispatcher.Invoke(() =>
-                    {
-                        progressBarText.Content = "Current version: " + hashObject.ModuleVersion + " - " + (count - pending.Count) + " / " + count;
-                        progressBar.Value = ((count - pending.Count) / count) * 100;
-                    });
+                        progress = ((count - pending.Count) / count) * 100;
+                        progressText = "Checking files... " + (count - pending.Count) + " / " + count;
+
+                        //this.Dispatcher.Invoke(() =>
+                        //{
+                        //    progressBarText.Content = "Checking files... " + (count - pending.Count) + " / " + count;
+                        //    progressBar.Value = ((count - pending.Count) / count) * 100;
+                        //});
                     }
                 }
             }
@@ -339,11 +371,11 @@ namespace cs_updater
                     failed = true;
                     if (ex.Message == "401")
                     {
+                        progressText = "Incorrect beta password";
+                        progress = 0;
                         this.Dispatcher.Invoke(() =>
                         {
                             System.Windows.Forms.MessageBox.Show("Unabled to authenticate with download server.\n\nBeta password is incorrect.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                            progressBarText.Content = "Incorrect beta password";
-                            progressBar.Value = 0;
                         });
                     }
                     else
@@ -362,28 +394,37 @@ namespace cs_updater
                                 System.Windows.Forms.MessageBox.Show("Unabled to verify files. \n\n" + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                             });
                         }
-                        this.Dispatcher.Invoke(() =>
-                        {
-                            progressBarText.Content = "Error verifying files";
-                            progressBar.Value = 0;
-                        });
+                        progressText = "Error verifying files";
+                        progress = 0;
                     }
                 }
             }
             if (updateRequired)
             {
+                progressText = "Update is required - Latest version: " + hashObject.ModuleVersion;
+                progress = 0;
                 this.Dispatcher.Invoke(() =>
                 {
-                    progressBarText.Content = "Update is required";
                     btn_update.Content = "Update";
+                    btn_update.IsEnabled = true;
+                });
+            }
+            else if (!filesVerified)
+            {
+                progressText = "Error - Unable to verify files.";
+                progress = 0;
+                this.Dispatcher.Invoke(() =>
+                {
+                    btn_update.Content = "Verify";
                     btn_update.IsEnabled = true;
                 });
             }
             else
             {
+                progressText = "Current version: " + hashObject.ModuleVersion + " - Ready to play";
+                progress = 100;
                 this.Dispatcher.Invoke(() =>
                 {
-                    progressBarText.Content = "Current version: " + hashObject.ModuleVersion + " - Ready to play";
                     btn_update.Content = "Play";
                     btn_update.IsEnabled = true;
                 });
@@ -409,55 +450,186 @@ namespace cs_updater
             return item;
         }
 
-        private void UpdateGameFiles()
+        private async Task UpdateGameFilesAsync()
         {
-            Process updater = new Process();
-            if (System.Environment.OSVersion.Version.Major >= 6)
+            this.Dispatcher.Invoke(() =>
             {
+                btn_update.IsEnabled = false;
+                btn_update.Content = "Updating...";
+                progressBar.Value = 0;
+                progressBarText.Content = "Starting verification...";
+            });
+            if (!hasWriteAccessToFolder(ActiveInstall.Path))
+            {
+                //Generate the folder & set permissions to allow us to update the files
+                Process updater = new Process();
+                if (System.Environment.OSVersion.Version.Major >= 6)
+                {
+                    updater.StartInfo.Verb = "runas"; //Run as admin, for UAC prompts
+                }
                 updater.StartInfo.Verb = "runas"; //Run as admin, for UAC prompts
-            }
-            updater.StartInfo.FileName = "updater-installer.exe";
-            using (AnonymousPipeServerStream pipeServer = new AnonymousPipeServerStream(PipeDirection.Out, HandleInheritability.Inheritable))
-            {
-                updater.StartInfo.Arguments = pipeServer.GetClientHandleAsString();
+                updater.StartInfo.FileName = "updater-permissions.exe";
+                updater.StartInfo.Arguments = "\"" + ActiveInstall.Path.Replace("\\", "\\\\") + "\"";
                 updater.StartInfo.UseShellExecute = true;
                 updater.Start();
-
-                pipeServer.DisposeLocalCopyOfClientHandle();
-
-                try
-                {
-                    // Read user input and send that to the client process.
-                    using (StreamWriter sw = new StreamWriter(pipeServer))
-                    {
-                        sw.AutoFlush = true;
-                        // Send a 'sync message' and wait for client to receive it.
-                        sw.WriteLine("SYNC");
-                        pipeServer.WaitForPipeDrain();
-                        sw.WriteLine("SYNC--HASHOBJECT");
-                        pipeServer.WaitForPipeDrain();
-                        // Send the console input to the client process.
-                        sw.WriteLine(JsonConvert.SerializeObject(hashObject));
-                        pipeServer.WaitForPipeDrain();
-                        sw.WriteLine("SYNC--URL");
-                        pipeServer.WaitForPipeDrain();
-                        sw.WriteLine(rootUrl);
-                        pipeServer.WaitForPipeDrain();
-                        sw.WriteLine("SYNC--ACTIVEINSTALL");
-                        pipeServer.WaitForPipeDrain();
-                        sw.WriteLine(JsonConvert.SerializeObject(ActiveInstall));
-                        pipeServer.WaitForPipeDrain();
-                    }
-                }
-                // Catch the IOException that is raised if the pipe is broken
-                // or disconnected.
-                catch (IOException e)
-                {
-                    Console.WriteLine("[SERVER] Error: {0}", e.Message);
-                }
-
                 updater.WaitForExit();
                 updater.Close();
+            }
+
+            if (Directory.Exists(ActiveInstall.Path))
+            {
+                if (hasWriteAccessToFolder(ActiveInstall.Path))
+                {
+                    await Task.Run(async () => await Update_Game_Files());
+                }
+            }
+            else
+            {
+                System.Windows.Forms.MessageBox.Show("Unable to create the NordInvasion directory", "Error - Unable to continue.");
+            }
+            this.Dispatcher.Invoke(() =>
+            {
+                btn_update.IsEnabled = true;
+                btn_update.Content = "Here!";
+                progressBar.Value = 0;
+                progressBarText.Content = "Update done";
+            });
+        }
+
+        private async Task<Boolean> Update_Game_Files()
+        {
+
+            Queue pending = new Queue(hashObject.getFiles());
+            List<Task<UpdateHashItem>> working = new List<Task<UpdateHashItem>>();
+            float count = pending.Count;
+            var errors = 0;
+
+            hashObject.Source = ActiveInstall.Path;
+
+            foreach (UpdateHashItem f in hashObject.getFolders())
+            {
+                System.IO.Directory.CreateDirectory(ActiveInstall.Path + f.Path);
+            }
+
+            while (pending.Count + working.Count != 0 && errors < 30)
+            {
+                if (working.Count < 4 && pending.Count != 0)
+                {
+                    var item = (UpdateHashItem)pending.Dequeue();
+                    if (item.Verified == false)
+                    {
+                        progress = ((count - pending.Count) / count) * 100;
+                        progressText = "Updating files... " + (count - pending.Count) + " / " + count;
+                        working.Add(Task.Run(async () => await Update_Item(item)));
+                    }
+                }
+                else
+                {
+                    Task<UpdateHashItem> t = await Task.WhenAny(working);
+                    working.RemoveAll(x => x.IsCompleted);
+                    if (t.Result.Verified)
+                    {
+                        progress = ((count - pending.Count) / count) * 100;
+                        progressText = "Updating files... " + (count - pending.Count) + " / " + count;
+                    }
+                    else
+                    {
+                        errors++;
+                        pending.Enqueue(t.Result);
+                    }
+                }
+            }
+            if (errors >= 30)
+            {
+                throw new Exception("Unable to download files from server. Please contact NI Support.");
+            }
+            return true;
+        }
+
+        private async Task<UpdateHashItem> Update_Item(UpdateHashItem item)
+        {
+
+            HttpResponseMessage response;
+            try
+            {
+                response = await client.GetAsync(rootUrl + "files/" + item.Crc + ".gz");
+            }
+            catch (Exception ex)
+            {
+                //web server sent an error message
+                logger.Error(new Exception("Error downloading the file: " + rootUrl + "files/" + item.Crc + ".gz" + "  " + item.Path, ex));
+                item.Attempts++;
+                if (item.Attempts > 3) throw;
+                return item;
+            }
+
+
+            if (response.IsSuccessStatusCode)
+            {
+                try
+                {
+                    using (FileStream fileStream = new FileStream(ActiveInstall.Path + item.Path, FileMode.Create, FileAccess.Write, FileShare.None))
+                    using (Stream stream = await response.Content.ReadAsStreamAsync())
+                    using (GZipStream decompressedStream = new GZipStream(stream, CompressionMode.Decompress))
+                    {
+                        decompressedStream.CopyTo(fileStream);
+                    }
+
+                    using (FileStream stream = new FileStream(ActiveInstall.Path + item.Path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                    using (SHA1Managed sha = new SHA1Managed())
+                    {
+                        byte[] checksum = sha.ComputeHash(stream);
+                        if (BitConverter.ToString(checksum).Replace("-", string.Empty).ToLower() == item.Crc)
+                        {
+                            item.Verified = true;
+                            return item;
+                        }
+                        else
+                        {
+                            return item;
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    // something odd went wrong
+                    logger.Error(new Exception("Error verifying the file: " + item.Name + "  " + item.Path, ex));
+                    if (item.Attempts >= 2) throw new Exception("Error:" + ex.InnerException.Message);
+                    item.Attempts++;
+                    return item;
+                }
+
+            }
+            else
+            {
+                // server said no
+                logger.Error("Failed to download: " + item.Name +
+                    Environment.NewLine + " Attempt: " + item.Attempts.ToString() +
+                    Environment.NewLine + "Reason: " + response.ReasonPhrase +
+                    Environment.NewLine + "Request: " + response.RequestMessage);
+                if (item.Attempts >= 2) throw new Exception("Error Code: " + response.ReasonPhrase + "\nFile: " + item.Name);
+                item.Attempts++;
+                return item;
+            }
+
+        }
+
+        private bool hasWriteAccessToFolder(string folderPath)
+        {
+            try
+            {
+                // Attempt to get a list of security permissions from the folder. 
+                // This will raise an exception if the path is read only or do not have access to view the permissions. 
+                System.Security.AccessControl.DirectorySecurity ds = Directory.GetAccessControl(folderPath);
+                return true;
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return false;
+            }
+            catch (DirectoryNotFoundException)
+            {
+                return false;
             }
         }
 
@@ -584,7 +756,6 @@ namespace cs_updater
         }
 
         #endregion
-
 
 
         private void windowKeyPress(object sender, System.Windows.Input.KeyEventArgs e)
@@ -745,8 +916,9 @@ namespace cs_updater
 
         private void Dev_Clear_Click(object sender, RoutedEventArgs e)
         {
-            Properties.Settings.Default.Reset();
+            Properties.Settings.Default.installDirs = "{ }";
             Properties.Settings.Default.Save();
+            LoadInstallDirs();
         }
         #endregion
     }
