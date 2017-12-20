@@ -7,6 +7,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Input;
+using cs_updater_lib;
 
 namespace cs_updater
 {
@@ -159,7 +160,7 @@ namespace cs_updater
             foreach (InstallPath foundInstall in foundInstalls)
             {
                 var item = Installs.FirstOrDefault(o => o.Path == foundInstall.Path);
-                if (item != null)
+                if (item == null)
                 {
                     newInstalls.Add(foundInstall);
                 }

@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         Title="NI Updater"
         Height="550" Width="750"
-        MinWidth="170" KeyDown="windowKeyPress"
+        MinWidth="170" KeyDown="windowKeyPress" WindowStartupLocation="CenterScreen"
         >
 
     <Grid>
@@ -81,7 +81,7 @@
         <Grid Grid.Column="1" Grid.Row="7" Grid.ColumnSpan="1">
             <ProgressBar x:Name="progressBar"  Foreground="DarkGoldenrod" Background="#FFF7F3E4" Height="Auto" BorderBrush="#FFA2760A" />
         </Grid>
-        <Button x:Name="btn_update" Content="Update" Grid.Column="3" Grid.Row="6" Grid.RowSpan="2" Click="Button_Update_Click" Foreground="White" IsEnabled="False">
+        <Button x:Name="btn_update" Content="Verify" Grid.Column="3" Grid.Row="6" Grid.RowSpan="2" Click="Button_Update_Click" Foreground="White" IsEnabled="False" Height="40" VerticalAlignment="Top">
             <Button.Style>
                 <Style TargetType="{x:Type Button}">
                     <Setter Property="Background" Value="#FF830606"/>

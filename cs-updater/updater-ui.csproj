@@ -98,9 +98,6 @@
     <Reference Include="System.Deployment" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\MahApps.Metro.1.5.0\lib\net45\System.Windows.Interactivity.dll</HintPath>
-    </Reference>
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -120,9 +117,6 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="BetaInfo.cs" />
-    <Compile Include="HostServer.cs" />
-    <Compile Include="InstallPath.cs" />
-    <Compile Include="UpdateHash.cs" />
     <Compile Include="InstallPathWindow.xaml.cs">
       <DependentUpon>InstallPathWindow.xaml</DependentUpon>
     </Compile>
@@ -134,7 +128,6 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="UpdateHashItem.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -206,6 +199,16 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\updater-installer\updater-installer.csproj">
+      <Project>{15a07ed3-b7eb-4bc9-8af9-e22afc889e30}</Project>
+      <Name>updater-installer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\updater-lib\updater-lib.csproj">
+      <Project>{7fc769e8-a64c-4237-bf8d-e2b332ea147b}</Project>
+      <Name>updater-lib</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

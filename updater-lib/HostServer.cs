@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace cs_updater
+namespace cs_updater_lib
 {
-    class HostServer
+    public class HostServer
     {
         public string Url { get; set; }
         public long Time { get; set; }

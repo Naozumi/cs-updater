@@ -4,9 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace cs_updater
+namespace cs_updater_lib
 {
-    class UpdateHashItem
+    [Serializable]
+    public class UpdateHashItem
     {
         public string Name { get; set; }
         public string Crc { get; set; }
