@@ -124,6 +124,11 @@ namespace cs_updater
             foreach(InstallPath install in Installs)
             {
                 if (install.IsDefault) d++;
+                if (install.Path == "" || install.Path == null)
+                {
+                    System.Windows.Forms.MessageBox.Show("Woops - looks like you added a directory without a path.\n\nPlease ensure all paths are set, or delete any options you want don't want.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
                 if (!install.Path.EndsWith(@"\")) install.Path += @"\";
             }
 

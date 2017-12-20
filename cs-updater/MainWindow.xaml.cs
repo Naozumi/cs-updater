@@ -339,6 +339,7 @@ namespace cs_updater
                 List<Task<UpdateHashItem>> working = new List<Task<UpdateHashItem>>();
                 float count = pending.Count;
 
+                int errors = 0;
                 while (pending.Count + working.Count != 0)
                 {
                     if (working.Count < 4 && pending.Count != 0)
@@ -353,14 +354,9 @@ namespace cs_updater
                         if (!t.Result.Verified) updateRequired = true;
                         progress = ((count - pending.Count) / count) * 100;
                         progressText = "Checking files... " + (count - pending.Count) + " / " + count;
-
-                        //this.Dispatcher.Invoke(() =>
-                        //{
-                        //    progressBarText.Content = "Checking files... " + (count - pending.Count) + " / " + count;
-                        //    progressBar.Value = ((count - pending.Count) / count) * 100;
-                        //});
                     }
                 }
+                if (updateRequired == false) filesVerified = true;
             }
             catch (Exception ex)
             {
