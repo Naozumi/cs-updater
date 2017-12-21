@@ -17,14 +17,14 @@ Intended Features
 
 * Dynamic language changing
   * Intention is to use [WPFLocalizationExtension](https://github.com/SeriousM/WPFLocalizationExtension)
-  * Note - UI does not include much text.
-* Error logging levels
-  * Probably just option to enable debug
-  * Error logging is pretty effective as is - may not make further changes. TBD.
-  
+  * UI is currently in UK English
+* Better directory management
+
 * Improve error handeling
   
 Under Consideration
 -----
 
 * Alter number of threads
+* "Native Feeling" message boxes rather than the annoying windows ones.
+* MVVM

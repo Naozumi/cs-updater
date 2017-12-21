@@ -117,8 +117,8 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="BetaInfo.cs" />
-    <Compile Include="InstallPathWindow.xaml.cs">
-      <DependentUpon>InstallPathWindow.xaml</DependentUpon>
+    <Compile Include="OptionsWindow.xaml.cs">
+      <DependentUpon>OptionsWindow.xaml</DependentUpon>
     </Compile>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -132,13 +132,20 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="InstallPathWindow.xaml">
+    <Page Include="OptionsWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="OptionsHelp.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="News.cs" />
+    <Compile Include="OptionsHelp.xaml.cs">
+      <DependentUpon>OptionsHelp.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>

@@ -1,0 +1,38 @@
+﻿<Window x:Class="cs_updater.OptionsHelp"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:cs_updater"
+        mc:Ignorable="d"
+        Title="OptionsHelp" SizeToContent="Height" Width="300">
+    <Grid>
+        <Grid.Background>
+            <ImageBrush ImageSource="Resources/ni_parch_body_mobile.jpg" TileMode="Tile" Viewport="0,0,828,314" ViewportUnits="Absolute"/>
+        </Grid.Background>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="40" />
+        </Grid.RowDefinitions>
+        <ScrollViewer VerticalScrollBarVisibility="Visible" Grid.Row="0">
+
+            <Label>
+                <TextBlock TextWrapping="Wrap" Margin="5,0" >
+                <Run FontWeight="Bold">Name:</Run><LineBreak/>
+                This is to help identify the installation to you and used only in the installation picker in the main window.
+                <LineBreak/><LineBreak/>
+                <Run FontWeight="Bold">Path to folder:</Run><LineBreak/>
+                Use the file browser to point to the modules folder (a folder will automatically be created for the mod to download to) 
+                or to the exact folder you want to download the files to (useful for with betas, for example).
+                <LineBreak/><LineBreak/>
+                <Run FontWeight="Bold">Password:</Run><LineBreak/>
+                If you are enrolled in a beta programme, it will require a password. Enter the password here.
+                <LineBreak/><LineBreak/>
+                <Run FontWeight="Bold">Default:</Run><LineBreak/>
+                When the updater starts, it will choose this installation as the default for updating. We recommend this is your primary install.
+                </TextBlock>
+            </Label>
+        </ScrollViewer>
+        <Button Content="Close" Width="100" Margin="5" Grid.Row="1" Click="Close_Click"/>
+    </Grid>
+</Window>

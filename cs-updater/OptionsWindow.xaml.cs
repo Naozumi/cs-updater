@@ -14,9 +14,9 @@ namespace cs_updater
     /// <summary>
     /// Interaction logic for Window1.xaml
     /// </summary>
-    public partial class InstallPathWindow : Window
+    public partial class OptionsWindow : Window
     {
-        public InstallPathWindow(List<InstallPath> installs)
+        public OptionsWindow(List<InstallPath> installs)
         {
             this.Installs = installs;
             InitializeComponent();
@@ -246,6 +246,12 @@ namespace cs_updater
             }
 
             return installs;
+        }
+
+        private void Help_Click(object sender, MouseButtonEventArgs e)
+        {
+            OptionsHelp help = new OptionsHelp();
+            help.Show();
         }
     }
 }

@@ -72,7 +72,7 @@ namespace cs_updater
             timer.Tick += OnTimerTick;
             timer.Start();
 
-            progressText = "Ready to check for updates.";
+            if (ActiveInstall.Path != null && ActiveInstall.Path != "") progressText = "Ready to check for updates.";
         }
 
         void OnTimerTick(object sender, EventArgs e)
@@ -84,7 +84,7 @@ namespace cs_updater
         private void ShowFirstRun()
         {
             System.Windows.Forms.MessageBox.Show("Welcome to the NI Updater.\n\nPlease set the Installation Path to continue.", "Welcome", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            progressBarText.Content = "Please set an installation path.";
+            progressText = "Please set an installation path.";
             MenuOpenPathEditor(null, null);
         }
 
@@ -158,7 +158,7 @@ namespace cs_updater
 
         private void MenuOpenPathEditor(Object sender, RoutedEventArgs e)
         {
-            InstallPathWindow ipw = new InstallPathWindow(installDirs);
+            OptionsWindow ipw = new OptionsWindow(installDirs);
             ipw.Owner = this;
             if ((bool)ipw.ShowDialog())
             {
