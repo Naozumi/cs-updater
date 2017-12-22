@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:cs_updater"
         mc:Ignorable="d"
-        Title="OptionsHelp" SizeToContent="Height" Width="300">
+        Title="Help - Options" SizeToContent="Height" Width="300">
     <Grid>
         <Grid.Background>
             <ImageBrush ImageSource="Resources/ni_parch_body_mobile.jpg" TileMode="Tile" Viewport="0,0,828,314" ViewportUnits="Absolute"/>
@@ -14,7 +14,7 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="40" />
         </Grid.RowDefinitions>
-        <ScrollViewer VerticalScrollBarVisibility="Visible" Grid.Row="0">
+        <ScrollViewer VerticalScrollBarVisibility="Auto" Grid.Row="0">
 
             <Label>
                 <TextBlock TextWrapping="Wrap" Margin="5,0" >
@@ -33,6 +33,34 @@
                 </TextBlock>
             </Label>
         </ScrollViewer>
-        <Button Content="Close" Width="100" Margin="5" Grid.Row="1" Click="Close_Click"/>
+        <Button Content="Close" Width="100" Margin="5" Grid.Row="1" Click="Close_Click" Foreground="White">
+            <Button.Style>
+                <Style TargetType="{x:Type Button}">
+                    <Setter Property="Background" Value="#FF830606"/>
+                    <Setter Property="BorderBrush" Value="#FFA2760A"/>
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="{x:Type Button}">
+                                <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}">
+                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                    <Style.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" Value="#FFA80303"/>
+                        </Trigger>
+                        <Trigger Property="IsPressed"  Value="True">
+                            <Setter Property="BorderBrush" Value="#FF915252"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled"  Value="False">
+                            <Setter Property="Background" Value="#FF976B6B"/>
+                            <Setter Property="Foreground" Value="#888"/>
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </Button.Style>
+        </Button>
     </Grid>
 </Window>

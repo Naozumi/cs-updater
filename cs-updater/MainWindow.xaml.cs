@@ -71,8 +71,6 @@ namespace cs_updater
             };
             timer.Tick += OnTimerTick;
             timer.Start();
-
-            if (ActiveInstall.Path != null && ActiveInstall.Path != "") progressText = "Ready to check for updates.";
         }
 
         void OnTimerTick(object sender, EventArgs e)
@@ -85,7 +83,7 @@ namespace cs_updater
         {
             System.Windows.Forms.MessageBox.Show("Welcome to the NI Updater.\n\nPlease set the Installation Path to continue.", "Welcome", MessageBoxButtons.OK, MessageBoxIcon.Information);
             progressText = "Please set an installation path.";
-            MenuOpenPathEditor(null, null);
+            Menu_OptionsClick(null, null);
         }
 
         private void LoadInstallDirs()
@@ -116,24 +114,16 @@ namespace cs_updater
                 menuInstallDirs.Items.Add(mi);
             }
 
-            //Add the extra options at bottom
-            menuInstallDirs.Items.Add(new Separator());
-            System.Windows.Controls.MenuItem miAdd = new System.Windows.Controls.MenuItem
-            {
-                Header = "Edit paths..."
-            };
-            miAdd.Click += new RoutedEventHandler(MenuOpenPathEditor);
-            miAdd.IsCheckable = false;
-            menuInstallDirs.Items.Add(miAdd);
-
             if (installDirs.Count > 0)
             {
                 btn_update.IsEnabled = true;
-                progressText = "Ready to check for updates.";
+                activeInstallText.Content = "Active Installation: " + ActiveInstall.Name;
+                progressText = "Awaiting file check";
             }
             else
             {
                 btn_update.IsEnabled = false;
+                activeInstallText.Content = "";
                 progressText = "Please set an installation path.";
             }
         }
@@ -142,7 +132,7 @@ namespace cs_updater
         {
             filesVerified = false;
             updateRequired = false;
-            btn_update.Content = "Verify";
+            btn_update.Content = "Check files";
             foreach (Object item in menuInstallDirs.Items)
             {
                 if (item.GetType() == typeof(System.Windows.Controls.MenuItem))
@@ -154,9 +144,11 @@ namespace cs_updater
             System.Windows.Controls.MenuItem mi = sender as System.Windows.Controls.MenuItem;
             ActiveInstall = (InstallPath)mi.Tag;
             mi.IsChecked = true;
+            activeInstallText.Content = "Active Installation: " + ActiveInstall.Name;
+            progressText = "Awaiting file check";
         }
 
-        private void MenuOpenPathEditor(Object sender, RoutedEventArgs e)
+        private void Menu_OptionsClick(Object sender, RoutedEventArgs e)
         {
             OptionsWindow ipw = new OptionsWindow(installDirs);
             ipw.Owner = this;
@@ -226,6 +218,7 @@ namespace cs_updater
         #region Update
         private async void Button_Update_Click(object sender, RoutedEventArgs e)
         {
+            menuSettings.IsEnabled = false;
             if (updateRequired)
             {
                 //DO UPDATE
@@ -248,11 +241,11 @@ namespace cs_updater
             filesVerified = false;
             updateRequired = false;
             progress = 0;
-            progressText = "Starting verification...";
+            progressText = "Starting file check...";
             this.Dispatcher.Invoke(() =>
             {
                 btn_update.IsEnabled = false;
-                btn_update.Content = "Verifying...";
+                btn_update.Content = "Checking files...";
                 //progressBar.Value = 0;
                 //progressBarText.Content = ;
             });
@@ -401,7 +394,7 @@ namespace cs_updater
                 progress = 0;
                 this.Dispatcher.Invoke(() =>
                 {
-                    btn_update.Content = "Update";
+                    btn_update.Content = "Update files";
                     btn_update.IsEnabled = true;
                 });
             }
@@ -411,13 +404,13 @@ namespace cs_updater
                 progress = 0;
                 this.Dispatcher.Invoke(() =>
                 {
-                    btn_update.Content = "Verify";
+                    btn_update.Content = "Check files";
                     btn_update.IsEnabled = true;
                 });
             }
             else
             {
-                progressText = "Current version: " + hashObject.ModuleVersion + " - Ready to play";
+                progressText = "NI " + hashObject.ModuleVersion + " is ready to play";
                 progress = 100;
                 this.Dispatcher.Invoke(() =>
                 {
@@ -453,7 +446,7 @@ namespace cs_updater
                 btn_update.IsEnabled = false;
                 btn_update.Content = "Updating...";
                 progressBar.Value = 0;
-                progressBarText.Content = "Starting verification...";
+                progressText = "Starting file update...";
             });
             if (!hasWriteAccessToFolder(ActiveInstall.Path))
             {

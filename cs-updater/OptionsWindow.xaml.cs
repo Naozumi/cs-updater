@@ -16,12 +16,16 @@ namespace cs_updater
     /// </summary>
     public partial class OptionsWindow : Window
     {
+        private OptionsHelp help = null;
+
         public OptionsWindow(List<InstallPath> installs)
         {
             this.Installs = installs;
             InitializeComponent();
             data.ItemsSource = this.Installs;
             data.Items.Refresh();
+            cb_verify.IsChecked = Properties.Settings.Default.AutoVerify;
+            cb_update.IsChecked = Properties.Settings.Default.AutoUpdate;
         }
 
         public List<InstallPath> Installs { get; set; }
@@ -121,7 +125,7 @@ namespace cs_updater
             }
 
             int d = 0;
-            foreach(InstallPath install in Installs)
+            foreach (InstallPath install in Installs)
             {
                 if (install.IsDefault) d++;
                 if (install.Path == "" || install.Path == null)
@@ -135,20 +139,22 @@ namespace cs_updater
 
             if (Installs.Count == 0)
             {
+                //No installs
                 System.Windows.Forms.MessageBox.Show("Please set a directory to continue.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-            else if(d == 1)
+            else if (d == 1)
             {
+                // All OK
                 DialogResult = true;
+                Properties.Settings.Default.AutoVerify = (bool)cb_verify.IsChecked;
+                Properties.Settings.Default.AutoUpdate = (bool)cb_update.IsChecked;
+                Properties.Settings.Default.Save();
                 this.Close();
             }
-            else if(d > 1)
+            else if (d > 1)
             {
+                //Too many defaults
                 System.Windows.Forms.MessageBox.Show("Sorry, you can only have one default.\n\nPlease set only one directory as default to continue.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-            else
-            {
-                System.Windows.Forms.MessageBox.Show("Please set one of the directories as your default to continue.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
 
         }
@@ -172,14 +178,14 @@ namespace cs_updater
             }
             if (newInstalls.Count > 0)
             {
-                System.Windows.Forms.MessageBox.Show(newInstalls.Count +" new installs found and added to the list.", newInstalls.Count + " installs found.", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                System.Windows.Forms.MessageBox.Show(newInstalls.Count + " new installs found and added to the list.", newInstalls.Count + " installs found.", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 Installs.AddRange(foundInstalls);
             }
             else
             {
                 System.Windows.Forms.MessageBox.Show("No new installs found.", newInstalls.Count + " new installs found.", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
-            
+
             data.Items.Refresh();
         }
 
@@ -250,8 +256,19 @@ namespace cs_updater
 
         private void Help_Click(object sender, MouseButtonEventArgs e)
         {
-            OptionsHelp help = new OptionsHelp();
+            if (help == null)
+            {
+                help = new OptionsHelp();
+            }
             help.Show();
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if (help != null)
+            {
+                help.Close();
+            }
         }
     }
 }

@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:cs_updater"
         mc:Ignorable="d"
-        Title="Options" Height="345" Width="920" WindowStartupLocation="CenterOwner">
+        Title="Options" Height="345" Width="920" WindowStartupLocation="CenterOwner" Closing="Window_Closing">
     <Grid>
         <Grid.Background>
             <ImageBrush ImageSource="Resources/ni_parch_body_mobile.jpg" TileMode="Tile" Viewport="0,0,828,314" ViewportUnits="Absolute"/>
@@ -26,8 +26,8 @@
         </Grid.RowDefinitions>
 
         <StackPanel Grid.Column="1" Grid.Row="1">
-            <CheckBox Content="Automatially verify files on startup." />
-            <CheckBox Content="Automatially update if update is available." />
+            <CheckBox Content="Automatially verify files on startup." x:Name="cb_verify" />
+            <CheckBox Content="Automatially update if update is available." x:Name="cb_update" />
         </StackPanel>
 
         <Grid Grid.Column="1" Grid.Row="3">
@@ -74,9 +74,93 @@
                 <ColumnDefinition Width="5"/>
                 <ColumnDefinition Width="100"/>
             </Grid.ColumnDefinitions>
-            <Button Grid.Column="0"  Content="Automatically Find Installations" Click="AutomaticallyAddInstalls" />
-            <Button Grid.Column="4" Content="OK" Click="OK_Click" />
-            <Button Grid.Column="6" Content="Cancel" Click="Cancel_Click" />
+            <Button Grid.Column="0"  Content="Automatically Find Installations" Click="AutomaticallyAddInstalls" Foreground="White">
+                <Button.Style>
+                    <Style TargetType="{x:Type Button}">
+                        <Setter Property="Background" Value="#FF830606"/>
+                        <Setter Property="BorderBrush" Value="#FFA2760A"/>
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="{x:Type Button}">
+                                    <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}">
+                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                        <Style.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#FFA80303"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed"  Value="True">
+                                <Setter Property="BorderBrush" Value="#FF915252"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled"  Value="False">
+                                <Setter Property="Background" Value="#FF976B6B"/>
+                                <Setter Property="Foreground" Value="#888"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+            </Button>
+            <Button Grid.Column="4" Content="OK" Click="OK_Click" Foreground="White">
+                <Button.Style>
+                    <Style TargetType="{x:Type Button}">
+                        <Setter Property="Background" Value="#FF830606"/>
+                        <Setter Property="BorderBrush" Value="#FFA2760A"/>
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="{x:Type Button}">
+                                    <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}">
+                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                        <Style.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#FFA80303"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed"  Value="True">
+                                <Setter Property="BorderBrush" Value="#FF915252"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled"  Value="False">
+                                <Setter Property="Background" Value="#FF976B6B"/>
+                                <Setter Property="Foreground" Value="#888"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+            </Button>
+            <Button Grid.Column="6" Content="Cancel" Click="Cancel_Click" Foreground="White">
+                <Button.Style>
+                    <Style TargetType="{x:Type Button}">
+                        <Setter Property="Background" Value="#FF830606"/>
+                        <Setter Property="BorderBrush" Value="#FFA2760A"/>
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="{x:Type Button}">
+                                    <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}">
+                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                        <Style.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#FFA80303"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed"  Value="True">
+                                <Setter Property="BorderBrush" Value="#FF915252"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled"  Value="False">
+                                <Setter Property="Background" Value="#FF976B6B"/>
+                                <Setter Property="Foreground" Value="#888"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+            </Button>
         </Grid>
 
 

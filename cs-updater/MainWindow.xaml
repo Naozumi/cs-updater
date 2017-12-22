@@ -28,14 +28,15 @@
             <RowDefinition Height="10"/>
             <RowDefinition/>
             <RowDefinition Height="10" />
-            <RowDefinition Height="30" />
-            <RowDefinition Height="10" />
+            <RowDefinition Height="20"/>
+            <RowDefinition Height="10"/>
+            <RowDefinition Height="20" />
             <RowDefinition Height="20" />
         </Grid.RowDefinitions>
 
         <DockPanel Grid.Column="0" Grid.ColumnSpan="7">
             <Menu DockPanel.Dock="Top" Background="#00000000">
-                <MenuItem Header="_Settings">
+                <MenuItem Header="_Settings" x:Name="menuSettings">
                     <!--<MenuItem Header="_Language">
                         <MenuItem Header="_English"/>
                         <MenuItem Header="_French"/>
@@ -44,11 +45,10 @@
                         <MenuItem Header="_Norwegian"/>
                         <MenuItem Header="_Danish"/>
                     </MenuItem>-->
-                    <MenuItem Header="_Install Directory" Name="menuInstallDirs">
-                        
-                    </MenuItem>
+                    <MenuItem Header="_Install Directory" Name="menuInstallDirs" />
+                    <MenuItem Header="_Options..." Name="menuOptions" Click="Menu_OptionsClick" />
                 </MenuItem>
-            
+
                 <MenuItem x:Name="DevMenu" Header="_Dev" Visibility="Hidden">
                     <MenuItem Header="_Build" Click="Modules_Build_Click"/>
                     <MenuItem Header="Count" Click="Modules_Child_Count_Click"/>
@@ -75,13 +75,13 @@
         </Border>
 
 
-        <Grid Grid.Column="1" Grid.Row="6" Grid.ColumnSpan="1">
-            <Label x:Name="progressBarText" HorizontalAlignment="Center" VerticalAlignment="Center" Content="Loading..."/>
-        </Grid>
+        
+        <Label x:Name="progressBarText" HorizontalAlignment="Center" VerticalAlignment="Center" Content="Loading..." Padding="0,2" Grid.Column="1" Grid.Row="6" />
         <Grid Grid.Column="1" Grid.Row="7" Grid.ColumnSpan="1">
             <ProgressBar x:Name="progressBar"  Foreground="DarkGoldenrod" Background="#FFF7F3E4" Height="Auto" BorderBrush="#FFA2760A" />
         </Grid>
-        <Button x:Name="btn_update" Content="Verify" Grid.Column="3" Grid.Row="6" Grid.RowSpan="2" Click="Button_Update_Click" Foreground="White" IsEnabled="False" Height="40" VerticalAlignment="Top">
+        <Label x:Name="activeInstallText" HorizontalAlignment="Center" VerticalAlignment="Center" Content="" Padding="0,2" Grid.Column="1" Grid.Row="8" />
+        <Button x:Name="btn_update" Content="Check files" Grid.Column="3" Grid.Row="6" Grid.RowSpan="3" Click="Button_Update_Click" Foreground="White" IsEnabled="False" Height="40" Margin="0,5" VerticalAlignment="Top">
             <Button.Style>
                 <Style TargetType="{x:Type Button}">
                     <Setter Property="Background" Value="#FF830606"/>
@@ -111,5 +111,4 @@
             </Button.Style>
         </Button>
     </Grid>
-
 </Window>
