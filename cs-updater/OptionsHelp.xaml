@@ -18,18 +18,23 @@
 
             <Label>
                 <TextBlock TextWrapping="Wrap" Margin="5,0" >
-                <Run FontWeight="Bold">Name:</Run><LineBreak/>
-                This is to help identify the installation to you and used only in the installation picker in the main window.
-                <LineBreak/><LineBreak/>
-                <Run FontWeight="Bold">Path to folder:</Run><LineBreak/>
-                Use the file browser to point to the modules folder (a folder will automatically be created for the mod to download to) 
-                or to the exact folder you want to download the files to (useful for with betas, for example).
-                <LineBreak/><LineBreak/>
-                <Run FontWeight="Bold">Password:</Run><LineBreak/>
-                If you are enrolled in a beta programme, it will require a password. Enter the password here.
-                <LineBreak/><LineBreak/>
-                <Run FontWeight="Bold">Default:</Run><LineBreak/>
-                When the updater starts, it will choose this installation as the default for updating. We recommend this is your primary install.
+                    <Run FontWeight="Bold">Name:</Run><LineBreak/>
+                    This is to help identify the installation to you and used only in the installation picker in the main window.
+                    <LineBreak/><LineBreak/>
+                    <Run FontWeight="Bold">Default:</Run><LineBreak/>
+                    When the updater starts, it will choose this installation as the default for updating. We recommend this is your primary install.
+                    <LineBreak/><LineBreak/>
+                    <Run FontWeight="Bold">Path to folder:</Run><LineBreak/>
+                    Use the file browser to point to the modules folder (a folder will automatically be created for the mod to download to) 
+                    or to the exact folder you want to download the files to (useful for with betas, for example).
+                    <LineBreak/><LineBreak/>
+                    <Run FontWeight="Bold">Path to launcher:</Run><LineBreak/>
+                    Use the file browser to point to the executable to launch the game. If you choose Steam, the launcher will attempt to find Steam for you.
+                    If it can't, use the file browser. If you click No, the launcher will attempt to find the warband launcher for you. If it finds it, you 
+                    will be asked to confirm. If it is wrong, use the file browser to find the correct file.
+                    <LineBreak/><LineBreak/>
+                    <Run FontWeight="Bold">Password:</Run><LineBreak/>
+                    If you are enrolled in a beta programme, it will require a password. Enter the password here.
                 </TextBlock>
             </Label>
         </ScrollViewer>

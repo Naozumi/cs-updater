@@ -215,7 +215,7 @@ namespace cs_updater
         #endregion
 
 
-        #region Update
+        #region Verify_&_Update
         private async void Button_Update_Click(object sender, RoutedEventArgs e)
         {
             menuSettings.IsEnabled = false;
@@ -227,12 +227,46 @@ namespace cs_updater
             else if (filesVerified)
             {
                 //PLAY GAME
+                RunGame();
             }
             else
             {
                 //VERIFY FILES
                 await VerifyGameFiles();
             }
+
+            if (updateRequired)
+            {
+                progressText = "Update is required - Latest version: " + hashObject.ModuleVersion;
+                progress = 0;
+                this.Dispatcher.Invoke(() =>
+                {
+                    btn_update.Content = "Update files";
+                    btn_update.IsEnabled = true;
+                });
+            }
+            else if (!filesVerified)
+            {
+                progressText = "Error - Unable to verify files.";
+                progress = 0;
+                this.Dispatcher.Invoke(() =>
+                {
+                    btn_update.Content = "Check files";
+                    btn_update.IsEnabled = true;
+                });
+            }
+            else
+            {
+                progressText = "NI " + hashObject.ModuleVersion + " is ready to play";
+                progress = 100;
+                this.Dispatcher.Invoke(() =>
+                {
+                    btn_update.Content = "Play";
+                    btn_update.IsEnabled = true;
+                });
+                filesVerified = true;
+            }
+            menuSettings.IsEnabled = true ;
         }
 
         private async Task<Boolean> VerifyGameFiles()
@@ -246,8 +280,6 @@ namespace cs_updater
             {
                 btn_update.IsEnabled = false;
                 btn_update.Content = "Checking files...";
-                //progressBar.Value = 0;
-                //progressBarText.Content = ;
             });
             var failed = false;
 
@@ -263,7 +295,6 @@ namespace cs_updater
                     progressText = "Update is required";
                     this.Dispatcher.Invoke(() =>
                     {
-                        //progressBarText.Content = "Update is required";
                         btn_update.Content = "Update";
                         btn_update.IsEnabled = true;
                     });
@@ -388,37 +419,6 @@ namespace cs_updater
                     }
                 }
             }
-            if (updateRequired)
-            {
-                progressText = "Update is required - Latest version: " + hashObject.ModuleVersion;
-                progress = 0;
-                this.Dispatcher.Invoke(() =>
-                {
-                    btn_update.Content = "Update files";
-                    btn_update.IsEnabled = true;
-                });
-            }
-            else if (!filesVerified)
-            {
-                progressText = "Error - Unable to verify files.";
-                progress = 0;
-                this.Dispatcher.Invoke(() =>
-                {
-                    btn_update.Content = "Check files";
-                    btn_update.IsEnabled = true;
-                });
-            }
-            else
-            {
-                progressText = "NI " + hashObject.ModuleVersion + " is ready to play";
-                progress = 100;
-                this.Dispatcher.Invoke(() =>
-                {
-                    btn_update.Content = "Play";
-                    btn_update.IsEnabled = true;
-                });
-                filesVerified = true;
-            }
             return true;
         }
 
@@ -476,13 +476,6 @@ namespace cs_updater
             {
                 System.Windows.Forms.MessageBox.Show("Unable to create the NordInvasion directory", "Error - Unable to continue.");
             }
-            this.Dispatcher.Invoke(() =>
-            {
-                btn_update.IsEnabled = true;
-                btn_update.Content = "Here!";
-                progressBar.Value = 0;
-                progressBarText.Content = "Update done";
-            });
         }
 
         private async Task<Boolean> Update_Game_Files()
@@ -532,6 +525,8 @@ namespace cs_updater
             {
                 throw new Exception("Unable to download files from server. Please contact NI Support.");
             }
+            updateRequired = false;
+            filesVerified = true;
             return true;
         }
 
@@ -746,6 +741,25 @@ namespace cs_updater
 
         #endregion
 
+        private void RunGame()
+        { 
+            if (ActiveInstall.Executable != "" && ActiveInstall.Executable != null)
+            {
+                Process warband = new Process();
+                if (ActiveInstall.Executable.EndsWith("steam.exe"))
+                {
+                    warband.StartInfo.FileName = ActiveInstall.Executable;
+                    warband.StartInfo.Arguments = "steam://rungameid/48700";
+                }
+                else
+                {
+                    warband.StartInfo.FileName = ActiveInstall.Executable;
+                }
+                warband.StartInfo.UseShellExecute = false;
+                warband.Start();
+                this.Close();
+            }        
+        }
 
         private void windowKeyPress(object sender, System.Windows.Input.KeyEventArgs e)
         {

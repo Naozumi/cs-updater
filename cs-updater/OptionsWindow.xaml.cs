@@ -81,12 +81,10 @@ namespace cs_updater
                 path = dir.FullName;
             }
 
-
-            //Sends the enter event - on a datagrid, this auto adds a new blank row. Generally, it just looks a bit better.
             InstallPath selected = (InstallPath)data.CurrentCell.Item;
             selected.Path = path;
 
-
+            //Sends the enter event - on a datagrid, this auto adds a new blank row. Generally, it just looks a bit better.
             this.data.CommitEdit();
             var key = Key.Enter;
             var target = Keyboard.FocusedElement;
@@ -215,7 +213,15 @@ namespace cs_updater
                                     {
                                         if (subkey.GetValue("DisplayName").ToString().Contains("Mount") && subkey.GetValue("DisplayName").ToString().Contains("Warband"))
                                         {
-                                            installs.Add(new InstallPath(subkey.GetValue("DisplayName").ToString(), subkey.GetValue("InstallLocation").ToString() + @"\Modules\NordInvasion\", "", false));
+                                            string lpath = null;
+                                            if (subkey.GetValue("UninstallString").ToString().Contains("steam.exe"))
+                                            {
+                                                lpath = GetSteamPath();
+                                            }else if (File.Exists(subkey.GetValue("UninstallString").ToString().Replace("uninstall.exe", "warband.exe"))) // if selected "Modules" folder
+                                            {
+                                                lpath = subkey.GetValue("UninstallString").ToString().Replace("uninstall.exe", "warband.exe");
+                                            }
+                                            installs.Add(new InstallPath(subkey.GetValue("DisplayName").ToString(), subkey.GetValue("InstallLocation").ToString() + @"\Modules\NordInvasion\", "", false, lpath));
                                         }
                                     }
                                 }
@@ -241,7 +247,16 @@ namespace cs_updater
                                     {
                                         if (subkey.GetValue("DisplayName").ToString().Contains("Mount") && subkey.GetValue("DisplayName").ToString().Contains("Warband"))
                                         {
-                                            installs.Add(new InstallPath(subkey.GetValue("DisplayName").ToString(), subkey.GetValue("InstallLocation").ToString(), "", false));
+                                            string lpath = null;
+                                            if (subkey.GetValue("UninstallString").ToString().Contains("steam.exe"))
+                                            {
+                                                lpath = GetSteamPath();
+                                            }
+                                            else if (File.Exists(subkey.GetValue("UninstallString").ToString().Replace("uninstall.exe", "warband.exe"))) // if selected "Modules" folder
+                                            {
+                                                lpath = subkey.GetValue("UninstallString").ToString().Replace("uninstall.exe", "warband.exe");
+                                            }
+                                            installs.Add(new InstallPath(subkey.GetValue("DisplayName").ToString(), subkey.GetValue("InstallLocation").ToString(), "", false, lpath));
                                         }
                                     }
                                 }
@@ -253,6 +268,8 @@ namespace cs_updater
 
             return installs;
         }
+
+        
 
         private void Help_Click(object sender, MouseButtonEventArgs e)
         {
@@ -269,6 +286,179 @@ namespace cs_updater
             {
                 help.Close();
             }
+        }
+
+        private void BrowseLauncher_Click(object sender, RoutedEventArgs e)
+        {
+            InstallPath selected = (InstallPath)data.CurrentCell.Item;
+
+            var answer = System.Windows.Forms.MessageBox.Show("Was this game installed via Steam?", "Steam installation check.", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+            bool need2find = true;
+            bool steam = false;
+            if (answer == System.Windows.Forms.DialogResult.Yes)
+            {
+                steam = true;
+                try
+                {
+                    var spath = GetSteamPath();
+                    if (spath != null)
+                    {
+                        selected.Executable = spath;
+                        need2find = false;
+                    }
+                }
+                catch
+                {
+                    //something went wrong with autofind - just continue as if all is well. Probably a permissions issue - we will use file finder instead.
+                }
+            }
+            
+            if (need2find)
+            {
+                System.Windows.Controls.Button btn = sender as System.Windows.Controls.Button;
+
+                string initialPath = null;
+                if (btn.Tag == null || (string)btn.Tag == "" || (string)btn.Tag == @"steam://rungameid/48700")
+                {
+                    if (selected.Path != null && selected.Path != "")
+                    {
+                        initialPath = selected.Path;
+                    }
+                    else
+                    {
+                        initialPath = @"C:\";
+                    }
+                }
+                else
+                {
+                    initialPath = (string)btn.Tag;
+                }
+
+                FileInfo file = null;
+                string dialogTitle = "";
+                if (steam)
+                {
+                    dialogTitle = "Select the Steam.exe executable";
+                }
+                else
+                {
+                    dialogTitle = "Select the Warband executable";
+                }
+                CommonOpenFileDialog dialog = new CommonOpenFileDialog
+                {
+                    InitialDirectory = initialPath,
+                    IsFolderPicker = false,
+                    Title = dialogTitle
+                };
+                dialog.Filters.Add(new CommonFileDialogFilter("Executables", "*.exe"));
+                if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
+                {
+                    file = new FileInfo(dialog.FileName);
+                }
+
+                if (file == null)
+                {
+                    this.Activate();
+                    return;
+                }
+
+                selected.Executable = file.FullName;
+            }
+        
+            //Sends the enter event - on a datagrid, this auto adds a new blank row. Generally, it just looks a bit better.
+            this.data.CommitEdit();
+            var key = Key.Enter;
+            var target = Keyboard.FocusedElement;
+            var routedEvent = Keyboard.KeyDownEvent;
+
+            target.RaiseEvent(
+              new System.Windows.Input.KeyEventArgs(
+                Keyboard.PrimaryDevice,
+                PresentationSource.FromVisual(this),
+                0,
+                key)
+              { RoutedEvent = routedEvent }
+            );
+
+            this.data.CommitEdit();
+            key = Key.Up;
+            target = Keyboard.FocusedElement;
+            routedEvent = Keyboard.KeyDownEvent;
+            target.RaiseEvent(
+              new System.Windows.Input.KeyEventArgs(
+                Keyboard.PrimaryDevice,
+                PresentationSource.FromVisual(this),
+                0,
+                key)
+              { RoutedEvent = routedEvent }
+            );
+            this.Activate();
+
+        }
+
+        private string GetSteamPath()
+        {
+            List<String> registry_key = new List<string>
+            {
+                @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall",
+                @"SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall"
+            };
+
+            if (Environment.Is64BitOperatingSystem)
+            {
+                foreach (string reg in registry_key)
+                {
+                    using (var hklm = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64))
+                    using (Microsoft.Win32.RegistryKey key = hklm.OpenSubKey(reg))
+                    {
+                        if (key != null)
+                        {
+                            foreach (string subkey_name in key.GetSubKeyNames())
+                            {
+                                using (RegistryKey subkey = key.OpenSubKey(subkey_name))
+                                {
+                                    if (subkey.GetValue("DisplayName") != null)
+                                    {
+                                        if (subkey.GetValue("DisplayName").ToString() == "Steam")
+                                        {
+                                            return subkey.GetValue("UninstallString").ToString().Replace("uninstall.exe", "steam.exe");
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            else
+            {
+                foreach (string reg in registry_key)
+                {
+                    using (var hklm = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32))
+                    using (Microsoft.Win32.RegistryKey key = hklm.OpenSubKey(reg))
+                    {
+                        if (key != null)
+                        {
+                            foreach (string subkey_name in key.GetSubKeyNames())
+                            {
+                                using (RegistryKey subkey = key.OpenSubKey(subkey_name))
+                                {
+                                    if (subkey.GetValue("DisplayName") != null)
+                                    {
+                                        if (subkey.GetValue("DisplayName").ToString() == "Steam")
+                                        {
+                                            return subkey.GetValue("UninstallString").ToString().Replace("uninstall.exe", "steam.exe");
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            return null;
         }
     }
 }

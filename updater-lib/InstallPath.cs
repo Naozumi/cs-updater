@@ -12,6 +12,7 @@ namespace cs_updater_lib
         public String Path { get; set; }
         public String Password { get; set; }
         public Boolean IsDefault { get; set; }
+        public String Executable { get; set; }
 
         public InstallPath() { }
 
@@ -21,6 +22,14 @@ namespace cs_updater_lib
             this.Path = Path;
             this.Password = Password;
             this.IsDefault = IsDefault;
+        }
+        public InstallPath(String Name, String Path, String Password, Boolean IsDefault, String Executable)
+        {
+            this.Name = Name;
+            this.Path = Path;
+            this.Password = Password;
+            this.IsDefault = IsDefault;
+            this.Executable = Executable;
         }
     }
 }

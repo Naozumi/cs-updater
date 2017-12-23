@@ -39,6 +39,7 @@
             <DataGrid Grid.Row="1" x:Name="data"  ItemsSource="{Binding Installs}" AutoGenerateColumns="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Name"  Binding="{Binding Name}" MinWidth="100"/>
+                    <DataGridCheckBoxColumn Header="Default" Binding="{Binding IsDefault}" />
                     <DataGridTemplateColumn Header="Path to folder" MinWidth="200">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
@@ -58,8 +59,26 @@
                             </DataTemplate>
                         </DataGridTemplateColumn.CellEditingTemplate>
                     </DataGridTemplateColumn>
+                    <DataGridTemplateColumn Header="Path to launcher" MinWidth="200">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Executable}"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                        <DataGridTemplateColumn.CellEditingTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="20" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="{Binding Executable}" Grid.Column="0" />
+                                    <Button Width="Auto" Height="Auto" Grid.Column="1" FontSize="10px" Tag="{Binding Executable}" Click="BrowseLauncher_Click">...</Button>
+                                </Grid>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellEditingTemplate>
+                    </DataGridTemplateColumn>
                     <DataGridTextColumn Header="Password (for NI Betas only)" Binding="{Binding Password}" />
-                    <DataGridCheckBoxColumn Header="Default" Binding="{Binding IsDefault}" />
                 </DataGrid.Columns>
             </DataGrid>
         </Grid>
