@@ -29,5 +29,17 @@
     <Setting Name="AutoUpdate" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
+    <Setting Name="UpdaterVersionCheck" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">https://nordinvasion.com/mod/updater-check.ajax.php</Value>
+    </Setting>
+    <Setting Name="BetaCheck" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">beta-check.ajax.php</Value>
+    </Setting>
+    <Setting Name="DownloadWebpage" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">https://nordinvasion.com/download.php</Value>
+    </Setting>
+    <Setting Name="Version" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">0.0</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

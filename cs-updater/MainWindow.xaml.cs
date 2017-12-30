@@ -5,7 +5,6 @@ using System.IO;
 using System.IO.Compression;
 using System.Security.Cryptography;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Forms;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using System.Threading.Tasks;
@@ -15,8 +14,8 @@ using System.Diagnostics;
 using NLog;
 using System.Windows.Input;
 using cs_updater_lib;
-using System.IO.Pipes;
 using System.Windows.Threading;
+using System.Deployment.Application;
 
 namespace cs_updater
 {
@@ -35,6 +34,7 @@ namespace cs_updater
         private static Logger logger = LogManager.GetCurrentClassLogger();
         private bool updateRequired = false;
         private bool filesVerified = false;
+        private bool needsUpdate = false;
 
         private double progress = 0;
         private string progressText = "Loading...";
@@ -48,6 +48,18 @@ namespace cs_updater
                 Properties.Settings.Default.Upgrade();
                 Properties.Settings.Default.UpgradeRequired = false;
                 Properties.Settings.Default.Save();
+            }
+
+            CheckForUpdate();
+            if (needsUpdate)
+            {
+                var answer = System.Windows.Forms.MessageBox.Show("Update available for the updater.\n\nUpdate must be installed manually. Click \"OK\" to visit the download page.", 
+                    "Update required", MessageBoxButtons.OKCancel, MessageBoxIcon.Information);
+                if (answer == System.Windows.Forms.DialogResult.OK)
+                {
+                    System.Diagnostics.Process.Start(Properties.Settings.Default.DownloadWebpage);
+                    this.Close();
+                }
             }
 
             if (Properties.Settings.Default.Dev == true)
@@ -77,6 +89,20 @@ namespace cs_updater
         {
             progressBar.Value = progress;
             progressBarText.Content = progressText;
+        }
+
+        private async void CheckForUpdate()
+        {
+            String versionString = await Task.Run(() => Download_JSON_File(Properties.Settings.Default.UpdaterVersionCheck));
+
+            if (versionString != null && (versionString.StartsWith("[") || versionString.StartsWith("{")))
+            {
+                UpdaterVersion UpdateStatus = await Task.Run(() => JsonConvert.DeserializeObject<UpdaterVersion>(versionString));
+                if (Version.Parse(UpdateStatus.version) > Version.Parse(Properties.Settings.Default.Version))
+                {
+                    needsUpdate = true;
+                }
+            }
         }
 
         private void ShowFirstRun()
@@ -159,7 +185,7 @@ namespace cs_updater
             }
             LoadInstallDirs();
         }
-
+        
 
         #region News
         public async void LoadNews()
@@ -266,12 +292,12 @@ namespace cs_updater
                 });
                 filesVerified = true;
             }
-            menuSettings.IsEnabled = true ;
+            menuSettings.IsEnabled = true;
         }
 
         private async Task<Boolean> VerifyGameFiles()
         {
-            
+
             filesVerified = false;
             updateRequired = false;
             progress = 0;
@@ -635,7 +661,7 @@ namespace cs_updater
             {
                 if (password == "" || password == null)
                 {
-                    filename = "cs.json";
+                    filename = Properties.Settings.Default.updateFile;
                 }
                 else
                 {
@@ -716,7 +742,7 @@ namespace cs_updater
                 FormUrlEncodedContent formContent = new FormUrlEncodedContent(pairs);
 
 
-                HttpResponseMessage response = await client.PostAsync(url + "beta-check.ajax.php", formContent);
+                HttpResponseMessage response = await client.PostAsync(url + Properties.Settings.Default.BetaCheck, formContent);
                 response.EnsureSuccessStatusCode();
                 return response.Content.ReadAsStringAsync().Result;
             }
@@ -742,7 +768,7 @@ namespace cs_updater
         #endregion
 
         private void RunGame()
-        { 
+        {
             if (ActiveInstall.Executable != "" && ActiveInstall.Executable != null)
             {
                 Process warband = new Process();
@@ -758,7 +784,7 @@ namespace cs_updater
                 warband.StartInfo.UseShellExecute = false;
                 warband.Start();
                 this.Close();
-            }        
+            }
         }
 
         private void windowKeyPress(object sender, System.Windows.Input.KeyEventArgs e)
@@ -924,6 +950,14 @@ namespace cs_updater
             LoadInstallDirs();
         }
         #endregion
+
+        public Version AssemblyVersion
+        {
+            get
+            {
+                return ApplicationDeployment.CurrentDeployment.CurrentVersion;
+            }
+        }
     }
 }
 

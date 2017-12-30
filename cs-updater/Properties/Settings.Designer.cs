@@ -123,5 +123,42 @@ namespace cs_updater.Properties {
                 this["AutoUpdate"] = value;
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("https://nordinvasion.com/mod/updater-check.ajax.php")]
+        public string UpdaterVersionCheck {
+            get {
+                return ((string)(this["UpdaterVersionCheck"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("beta-check.ajax.php")]
+        public string BetaCheck {
+            get {
+                return ((string)(this["BetaCheck"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.SpecialSettingAttribute(global::System.Configuration.SpecialSetting.WebServiceUrl)]
+        [global::System.Configuration.DefaultSettingValueAttribute("https://nordinvasion.com/download.php")]
+        public string DownloadWebpage {
+            get {
+                return ((string)(this["DownloadWebpage"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0.0")]
+        public string Version {
+            get {
+                return ((string)(this["Version"]));
+            }
+        }
     }
 }
