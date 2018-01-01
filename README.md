@@ -11,6 +11,7 @@ Current Features
 * Threaded downloads
 * News feed
 * Mutiple installation directories
+* Check for updates and download the installer
 
 Intended Features
 -----
@@ -19,8 +20,8 @@ Intended Features
   * Intention is to use [WPFLocalizationExtension](https://github.com/SeriousM/WPFLocalizationExtension)
   * UI is currently in UK English
 * Better directory management
-
 * Improve error handeling
+  * Add ability to export logs for sharing to devs
   
 Under Consideration
 -----

@@ -50,39 +50,12 @@ namespace cs_updater
                 Properties.Settings.Default.Save();
             }
 
-            CheckForUpdate();
-            if (needsUpdate)
-            {
-                var answer = System.Windows.Forms.MessageBox.Show("Update available for the updater.\n\nUpdate must be installed manually. Click \"OK\" to visit the download page.", 
-                    "Update required", MessageBoxButtons.OKCancel, MessageBoxIcon.Information);
-                if (answer == System.Windows.Forms.DialogResult.OK)
-                {
-                    System.Diagnostics.Process.Start(Properties.Settings.Default.DownloadWebpage);
-                    this.Close();
-                }
-            }
-
             if (Properties.Settings.Default.Dev == true)
             {
                 DevMenu.Visibility = Visibility.Visible;
             }
 
-            SetNews("Loading news...");
-            LoadInstallDirs();
-            this.Show();
-            LoadNews();
-
-            if (installDirs.Count == 0)
-            {
-                ShowFirstRun();
-            }
-
-            var timer = new DispatcherTimer
-            {
-                Interval = TimeSpan.FromMilliseconds(5)
-            };
-            timer.Tick += OnTimerTick;
-            timer.Start();
+            CheckForUpdate();
         }
 
         void OnTimerTick(object sender, EventArgs e)
@@ -93,15 +66,53 @@ namespace cs_updater
 
         private async void CheckForUpdate()
         {
-            String versionString = await Task.Run(() => Download_JSON_File(Properties.Settings.Default.UpdaterVersionCheck));
-
-            if (versionString != null && (versionString.StartsWith("[") || versionString.StartsWith("{")))
+            SetNews("Checking for update...");
+            try
             {
-                UpdaterVersion UpdateStatus = await Task.Run(() => JsonConvert.DeserializeObject<UpdaterVersion>(versionString));
-                if (Version.Parse(UpdateStatus.version) > Version.Parse(Properties.Settings.Default.Version))
+                String versionString = await Task.Run(() => Download_JSON_File(Properties.Settings.Default.UpdaterVersionCheck));
+
+                if (versionString != null && (versionString.StartsWith("[") || versionString.StartsWith("{")))
                 {
-                    needsUpdate = true;
+                    UpdaterVersion UpdateJson = await Task.Run(() => JsonConvert.DeserializeObject<UpdaterVersion>(versionString));
+                    if (Version.Parse(UpdateJson.version) > Version.Parse(Properties.Settings.Default.Version))
+                    {
+                        var answer = System.Windows.Forms.MessageBox.Show("Update available for the updater.\n\nUpdate must be installed manually. Click \"OK\" to download.",
+                        "Update required", MessageBoxButtons.OKCancel, MessageBoxIcon.Information);
+                        if (answer == System.Windows.Forms.DialogResult.OK)
+                        {
+                            System.Diagnostics.Process.Start(UpdateJson.url);
+                            System.Windows.Application.Current.Shutdown();
+                            return;
+                        }
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                logger.Error("Error with updater version check.");
+                logger.Error(ex);
+            }
+
+
+            //else carry on with normal operation
+            LoadInstallDirs();
+            this.Show();
+            LoadNews();
+
+            var timer = new DispatcherTimer
+            {
+                Interval = TimeSpan.FromMilliseconds(5)
+            };
+            timer.Tick += OnTimerTick;
+            timer.Start();
+
+            if (installDirs.Count == 0)
+            {
+                ShowFirstRun();
+            }
+            else if (Properties.Settings.Default.AutoVerify)
+            {
+                DoUpdate(); //trigger update of files
             }
         }
 
@@ -185,21 +196,30 @@ namespace cs_updater
             }
             LoadInstallDirs();
         }
-        
+
 
         #region News
         public async void LoadNews()
         {
-            String newsString = await Task.Run(() => Download_JSON_File(Properties.Settings.Default.newsUrl));
-
-            if (newsString != null && (newsString.StartsWith("[") || newsString.StartsWith("{")))
+            try
             {
-                news = await Task.Run(() => JsonConvert.DeserializeObject<List<News>>(newsString));
-                foreach (var item in news)
+                String newsString = await Task.Run(() => Download_JSON_File(Properties.Settings.Default.newsUrl));
+
+                if (newsString != null && (newsString.StartsWith("[") || newsString.StartsWith("{")))
                 {
-                    list_news.Items.Add(item.subject);
+                    news = await Task.Run(() => JsonConvert.DeserializeObject<List<News>>(newsString));
+                    foreach (var item in news)
+                    {
+                        list_news.Items.Add(item.subject);
+                    }
+                    SetNews(news[0].message);
                 }
-                SetNews(news[0].message);
+            }
+            catch (Exception ex)
+            {
+                SetNews("Unable to load news.");
+                logger.Error("Unable to load news.");
+                logger.Error(ex);
             }
         }
 
@@ -242,7 +262,12 @@ namespace cs_updater
 
 
         #region Verify_&_Update
-        private async void Button_Update_Click(object sender, RoutedEventArgs e)
+        private void Button_Update_Click(object sender, RoutedEventArgs e)
+        {
+            DoUpdate();
+        }
+
+        private async void DoUpdate()
         {
             menuSettings.IsEnabled = false;
             if (updateRequired)
@@ -270,6 +295,10 @@ namespace cs_updater
                     btn_update.Content = "Update files";
                     btn_update.IsEnabled = true;
                 });
+                if (Properties.Settings.Default.AutoUpdate)
+                {
+                    DoUpdate(); //trigger update of files
+                }
             }
             else if (!filesVerified)
             {

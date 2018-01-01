@@ -9,6 +9,6 @@ namespace cs_updater
     class UpdaterVersion
     {
         public string version { get; set; }
-        public string manual { get; set; }
+        public string url { get; set; }
     }
 }
