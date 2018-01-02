@@ -34,7 +34,6 @@ namespace cs_updater
         private static Logger logger = LogManager.GetCurrentClassLogger();
         private bool updateRequired = false;
         private bool filesVerified = false;
-        private bool needsUpdate = false;
 
         private double progress = 0;
         private string progressText = "Loading...";
@@ -212,7 +211,7 @@ namespace cs_updater
                     {
                         list_news.Items.Add(item.subject);
                     }
-                    SetNews(news[0].message);
+                    list_news.SelectedItem = list_news.Items.GetItemAt(0);
                 }
             }
             catch (Exception ex)
@@ -258,6 +257,14 @@ namespace cs_updater
                 SetNews(news[list_news.SelectedIndex].message);
             }
         }
+
+        private void Open_Thread_Click(object sender, RoutedEventArgs e)
+        {
+            if (list_news.SelectedIndex > -1 && list_news.SelectedIndex < news.Count)
+            {
+                System.Diagnostics.Process.Start("http://forum.nordinvasion.com/showthread.php?tid=" + news[list_news.SelectedIndex].tid);
+            }
+        }
         #endregion
 
 
@@ -270,58 +277,71 @@ namespace cs_updater
         private async void DoUpdate()
         {
             menuSettings.IsEnabled = false;
-            if (updateRequired)
+            try
             {
-                //DO UPDATE
-                await UpdateGameFilesAsync();
-            }
-            else if (filesVerified)
-            {
-                //PLAY GAME
-                RunGame();
-            }
-            else
-            {
-                //VERIFY FILES
-                await VerifyGameFiles();
-            }
+                if (updateRequired)
+                {
+                    //DO UPDATE
+                    await UpdateGameFilesAsync();
+                }
+                else if (filesVerified)
+                {
+                    //PLAY GAME
+                    RunGame();
+                }
+                else
+                {
+                    //VERIFY FILES
+                    await VerifyGameFiles();
+                }
 
-            if (updateRequired)
-            {
-                progressText = "Update is required - Latest version: " + hashObject.ModuleVersion;
-                progress = 0;
-                this.Dispatcher.Invoke(() =>
+                if (updateRequired)
                 {
-                    btn_update.Content = "Update files";
-                    btn_update.IsEnabled = true;
-                });
-                if (Properties.Settings.Default.AutoUpdate)
+                    progressText = "Update is required - Latest version: " + hashObject.ModuleVersion;
+                    progress = 0;
+                    this.Dispatcher.Invoke(() =>
+                    {
+                        btn_update.Content = "Update files";
+                        btn_update.IsEnabled = true;
+                    });
+                    if (Properties.Settings.Default.AutoUpdate)
+                    {
+                        DoUpdate(); //trigger update of files
+                    }
+                }
+                else if (!filesVerified)
                 {
-                    DoUpdate(); //trigger update of files
+                    progressText = "Error - Unable to verify files.";
+                    progress = 0;
+                    this.Dispatcher.Invoke(() =>
+                    {
+                        btn_update.Content = "Check files";
+                        btn_update.IsEnabled = true;
+                        menuSettings.IsEnabled = true;
+                    });
+                }
+                else
+                {
+                    progressText = "NI " + hashObject.ModuleVersion + " is ready to play";
+                    progress = 100;
+
+                    this.Dispatcher.Invoke(() =>
+                    {
+                        btn_update.Content = "Play";
+                        btn_update.IsEnabled = true;
+                        menuSettings.IsEnabled = true;
+                    });
+
+                    filesVerified = true;
                 }
             }
-            else if (!filesVerified)
+            catch (Exception ex)
             {
-                progressText = "Error - Unable to verify files.";
-                progress = 0;
-                this.Dispatcher.Invoke(() =>
-                {
-                    btn_update.Content = "Check files";
-                    btn_update.IsEnabled = true;
-                });
+                logger.Error("Error - \"Do Update\"");
+                logger.Error(ex);
+                menuSettings.IsEnabled = true;
             }
-            else
-            {
-                progressText = "NI " + hashObject.ModuleVersion + " is ready to play";
-                progress = 100;
-                this.Dispatcher.Invoke(() =>
-                {
-                    btn_update.Content = "Play";
-                    btn_update.IsEnabled = true;
-                });
-                filesVerified = true;
-            }
-            menuSettings.IsEnabled = true;
+            
         }
 
         private async Task<Boolean> VerifyGameFiles()
@@ -418,7 +438,6 @@ namespace cs_updater
                 List<Task<UpdateHashItem>> working = new List<Task<UpdateHashItem>>();
                 float count = pending.Count;
 
-                int errors = 0;
                 while (pending.Count + working.Count != 0)
                 {
                     if (working.Count < 4 && pending.Count != 0)
@@ -794,14 +813,12 @@ namespace cs_updater
             }
         }
 
-        #endregion
-
         private void RunGame()
         {
             if (ActiveInstall.Executable != "" && ActiveInstall.Executable != null)
             {
                 Process warband = new Process();
-                if (ActiveInstall.Executable.EndsWith("steam.exe"))
+                if (ActiveInstall.Executable.ToLower().EndsWith("steam.exe"))
                 {
                     warband.StartInfo.FileName = ActiveInstall.Executable;
                     warband.StartInfo.Arguments = "steam://rungameid/48700";
@@ -814,7 +831,16 @@ namespace cs_updater
                 warband.Start();
                 this.Close();
             }
+            else
+            {
+                this.Dispatcher.Invoke(() =>
+                {
+                    System.Windows.Forms.MessageBox.Show("No launcher configured - please set the path to steam or mb_warband.exe to enable launching the game.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                });
+            }
         }
+        #endregion
+
 
         private void windowKeyPress(object sender, System.Windows.Input.KeyEventArgs e)
         {
@@ -827,151 +853,14 @@ namespace cs_updater
             }
         }
 
-
-
+        private void Menu_Logs_Click(object sender, RoutedEventArgs e)
+        {
+            string cmd = "explorer.exe";
+            string arg = "/e, " + Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "NordInvasion", "Updater");
+            Process.Start(cmd, arg);
+        }
 
         #region Dev Controls
-
-        private UpdateHash BuildStructure(DirectoryInfo directory)
-        {
-            var hash = new UpdateHash
-            {
-                Module = "NordInvasion",
-                Files = BuildFileStructure(directory)
-            };
-
-            return hash;
-        }
-
-        private static List<UpdateHashItem> BuildFileStructure(DirectoryInfo directory)
-        {
-            var jsonObject = new List<UpdateHashItem>();
-
-            try
-            {
-                foreach (var file in directory.GetFiles())
-                {
-                    var crc = string.Empty;
-                    {
-                        using (FileStream stream = new FileStream(file.FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)) // File.OpenRead(file.FullName))
-                        {
-                            using (SHA1Managed sha = new SHA1Managed())
-                            {
-                                byte[] checksum = sha.ComputeHash(stream);
-                                crc = BitConverter.ToString(checksum)
-                                    .Replace("-", string.Empty).ToLower();
-                            }
-                        }
-                        jsonObject.Add(new UpdateHashItem(file.Name, crc));
-                    }
-                }
-            }
-            catch (Exception err)
-            {
-                System.Windows.Forms.MessageBox.Show("Unable to complete building of JSON file due to error: \n\n" + err.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return null;
-            }
-
-            foreach (var folder in directory.GetDirectories())
-            {
-                jsonObject.Add(new UpdateHashItem(folder.Name, BuildFileStructure(new DirectoryInfo(folder.FullName))));
-            }
-
-            return jsonObject;
-        }
-
-        private async void Modules_Build_Click(object sender, RoutedEventArgs e)
-        {
-            //note: currently this button just does "useful" features required in/to prove the final version.
-
-            //set the directory
-            DirectoryInfo dir = null;
-
-            CommonOpenFileDialog dialog = new CommonOpenFileDialog
-            {
-                InitialDirectory = "C:\\",
-                IsFolderPicker = true
-            };
-            if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
-            {
-                dir = new DirectoryInfo(dialog.FileName);
-            }
-
-            if (dir == null) return;
-
-            //build the json Object which contains all the files and folders
-            hashObject = await Task.Run(() => BuildStructure(dir));
-            hashObject.Source = dir.FullName;
-            if (hashObject.Files == null) return;
-
-            //convert the json object to a json string
-            string jobjString = await Task.Run(() => JsonConvert.SerializeObject(hashObject, Formatting.Indented, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore }));
-
-            //display the json file in the web browser window.
-            string output = "<html><body oncontextmenu='return false; '><pre>" + jobjString + "</pre></body</html>";
-            SetNews("<pre>" + jobjString + "</pre>");
-        }
-
-        private void Modules_Child_Count_Click(object sender, RoutedEventArgs e)
-        {
-            System.Windows.Forms.MessageBox.Show("Files & Folders found: " + hashObject.getFileCount().ToString(), "F&F Count");
-        }
-
-        private void Modules_Compress_Click(object sender, RoutedEventArgs e)
-        {
-            var watch = System.Diagnostics.Stopwatch.StartNew();
-            if (hashObject.Source == null) return;
-
-            //set the directory
-            DirectoryInfo dir = null;
-
-            CommonOpenFileDialog dialog = new CommonOpenFileDialog
-            {
-                InitialDirectory = "C:\\",
-                IsFolderPicker = true
-            };
-            if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
-            {
-                dir = new DirectoryInfo(dialog.FileName);
-            }
-
-            if (dir == null) return;
-
-            CompressFiles(dir.FullName, null, hashObject.Files);
-            watch.Stop();
-            System.Windows.Forms.MessageBox.Show("Done - " + watch.ElapsedMilliseconds.ToString(), "Finished", MessageBoxButtons.OK, MessageBoxIcon.Information);
-        }
-
-        private void CompressFiles(string outputDirectory, string subDirectory, List<UpdateHashItem> files)
-        {
-            if (!outputDirectory.EndsWith("\\")) outputDirectory += "\\";
-            if (subDirectory != null && !subDirectory.EndsWith("\\")) subDirectory += "\\";
-
-            if (files == null) return;
-            foreach (var f in files)
-            {
-                if (f.isFolder())
-                {
-                    Directory.CreateDirectory(outputDirectory + subDirectory + f.Name);
-                    if (f.Files != null) CompressFiles(outputDirectory, subDirectory + f.Name + "\\", f.Files);
-                }
-                else
-                {
-                    CreateGz(hashObject.Source + "\\" + subDirectory + f.Name, outputDirectory + subDirectory + f.Name);
-                }
-            }
-        }
-
-        private void CreateGz(String inputFile, String outputFile)
-        {
-            using (FileStream originalFileStream = new FileStream(inputFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
-            using (FileStream compressedFileStream = File.Create(outputFile + ".gz"))
-            using (GZipStream compressionStream = new GZipStream(compressedFileStream, CompressionMode.Compress))
-            {
-                originalFileStream.CopyTo(compressionStream);
-            }
-        }
-
         private void Dev_Clear_Click(object sender, RoutedEventArgs e)
         {
             Properties.Settings.Default.installDirs = "{ }";
@@ -979,14 +868,6 @@ namespace cs_updater
             LoadInstallDirs();
         }
         #endregion
-
-        public Version AssemblyVersion
-        {
-            get
-            {
-                return ApplicationDeployment.CurrentDeployment.CurrentVersion;
-            }
-        }
     }
 }
 

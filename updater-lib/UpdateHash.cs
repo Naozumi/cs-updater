@@ -32,10 +32,10 @@ namespace cs_updater_lib
             Source = source;
         }
 
-        public int getFileCount()
+        public double getFileCount()
         {
             if (this.Files == null) return 0;
-            int count = this.Files.Count();
+            double count = this.Files.Count();
             foreach (UpdateHashItem i in this.Files)
             {
                 count += i.getFilesCount();

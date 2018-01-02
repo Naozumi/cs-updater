@@ -35,7 +35,7 @@
                 <RowDefinition Height="23" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
-            <Label Grid.Row="0"  Content="Help" HorizontalAlignment="Right" Foreground="Blue" FontSize="10" Cursor="Hand" MouseLeftButtonDown="Help_Click"/>
+            <!--<Label Grid.Row="0"  Content="Help" HorizontalAlignment="Left" Foreground="Blue" FontSize="11" Cursor="Hand" MouseLeftButtonDown="Help_Click"/>-->
             <DataGrid Grid.Row="1" x:Name="data"  ItemsSource="{Binding Installs}" AutoGenerateColumns="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Name"  Binding="{Binding Name}" MinWidth="100"/>
@@ -92,6 +92,8 @@
                 <ColumnDefinition Width="100"/>
                 <ColumnDefinition Width="5"/>
                 <ColumnDefinition Width="100"/>
+                <ColumnDefinition Width="5"/>
+                <ColumnDefinition Width="100"/>
             </Grid.ColumnDefinitions>
             <Button Grid.Column="0"  Content="Automatically Find Installations" Click="AutomaticallyAddInstalls" Foreground="White">
                 <Button.Style>
@@ -122,7 +124,7 @@
                     </Style>
                 </Button.Style>
             </Button>
-            <Button Grid.Column="4" Content="OK" Click="OK_Click" Foreground="White">
+            <Button Grid.Column="4" Content="Help" Click="Help_Click" Foreground="White">
                 <Button.Style>
                     <Style TargetType="{x:Type Button}">
                         <Setter Property="Background" Value="#FF830606"/>
@@ -151,7 +153,36 @@
                     </Style>
                 </Button.Style>
             </Button>
-            <Button Grid.Column="6" Content="Cancel" Click="Cancel_Click" Foreground="White">
+            <Button Grid.Column="6" Content="OK" Click="OK_Click" Foreground="White">
+                <Button.Style>
+                    <Style TargetType="{x:Type Button}">
+                        <Setter Property="Background" Value="#FF830606"/>
+                        <Setter Property="BorderBrush" Value="#FFA2760A"/>
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="{x:Type Button}">
+                                    <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}">
+                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                        <Style.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#FFA80303"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed"  Value="True">
+                                <Setter Property="BorderBrush" Value="#FF915252"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled"  Value="False">
+                                <Setter Property="Background" Value="#FF976B6B"/>
+                                <Setter Property="Foreground" Value="#888"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+            </Button>
+            <Button Grid.Column="8" Content="Cancel" Click="Cancel_Click" Foreground="White">
                 <Button.Style>
                     <Style TargetType="{x:Type Button}">
                         <Setter Property="Background" Value="#FF830606"/>

@@ -18,6 +18,9 @@
 
             <Label>
                 <TextBlock TextWrapping="Wrap" Margin="5,0" >
+                    <Run FontWeight="Bold">To Edit:</Run><LineBreak/>
+                    Double click any cell to start editing. Values are explained below.
+                    <LineBreak/><LineBreak/>
                     <Run FontWeight="Bold">Name:</Run><LineBreak/>
                     This is to help identify the installation to you and used only in the installation picker in the main window.
                     <LineBreak/><LineBreak/>

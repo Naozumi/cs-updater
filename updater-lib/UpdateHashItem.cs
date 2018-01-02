@@ -45,9 +45,9 @@ namespace cs_updater_lib
             this.Files = files;
         }
 
-        public int getFilesCount()
+        public double getFilesCount()
         {
-            int c = 0;
+            double c = 0;
             if (this.Files != null)
             {
                 c += this.Files.Count();

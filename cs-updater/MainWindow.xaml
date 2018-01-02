@@ -36,7 +36,7 @@
 
         <DockPanel Grid.Column="0" Grid.ColumnSpan="7">
             <Menu DockPanel.Dock="Top" Background="#00000000">
-                <MenuItem Header="_Settings" x:Name="menuSettings">
+                <MenuItem Header="_Settings" x:Name="menuSettings" IsEnabled="True">
                     <!--<MenuItem Header="_Language">
                         <MenuItem Header="_English"/>
                         <MenuItem Header="_French"/>
@@ -47,12 +47,11 @@
                     </MenuItem>-->
                     <MenuItem Header="_Install Directory" Name="menuInstallDirs" />
                     <MenuItem Header="_Options..." Name="menuOptions" Click="Menu_OptionsClick" />
+                    <Separator />
+                    <MenuItem Header="Open _Logs Folder..." Name="menuLogs" Click="Menu_Logs_Click"/>
                 </MenuItem>
 
                 <MenuItem x:Name="DevMenu" Header="_Dev" Visibility="Hidden">
-                    <MenuItem Header="_Build" Click="Modules_Build_Click"/>
-                    <MenuItem Header="Count" Click="Modules_Child_Count_Click"/>
-                    <MenuItem Header="Compress" Click="Modules_Compress_Click"/>
                     <MenuItem Header="_Clear Preferences" Click="Dev_Clear_Click"/>
                 </MenuItem>
             </Menu>
@@ -70,7 +69,14 @@
                 </Grid.ColumnDefinitions>
                 <ListBox Grid.Column="0" Grid.Row="0" Opacity="1" BorderThickness="0" Name="list_news" SelectionChanged="list_news_SelectionChanged"/>
                 <GridSplitter Grid.Column="1" Width="4" HorizontalAlignment="Stretch" Background="#FFA2760A" />
-                <WebBrowser x:Name="Web_News" Grid.Column="2" Opacity="1" Height="Auto" Width="Auto" Navigating="Web_News_Navigating"/>
+                <Grid Grid.Column="2" Background="#FFFFFF">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="20" />
+                    </Grid.RowDefinitions>
+                    <WebBrowser x:Name="Web_News" Grid.Row="0" Opacity="1" Height="Auto" Width="Auto" Navigating="Web_News_Navigating"/>
+                    <Label Grid.Row="1" FontStyle="Italic"  Content="Open forum thread..." HorizontalAlignment="Right" VerticalAlignment="Center" Foreground="#FF830606" FontSize="12" Cursor="Hand" MouseLeftButtonDown="Open_Thread_Click" Padding="0"/>
+                </Grid>
             </Grid>
         </Border>
 

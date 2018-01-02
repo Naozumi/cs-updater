@@ -195,7 +195,9 @@
     </Resource>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="ni-badge.ico" />
+    <Resource Include="ni-badge.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.6.1">

@@ -8,6 +8,7 @@ using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Input;
 using cs_updater_lib;
+using NLog;
 
 namespace cs_updater
 {
@@ -17,6 +18,7 @@ namespace cs_updater
     public partial class OptionsWindow : Window
     {
         private OptionsHelp help = null;
+        private static Logger logger = LogManager.GetCurrentClassLogger();
 
         public OptionsWindow(List<InstallPath> installs)
         {
@@ -26,6 +28,8 @@ namespace cs_updater
             data.Items.Refresh();
             cb_verify.IsChecked = Properties.Settings.Default.AutoVerify;
             cb_update.IsChecked = Properties.Settings.Default.AutoUpdate;
+
+            if (this.Installs.Count == 0) Help_Click(null, null);
         }
 
         public List<InstallPath> Installs { get; set; }
@@ -140,6 +144,11 @@ namespace cs_updater
                 //No installs
                 System.Windows.Forms.MessageBox.Show("Please set a directory to continue.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+            else if (d < 1)
+            {
+                //No installs
+                System.Windows.Forms.MessageBox.Show("Please set one of the installations as default to continue.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
             else if (d == 1)
             {
                 // All OK
@@ -164,27 +173,36 @@ namespace cs_updater
 
         private void AutomaticallyAddInstalls(Object sender, RoutedEventArgs e)
         {
-            List<InstallPath> foundInstalls = getInstallationDirectories();
-            List<InstallPath> newInstalls = new List<InstallPath>();
-            foreach (InstallPath foundInstall in foundInstalls)
+            try
             {
-                var item = Installs.FirstOrDefault(o => o.Path == foundInstall.Path);
-                if (item == null)
+                List<InstallPath> foundInstalls = getInstallationDirectories();
+                List<InstallPath> newInstalls = new List<InstallPath>();
+                foreach (InstallPath foundInstall in foundInstalls)
                 {
-                    newInstalls.Add(foundInstall);
+                    var item = Installs.FirstOrDefault(o => o.Path == foundInstall.Path);
+                    if (item == null)
+                    {
+                        newInstalls.Add(foundInstall);
+                    }
                 }
-            }
-            if (newInstalls.Count > 0)
-            {
-                System.Windows.Forms.MessageBox.Show(newInstalls.Count + " new installs found and added to the list.", newInstalls.Count + " installs found.", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                Installs.AddRange(foundInstalls);
-            }
-            else
-            {
-                System.Windows.Forms.MessageBox.Show("No new installs found.", newInstalls.Count + " new installs found.", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
+                if (newInstalls.Count > 0)
+                {
+                    System.Windows.Forms.MessageBox.Show(newInstalls.Count + " new installs found and added to the list.", newInstalls.Count + " installs found.", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    Installs.AddRange(newInstalls);
+                }
+                else
+                {
+                    System.Windows.Forms.MessageBox.Show("No new installs found.", newInstalls.Count + " new installs found.", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
 
-            data.Items.Refresh();
+                data.Items.Refresh();
+            }
+            catch (Exception ex)
+            {
+                logger.Error("Error finding directories");
+                logger.Error(ex);
+                System.Windows.Forms.MessageBox.Show("Sorry, unable to locate installs.", "Unable to locate installs", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
         }
 
         private List<InstallPath> getInstallationDirectories()
@@ -213,15 +231,17 @@ namespace cs_updater
                                     {
                                         if (subkey.GetValue("DisplayName").ToString().Contains("Mount") && subkey.GetValue("DisplayName").ToString().Contains("Warband"))
                                         {
-                                            string lpath = null;
+                                            string lpath = "";
                                             if (subkey.GetValue("UninstallString").ToString().Contains("steam.exe"))
                                             {
                                                 lpath = GetSteamPath();
-                                            }else if (File.Exists(subkey.GetValue("UninstallString").ToString().Replace("uninstall.exe", "warband.exe"))) // if selected "Modules" folder
-                                            {
-                                                lpath = subkey.GetValue("UninstallString").ToString().Replace("uninstall.exe", "warband.exe");
+                                                installs.Add(new InstallPath(subkey.GetValue("DisplayName").ToString(), subkey.GetValue("InstallLocation").ToString() + @"\Modules\NordInvasion\", "", false, lpath));
                                             }
-                                            installs.Add(new InstallPath(subkey.GetValue("DisplayName").ToString(), subkey.GetValue("InstallLocation").ToString() + @"\Modules\NordInvasion\", "", false, lpath));
+                                            else if (File.Exists(subkey.GetValue("UninstallString").ToString().Replace("uninstall.exe", "mb_warband.exe"))) // if selected "Modules" folder
+                                            {
+                                                lpath = subkey.GetValue("UninstallString").ToString().Replace("uninstall.exe", "mb_warband.exe");
+                                                installs.Add(new InstallPath(subkey.GetValue("DisplayName").ToString(), subkey.GetValue("UninstallString").ToString().Replace("uninstall.exe", "") + @"Modules\NordInvasion\", "", false, lpath));
+                                            }
                                         }
                                     }
                                 }
@@ -247,16 +267,17 @@ namespace cs_updater
                                     {
                                         if (subkey.GetValue("DisplayName").ToString().Contains("Mount") && subkey.GetValue("DisplayName").ToString().Contains("Warband"))
                                         {
-                                            string lpath = null;
+                                            string lpath = "";
                                             if (subkey.GetValue("UninstallString").ToString().Contains("steam.exe"))
                                             {
                                                 lpath = GetSteamPath();
+                                                installs.Add(new InstallPath(subkey.GetValue("DisplayName").ToString(), subkey.GetValue("InstallLocation").ToString(), "", false, lpath));
                                             }
-                                            else if (File.Exists(subkey.GetValue("UninstallString").ToString().Replace("uninstall.exe", "warband.exe"))) // if selected "Modules" folder
+                                            else if (File.Exists(subkey.GetValue("UninstallString").ToString().Replace("uninstall.exe", "mb_warband.exe"))) // if selected "Modules" folder
                                             {
-                                                lpath = subkey.GetValue("UninstallString").ToString().Replace("uninstall.exe", "warband.exe");
+                                                lpath = subkey.GetValue("UninstallString").ToString().Replace("uninstall.exe", "mb_warband.exe");
+                                                installs.Add(new InstallPath(subkey.GetValue("DisplayName").ToString(), subkey.GetValue("UninstallString").ToString().Replace("uninstall.exe", "") + @"Modules\NordInvasion\", "", false, lpath));
                                             }
-                                            installs.Add(new InstallPath(subkey.GetValue("DisplayName").ToString(), subkey.GetValue("InstallLocation").ToString(), "", false, lpath));
                                         }
                                     }
                                 }
@@ -269,9 +290,9 @@ namespace cs_updater
             return installs;
         }
 
-        
 
-        private void Help_Click(object sender, MouseButtonEventArgs e)
+
+        private void Help_Click(object sender, RoutedEventArgs e)
         {
             if (help == null)
             {
@@ -302,10 +323,14 @@ namespace cs_updater
                 try
                 {
                     var spath = GetSteamPath();
-                    if (spath != null)
+                    if (spath != "")
                     {
                         selected.Executable = spath;
                         need2find = false;
+                    }
+                    else
+                    {
+                        System.Windows.Forms.MessageBox.Show("Could not find steam - please locate it manually.", "Unable to locate steam.", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
                 }
                 catch
@@ -313,7 +338,7 @@ namespace cs_updater
                     //something went wrong with autofind - just continue as if all is well. Probably a permissions issue - we will use file finder instead.
                 }
             }
-            
+
             if (need2find)
             {
                 System.Windows.Controls.Button btn = sender as System.Windows.Controls.Button;
@@ -365,7 +390,7 @@ namespace cs_updater
 
                 selected.Executable = file.FullName;
             }
-        
+
             //Sends the enter event - on a datagrid, this auto adds a new blank row. Generally, it just looks a bit better.
             this.data.CommitEdit();
             var key = Key.Enter;
@@ -418,11 +443,14 @@ namespace cs_updater
                             {
                                 using (RegistryKey subkey = key.OpenSubKey(subkey_name))
                                 {
-                                    if (subkey.GetValue("DisplayName") != null)
+                                    if (subkey.GetValue("DisplayName") != null && subkey.GetValue("Publisher") != null)
                                     {
-                                        if (subkey.GetValue("DisplayName").ToString() == "Steam")
+                                        if (subkey.GetValue("DisplayName").ToString() == "Steam" && subkey.GetValue("Publisher").ToString() == "Valve Corporation")
                                         {
-                                            return subkey.GetValue("UninstallString").ToString().Replace("uninstall.exe", "steam.exe");
+                                            if (subkey.GetValue("UninstallString").ToString().Contains("uninstall.exe"))
+                                            {
+                                                return subkey.GetValue("UninstallString").ToString().Replace("uninstall.exe", "steam.exe");
+                                            }
                                         }
                                     }
                                 }
@@ -444,11 +472,14 @@ namespace cs_updater
                             {
                                 using (RegistryKey subkey = key.OpenSubKey(subkey_name))
                                 {
-                                    if (subkey.GetValue("DisplayName") != null)
+                                    if (subkey.GetValue("DisplayName") != null && subkey.GetValue("Publisher") != null)
                                     {
-                                        if (subkey.GetValue("DisplayName").ToString() == "Steam")
+                                        if (subkey.GetValue("DisplayName").ToString() == "Steam" && subkey.GetValue("Publisher").ToString() == "Valve Corporation")
                                         {
-                                            return subkey.GetValue("UninstallString").ToString().Replace("uninstall.exe", "steam.exe");
+                                            if (subkey.GetValue("UninstallString").ToString().Contains("uninstall.exe"))
+                                            {
+                                                return subkey.GetValue("UninstallString").ToString().Replace("uninstall.exe", "steam.exe");
+                                            }
                                         }
                                     }
                                 }
@@ -457,8 +488,7 @@ namespace cs_updater
                     }
                 }
             }
-
-            return null;
+            return "";
         }
     }
 }

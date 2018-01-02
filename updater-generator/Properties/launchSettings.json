@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "updater-generator": {
+      "commandName": "Project",
+      "commandLineArgs": "\"C:\\Program Files (x86)\\Steam\\steamapps\\common\\MountBlade Warband\\Modules\\NordInvasion\" \"C:\\outputFiles\" 1.7.0 \"jsonhash.json\""
+    }
+  }
+}
