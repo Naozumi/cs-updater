@@ -35,8 +35,7 @@
                 <RowDefinition Height="23" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
-            <!--<Label Grid.Row="0"  Content="Help" HorizontalAlignment="Left" Foreground="Blue" FontSize="11" Cursor="Hand" MouseLeftButtonDown="Help_Click"/>-->
-            <DataGrid Grid.Row="1" x:Name="data"  ItemsSource="{Binding Installs}" AutoGenerateColumns="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+            <DataGrid Grid.Row="1" x:Name="data"  ItemsSource="{Binding Installs}" AutoGenerateColumns="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" SelectionMode="Single">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Name"  Binding="{Binding Name}" MinWidth="100"/>
                     <DataGridCheckBoxColumn Header="Default" Binding="{Binding IsDefault}" />

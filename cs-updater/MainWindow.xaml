@@ -9,21 +9,37 @@
         Height="550" Width="750"
         MinWidth="170" KeyDown="windowKeyPress" WindowStartupLocation="CenterScreen"
         >
+    <Window.Resources>
+        <Style x:Key="GridSplitterStyle" TargetType="{x:Type GridSplitter}">
+            <Setter Property="Background">
+                <Setter.Value>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                        <GradientStop Color="#FFFFFF" Offset="0"/>
+                        <GradientStop Color="#FFFFFF" Offset="0.40"/>
+                        <GradientStop Color="#FFA2760A" Offset="0.40"/>
+                        <GradientStop Color="#FFA2760A" Offset="0.60"/>
+                        <GradientStop Color="#FFFFFF" Offset="0.60"/>
+                        <GradientStop Color="#FFFFFF" Offset="1"/>
+                    </LinearGradientBrush>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
 
     <Grid>
         <Grid.Background>
             <ImageBrush ImageSource="Resources/ni_parch_body_mobile.jpg" TileMode="Tile" Viewport="0,0,828,314" ViewportUnits="Absolute"/>
         </Grid.Background>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="20"/>
+            <ColumnDefinition Width="10"/>
             <ColumnDefinition MinWidth="50" />
             <ColumnDefinition Width="10"/>
             <ColumnDefinition Width="*" MaxWidth="100" MinWidth="50"/>
-            <ColumnDefinition Width="20"/>
+            <ColumnDefinition Width="10"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="10" />
+            <RowDefinition Height="0" />
             <RowDefinition Height="65"/>
             <RowDefinition Height="10"/>
             <RowDefinition/>
@@ -31,21 +47,15 @@
             <RowDefinition Height="20"/>
             <RowDefinition Height="10"/>
             <RowDefinition Height="20" />
-            <RowDefinition Height="20" />
+            <RowDefinition Height="10" />
         </Grid.RowDefinitions>
 
-        <DockPanel Grid.Column="0" Grid.ColumnSpan="7">
-            <Menu DockPanel.Dock="Top" Background="#00000000">
+        <Grid Grid.ColumnSpan="100">
+            <Menu Background="#00000000" HorizontalAlignment="Stretch">
                 <MenuItem Header="_Settings" x:Name="menuSettings" IsEnabled="True">
-                    <!--<MenuItem Header="_Language">
-                        <MenuItem Header="_English"/>
-                        <MenuItem Header="_French"/>
-                        <MenuItem Header="E_spañol"/>
-                        <MenuItem Header="_German"/>
-                        <MenuItem Header="_Norwegian"/>
-                        <MenuItem Header="_Danish"/>
-                    </MenuItem>-->
-                    <MenuItem Header="_Install Directory" Name="menuInstallDirs" />
+                    <MenuItem Header="_Active Installation" Name="menuInstallDirs">
+
+                    </MenuItem>
                     <MenuItem Header="_Options..." Name="menuOptions" Click="Menu_OptionsClick" />
                     <Separator />
                     <MenuItem Header="Open _Logs Folder..." Name="menuLogs" Click="Menu_Logs_Click"/>
@@ -55,20 +65,18 @@
                     <MenuItem Header="_Clear Preferences" Click="Dev_Clear_Click"/>
                 </MenuItem>
             </Menu>
-            <StackPanel></StackPanel>
-        </DockPanel>
-
+        </Grid>
 
         <Image Grid.Column="1" Height="Auto" Grid.Row="2" VerticalAlignment="Top" Width="Auto" Grid.ColumnSpan="3" Source="Resources/new_banner.png"/>
         <Border BorderBrush="#FFA2760A" BorderThickness="1" Grid.Column="1" Grid.Row="4" Grid.ColumnSpan="3">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="5" />
+                    <ColumnDefinition Width="8" />
                     <ColumnDefinition Width="3*" />
                 </Grid.ColumnDefinitions>
                 <ListBox Grid.Column="0" Grid.Row="0" Opacity="1" BorderThickness="0" Name="list_news" SelectionChanged="list_news_SelectionChanged"/>
-                <GridSplitter Grid.Column="1" Width="4" HorizontalAlignment="Stretch" Background="#FFA2760A" />
+                <GridSplitter Grid.Column="1" Width="8" Margin="0" HorizontalAlignment="Stretch" Style="{DynamicResource GridSplitterStyle}" />
                 <Grid Grid.Column="2" Background="#FFFFFF">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*" />
@@ -81,13 +89,13 @@
         </Border>
 
 
-        
+
         <Label x:Name="progressBarText" HorizontalAlignment="Center" VerticalAlignment="Center" Content="Loading..." Padding="0,2" Grid.Column="1" Grid.Row="6" />
         <Grid Grid.Column="1" Grid.Row="7" Grid.ColumnSpan="1">
             <ProgressBar x:Name="progressBar"  Foreground="DarkGoldenrod" Background="#FFF7F3E4" Height="Auto" BorderBrush="#FFA2760A" />
         </Grid>
         <Label x:Name="activeInstallText" HorizontalAlignment="Center" VerticalAlignment="Center" Content="" Padding="0,2" Grid.Column="1" Grid.Row="8" />
-        <Button x:Name="btn_update" Content="Check files" Grid.Column="3" Grid.Row="6" Grid.RowSpan="3" Click="Button_Update_Click" Foreground="White" IsEnabled="False" Height="40" Margin="0,5" VerticalAlignment="Top">
+        <Button x:Name="btn_update" Content="Check files" Grid.Column="3" Grid.Row="6" Grid.RowSpan="3" Click="Button_Update_Click" Foreground="White" IsEnabled="False" Height="50" Margin="0" VerticalAlignment="Top">
             <Button.Style>
                 <Style TargetType="{x:Type Button}">
                     <Setter Property="Background" Value="#FF830606"/>

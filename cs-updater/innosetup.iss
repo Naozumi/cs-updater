@@ -1,7 +1,7 @@
 #include <idp.iss>
 
 #define MyAppName "NordInvasion Updater"
-#define MyAppVersion "3.0.0.5"
+#define MyAppVersion "3.0.0.7"
 #define MyAppPublisher "NordInvasion"
 #define MyAppURL "https://nordinvasion.com"
 #define MyAppExeName "NordInvasion_Updater.exe"
@@ -24,6 +24,7 @@ LicenseFile=C:\Users\andy\source\repos\gpl-3.0.txt
 InfoAfterFile=C:\Users\andy\source\repos\postinstall.txt
 OutputDir=C:\Users\andy\source\repos
 OutputBaseFilename=niupdater{#MyAppVersion}
+VersionInfoVersion={#MyAppVersion}
 SetupIconFile=C:\Users\andy\source\repos\cs-updater\cs-updater\ni-badge.ico
 Compression=lzma
 SolidCompression=yes
@@ -32,7 +33,7 @@ SolidCompression=yes
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Tasks]
-Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
+Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: checked
 
 [Files]
 Source: "C:\Users\andy\source\repos\cs-updater\cs-updater\bin\Release\NordInvasion_Updater.exe"; DestDir: "{app}"; Flags: ignoreversion

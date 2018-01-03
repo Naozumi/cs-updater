@@ -146,6 +146,8 @@ namespace cs_updater
                 {
                     ActiveInstall = install;
                     mi.IsChecked = true;
+                    //menuInstallDirs.Header = "Active Installation: " + ActiveInstall.Name;
+                    activeInstallText.Content = "Active Installation: " + ActiveInstall.Name;
                 }
                 menuInstallDirs.Items.Add(mi);
             }
@@ -153,13 +155,13 @@ namespace cs_updater
             if (installDirs.Count > 0)
             {
                 btn_update.IsEnabled = true;
-                activeInstallText.Content = "Active Installation: " + ActiveInstall.Name;
+                //menuInstallDirs.Header = "Active Installation: " + ActiveInstall.Name;
                 progressText = "Awaiting file check";
             }
             else
             {
                 btn_update.IsEnabled = false;
-                activeInstallText.Content = "";
+                //menuInstallDirs.Header = "Active Installation";
                 progressText = "Please set an installation path.";
             }
         }
@@ -180,6 +182,7 @@ namespace cs_updater
             System.Windows.Controls.MenuItem mi = sender as System.Windows.Controls.MenuItem;
             ActiveInstall = (InstallPath)mi.Tag;
             mi.IsChecked = true;
+            //menuInstallDirs.Header = "Active Installation: " + ActiveInstall.Name;
             activeInstallText.Content = "Active Installation: " + ActiveInstall.Name;
             progressText = "Awaiting file check";
         }
