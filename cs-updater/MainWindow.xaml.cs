@@ -306,6 +306,7 @@ namespace cs_updater
                     {
                         btn_update.Content = "Update files";
                         btn_update.IsEnabled = true;
+                        menuSettings.IsEnabled = true;
                     });
                     if (Properties.Settings.Default.AutoUpdate)
                     {

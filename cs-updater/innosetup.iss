@@ -1,7 +1,7 @@
 #include <idp.iss>
 
 #define MyAppName "NordInvasion Updater"
-#define MyAppVersion "3.0.0.7"
+#define MyAppVersion "3.0.0.8"
 #define MyAppPublisher "NordInvasion"
 #define MyAppURL "https://nordinvasion.com"
 #define MyAppExeName "NordInvasion_Updater.exe"
@@ -33,7 +33,7 @@ SolidCompression=yes
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Tasks]
-Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: checked
+Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
 Source: "C:\Users\andy\source\repos\cs-updater\cs-updater\bin\Release\NordInvasion_Updater.exe"; DestDir: "{app}"; Flags: ignoreversion
