@@ -120,18 +120,21 @@ namespace updater_generator
             {
                 foreach (var file in directory.GetFiles())
                 {
-                    var crc = string.Empty;
+                    if (!file.Name.StartsWith("."))
                     {
-                        using (FileStream stream = new FileStream(file.FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)) // File.OpenRead(file.FullName))
+                        var crc = string.Empty;
                         {
-                            using (SHA1Managed sha = new SHA1Managed())
+                            using (FileStream stream = new FileStream(file.FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)) // File.OpenRead(file.FullName))
                             {
-                                byte[] checksum = sha.ComputeHash(stream);
-                                crc = BitConverter.ToString(checksum)
-                                    .Replace("-", string.Empty).ToLower();
+                                using (SHA1Managed sha = new SHA1Managed())
+                                {
+                                    byte[] checksum = sha.ComputeHash(stream);
+                                    crc = BitConverter.ToString(checksum)
+                                        .Replace("-", string.Empty).ToLower();
+                                }
                             }
+                            jsonObject.Add(new UpdateHashItem(file.Name, crc));
                         }
-                        jsonObject.Add(new UpdateHashItem(file.Name, crc));
                     }
                 }
             }
@@ -143,7 +146,10 @@ namespace updater_generator
 
             foreach (var folder in directory.GetDirectories())
             {
-                jsonObject.Add(new UpdateHashItem(folder.Name, BuildFileStructure(new DirectoryInfo(folder.FullName))));
+                if (!folder.Name.StartsWith("."))
+                {
+                    jsonObject.Add(new UpdateHashItem(folder.Name, BuildFileStructure(new DirectoryInfo(folder.FullName))));
+                }
             }
 
             return jsonObject;
