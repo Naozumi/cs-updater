@@ -75,7 +75,7 @@ namespace cs_updater
                     UpdaterVersion UpdateJson = await Task.Run(() => JsonConvert.DeserializeObject<UpdaterVersion>(versionString));
                     if (Version.Parse(UpdateJson.version) > Version.Parse(Properties.Settings.Default.Version))
                     {
-                        var answer = System.Windows.Forms.MessageBox.Show("Update available for the updater.\n\nUpdate must be installed manually. Click \"OK\" to download.",
+                        var answer = System.Windows.Forms.MessageBox.Show("Update available for the updater.\n\nClick \"OK\" to download.",
                         "Update required", MessageBoxButtons.OKCancel, MessageBoxIcon.Information);
                         if (answer == System.Windows.Forms.DialogResult.OK)
                         {
@@ -343,9 +343,33 @@ namespace cs_updater
             {
                 logger.Error("Error - \"Do Update\"");
                 logger.Error(ex);
-                menuSettings.IsEnabled = true;
+                progressText = "Error updating.";
+                progress = 0;
+                this.Dispatcher.Invoke(() =>
+                {
+                    btn_update.Content = "Check files";
+                    btn_update.IsEnabled = true;
+                    menuSettings.IsEnabled = true;
+                    var errMessage = "";
+                    if (filesVerified && !updateRequired)
+                    {
+                        errMessage = "Error launching game.\n\nIf the error persists then please contact the developers via forum.nordinvasion.com";
+                    }
+                    else if (filesVerified && updateRequired)
+                    {
+                        errMessage = "Error downloading update.\n\nIf the error persists then please contact the developers via forum.nordinvasion.com";
+                    }
+                    else if (!filesVerified)
+                    {
+                        errMessage = "Error verifying files.\n\nIf the error persists then please contact the developers via forum.nordinvasion.com";
+                    }
+                    filesVerified = false;
+                    updateRequired = false;
+
+                    System.Windows.Forms.MessageBox.Show(errMessage, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                });
             }
-            
+
         }
 
         private async Task<Boolean> VerifyGameFiles()
@@ -367,17 +391,6 @@ namespace cs_updater
                 if (ActiveInstall.Path == "")
                 {
                     throw new Exception("Install directory not set.");
-                }
-                else if (!Directory.Exists(ActiveInstall.Path))
-                {
-                    updateRequired = true;
-                    progressText = "Update is required";
-                    this.Dispatcher.Invoke(() =>
-                    {
-                        btn_update.Content = "Update";
-                        btn_update.IsEnabled = true;
-                    });
-                    return true;
                 }
 
                 //Download JSON and decide on best host
@@ -436,6 +449,7 @@ namespace cs_updater
                 if (!Directory.Exists(hashObject.Source))
                 {
                     updateRequired = true;
+                    return true;
                 }
 
                 Queue pending = new Queue(hashObject.getFiles());
@@ -548,6 +562,10 @@ namespace cs_updater
                 if (hasWriteAccessToFolder(ActiveInstall.Path))
                 {
                     await Task.Run(async () => await Update_Game_Files());
+                }
+                else
+                {
+                    System.Windows.Forms.MessageBox.Show("Unable to create the NordInvasion directory", "Error - Unable to continue.");
                 }
             }
             else

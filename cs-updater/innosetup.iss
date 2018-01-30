@@ -1,7 +1,7 @@
 #include <idp.iss>
 
 #define MyAppName "NordInvasion Updater"
-#define MyAppVersion "3.0.0.8"
+#define MyAppVersion "3.0.0.9"
 #define MyAppPublisher "NordInvasion"
 #define MyAppURL "https://nordinvasion.com"
 #define MyAppExeName "NordInvasion_Updater.exe"
