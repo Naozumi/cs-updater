@@ -53,7 +53,6 @@ namespace cs_updater
             {
                 DevMenu.Visibility = Visibility.Visible;
             }
-
             CheckForUpdate();
         }
 
@@ -61,6 +60,7 @@ namespace cs_updater
         {
             progressBar.Value = progress;
             progressBarText.Content = progressText;
+            taskBarItemInfo.ProgressValue = progress/100;
         }
 
         private async void CheckForUpdate()
@@ -279,9 +279,11 @@ namespace cs_updater
 
         private async void DoUpdate()
         {
-            menuSettings.IsEnabled = false;
             try
             {
+                menuSettings.IsEnabled = false;
+                taskBarItemInfo.ProgressState = System.Windows.Shell.TaskbarItemProgressState.Normal;
+
                 if (updateRequired)
                 {
                     //DO UPDATE
@@ -338,6 +340,7 @@ namespace cs_updater
 
                     filesVerified = true;
                 }
+                taskBarItemInfo.ProgressState = System.Windows.Shell.TaskbarItemProgressState.None;
             }
             catch (Exception ex)
             {
@@ -345,6 +348,7 @@ namespace cs_updater
                 logger.Error(ex);
                 progressText = "Error updating.";
                 progress = 0;
+                taskBarItemInfo.ProgressState = System.Windows.Shell.TaskbarItemProgressState.Error;
                 this.Dispatcher.Invoke(() =>
                 {
                     btn_update.Content = "Check files";
@@ -880,6 +884,12 @@ namespace cs_updater
             string cmd = "explorer.exe";
             string arg = "/e, " + Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "NordInvasion", "Updater");
             Process.Start(cmd, arg);
+        }
+
+        private void Menu_About_Click(object sender, RoutedEventArgs e)
+        {
+            System.Windows.Forms.MessageBox.Show("NordInvasion Updater\nVersion: " + Properties.Settings.Default.Version + "\n\nFor more info visit:\nhttps://nordinvasion.com",
+                        "About", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         #region Dev Controls

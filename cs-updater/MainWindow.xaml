@@ -25,7 +25,9 @@
             </Setter>
         </Style>
     </Window.Resources>
-
+    <Window.TaskbarItemInfo>
+        <TaskbarItemInfo x:Name="taskBarItemInfo" />
+    </Window.TaskbarItemInfo>
     <Grid>
         <Grid.Background>
             <ImageBrush ImageSource="Resources/ni_parch_body_mobile.jpg" TileMode="Tile" Viewport="0,0,828,314" ViewportUnits="Absolute"/>
@@ -56,9 +58,11 @@
                     <MenuItem Header="_Active Installation" Name="menuInstallDirs">
 
                     </MenuItem>
-                    <MenuItem Header="_Options..." Name="menuOptions" Click="Menu_OptionsClick" />
+                    <MenuItem Header="_Options" Name="menuOptions" Click="Menu_OptionsClick" />
                     <Separator />
-                    <MenuItem Header="Open _Logs Folder..." Name="menuLogs" Click="Menu_Logs_Click"/>
+                    <MenuItem Header="Open _Logs Folder" Name="menuLogs" Click="Menu_Logs_Click"/>
+                    <Separator />
+                    <MenuItem Header="A_bout" Name="menuAbout" Click="Menu_About_Click"/>
                 </MenuItem>
 
                 <MenuItem x:Name="DevMenu" Header="_Dev" Visibility="Hidden">
