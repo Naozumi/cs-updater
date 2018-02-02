@@ -9,6 +9,7 @@ using System.Windows.Forms;
 using System.Windows.Input;
 using cs_updater_lib;
 using NLog;
+using System.Text.RegularExpressions;
 
 namespace cs_updater
 {
@@ -489,6 +490,12 @@ namespace cs_updater
                 }
             }
             return "";
+        }
+
+        private void NumberValidationTextBox(object sender, TextCompositionEventArgs e)
+        {
+            Regex regex = new Regex("[^0-9]+");
+            e.Handled = regex.IsMatch(e.Text);
         }
     }
 }

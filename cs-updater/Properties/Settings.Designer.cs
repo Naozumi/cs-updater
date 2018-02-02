@@ -160,5 +160,17 @@ namespace cs_updater.Properties {
                 return ((string)(this["Version"]));
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("4")]
+        public int Threads {
+            get {
+                return ((int)(this["Threads"]));
+            }
+            set {
+                this["Threads"] = value;
+            }
+        }
     }
 }
