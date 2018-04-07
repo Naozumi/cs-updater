@@ -466,7 +466,7 @@ namespace cs_updater
 
                 while (pending.Count + working.Count != 0)
                 {
-                    if (working.Count < 4 && pending.Count != 0)
+                    if (working.Count < Properties.Settings.Default.Threads && pending.Count != 0)
                     {
                         var item = (UpdateHashItem)pending.Dequeue();
                         working.Add(Task.Run(() => VerifyItem(item)));
@@ -606,7 +606,7 @@ namespace cs_updater
 
             while (pending.Count + working.Count != 0 && errors < 30)
             {
-                if (working.Count < 4 && pending.Count != 0)
+                if (working.Count < Properties.Settings.Default.Threads && pending.Count != 0)
                 {
                     var item = (UpdateHashItem)pending.Dequeue();
                     if (item.Verified == false)

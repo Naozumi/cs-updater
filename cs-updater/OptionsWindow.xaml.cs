@@ -29,6 +29,7 @@ namespace cs_updater
             data.Items.Refresh();
             cb_verify.IsChecked = Properties.Settings.Default.AutoVerify;
             cb_update.IsChecked = Properties.Settings.Default.AutoUpdate;
+            tb_threads.Text = Properties.Settings.Default.Threads.ToString();
 
             if (this.Installs.Count == 0) Help_Click(null, null);
         }
@@ -156,6 +157,7 @@ namespace cs_updater
                 DialogResult = true;
                 Properties.Settings.Default.AutoVerify = (bool)cb_verify.IsChecked;
                 Properties.Settings.Default.AutoUpdate = (bool)cb_update.IsChecked;
+                Properties.Settings.Default.Threads = Int32.Parse(tb_threads.Text);
                 Properties.Settings.Default.Save();
                 this.Close();
             }

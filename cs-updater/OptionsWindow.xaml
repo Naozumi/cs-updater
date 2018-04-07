@@ -41,7 +41,7 @@
             <CheckBox Grid.Row="1" Content="" x:Name="cb_update" VerticalAlignment="Center" Padding="0" HorizontalAlignment="Right" Margin="0,1,0,0" />
             <Label Grid.Row="1" Grid.Column="1" Content="Automatially update if update is available." Margin="0,1,0,0" Padding="5,0" VerticalAlignment="Top" />
             
-            <TextBox Grid.Row="2" Name="NumberTextBox" PreviewTextInput="NumberValidationTextBox" Margin="1,0,1,0" Height="18" VerticalAlignment="Center" TextAlignment="Right" />
+            <TextBox Grid.Row="2" Name="tb_threads" PreviewTextInput="NumberValidationTextBox" Margin="1,0,1,0" Height="18" VerticalAlignment="Center" TextAlignment="Right" />
             <Label Grid.Row="2" Grid.Column="1" Content="Number of concurrent downloads." Margin="0" Padding="5,0" VerticalAlignment="Top" />
         </Grid>
 
