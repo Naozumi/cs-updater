@@ -590,7 +590,6 @@ namespace cs_updater
 
         private async Task<Boolean> Update_Game_Files()
         {
-
             Queue pending = new Queue(hashObject.getFiles());
             List<Task<UpdateHashItem>> working = new List<Task<UpdateHashItem>>();
             float count = pending.Count;
@@ -598,9 +597,28 @@ namespace cs_updater
 
             hashObject.Source = ActiveInstall.Path;
 
+
+
             foreach (UpdateHashItem f in hashObject.getFolders())
             {
-                System.IO.Directory.CreateDirectory(ActiveInstall.Path + f.Path);
+                try
+                {
+                    System.IO.Directory.CreateDirectory(ActiveInstall.Path + f.Path);
+                }
+                catch
+                {
+                    MakeFilesWriteable();
+                    try
+                    {
+                        System.IO.Directory.CreateDirectory(ActiveInstall.Path + f.Path);
+                    }
+                    catch (Exception ex)
+                    {
+                        logger.Error(new Exception("Cannot create folder: " + f.Path, ex));
+                        throw new Exception("Unable to create the neccessary folders - insufficient permissions.");
+                    }
+                }
+
             }
 
 
