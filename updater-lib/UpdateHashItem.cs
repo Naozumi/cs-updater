@@ -21,15 +21,19 @@ namespace cs_updater_lib
         public int Attempts { get; set; }
         [Newtonsoft.Json.JsonIgnore]
         public Boolean Verified { get; set; }
+        [Newtonsoft.Json.JsonIgnore]
+        public Boolean Writable { get; set; }
 
         public UpdateHashItem()
         {
+            this.Writable = true;
         }
 
         public UpdateHashItem(string name, string crc)
         {
             this.Name = name;
             this.Crc = crc;
+            this.Writable = true;
         }
 
         public UpdateHashItem(string name, string crc, List<UpdateHashItem> files)
@@ -37,15 +41,17 @@ namespace cs_updater_lib
             Name = name;
             Crc = crc;
             Files = files;
+            this.Writable = true;
         }
 
         public UpdateHashItem(string name, List<UpdateHashItem> files)
         {
             this.Name = name;
             this.Files = files;
+            this.Writable = true;
         }
 
-        public double getFilesCount()
+        public double GetFilesCount()
         {
             double c = 0;
             if (this.Files != null)
@@ -53,7 +59,7 @@ namespace cs_updater_lib
                 c += this.Files.Count();
                 foreach (UpdateHashItem sub in this.Files)
                 {
-                    c += sub.getFilesCount();
+                    c += sub.GetFilesCount();
                 }
             }
             else
@@ -64,7 +70,7 @@ namespace cs_updater_lib
             return c;
         }
 
-        public bool isFolder()
+        public bool IsFolder()
         {
             if (this.Crc == null)
             {
@@ -73,23 +79,23 @@ namespace cs_updater_lib
             return false;
         }
 
-        public List<UpdateHashItem> getFolders(String path)
+        public List<UpdateHashItem> GetFolders(String path)
         {
             var l = new List<UpdateHashItem>();
             if (this.Files == null) return null;
             foreach (UpdateHashItem f in this.Files)
             {
-                if (f.isFolder())
+                if (f.IsFolder())
                 {
                     f.Path = path + f.Name;
                     l.Add(f);
-                    f.getFolders(path + "\\");
+                    f.GetFolders(path + "\\");
                 }
             }
             return l;
         }
 
-        public List<UpdateHashItem> getFiles(String path)
+        public List<UpdateHashItem> GetFiles(String path)
         {
             var l = new List<UpdateHashItem>();
             if (this.Files == null) return null;
@@ -102,7 +108,7 @@ namespace cs_updater_lib
                 }
                 else
                 {
-                    f.getFiles(path + f.Name + "\\");
+                    f.GetFiles(path + f.Name + "\\");
                 }
             }
             return l;

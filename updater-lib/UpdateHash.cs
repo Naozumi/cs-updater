@@ -38,7 +38,7 @@ namespace cs_updater_lib
             double count = this.Files.Count();
             foreach (UpdateHashItem i in this.Files)
             {
-                count += i.getFilesCount();
+                count += i.GetFilesCount();
             }
             return count;
         }
@@ -49,11 +49,11 @@ namespace cs_updater_lib
             if (this.Files == null) return null;
             foreach (UpdateHashItem f in this.Files)
             {
-                if (f.isFolder())
+                if (f.IsFolder())
                 {
                     f.Path = f.Name;
                     l.Add(f);
-                    l.AddRange(f.getFolders(f.Path + "\\"));
+                    l.AddRange(f.GetFolders(f.Path + "\\"));
                 }
             }
             return l;
@@ -65,13 +65,13 @@ namespace cs_updater_lib
             if (this.Files == null) return null;
             foreach (UpdateHashItem f in this.Files)
             {
-                if (!f.isFolder())
+                if (!f.IsFolder())
                 {
                     f.Path = f.Name;
                     l.Add(f);
                 }
                 else {
-                    l.AddRange(f.getFiles(f.Name + "\\"));
+                    l.AddRange(f.GetFiles(f.Name + "\\"));
                 }
             }
             return l;

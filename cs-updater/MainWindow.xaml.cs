@@ -34,6 +34,8 @@ namespace cs_updater
         private static Logger logger = LogManager.GetCurrentClassLogger();
         private bool updateRequired = false;
         private bool filesVerified = false;
+        private Object locker = new Object();
+        private bool WritableAttempted = true;
 
         private double progress = 0;
         private string progressText = "Loading...";
@@ -60,7 +62,7 @@ namespace cs_updater
         {
             progressBar.Value = progress;
             progressBarText.Content = progressText;
-            taskBarItemInfo.ProgressValue = progress/100;
+            taskBarItemInfo.ProgressValue = progress / 100;
         }
 
         private async void CheckForUpdate()
@@ -283,6 +285,7 @@ namespace cs_updater
             {
                 menuSettings.IsEnabled = false;
                 taskBarItemInfo.ProgressState = System.Windows.Shell.TaskbarItemProgressState.Normal;
+                WritableAttempted = false;
 
                 if (updateRequired)
                 {
@@ -456,6 +459,7 @@ namespace cs_updater
                     return true;
                 }
 
+                //Verify Files
                 Queue pending = new Queue(hashObject.getFiles());
                 List<Task<UpdateHashItem>> working = new List<Task<UpdateHashItem>>();
                 float count = pending.Count;
@@ -471,7 +475,6 @@ namespace cs_updater
                     {
                         Task<UpdateHashItem> t = await Task.WhenAny(working);
                         working.RemoveAll(x => x.IsCompleted);
-                        if (!t.Result.Verified) updateRequired = true;
                         progress = ((count - pending.Count) / count) * 100;
                         progressText = "Checking files... " + (count - pending.Count) + " / " + count;
                     }
@@ -520,19 +523,33 @@ namespace cs_updater
 
         private UpdateHashItem VerifyItem(UpdateHashItem item)
         {
-            if (File.Exists(hashObject.Source + item.Path))
+            try
             {
-                using (FileStream stream = new FileStream(ActiveInstall.Path + item.Path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
-                using (SHA1Managed sha = new SHA1Managed())
+                if (File.Exists(hashObject.Source + item.Path))
                 {
-                    byte[] checksum = sha.ComputeHash(stream);
-                    if (BitConverter.ToString(checksum).Replace("-", string.Empty).ToLower() == item.Crc)
+                    using (FileStream stream = new FileStream(ActiveInstall.Path + item.Path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                    using (SHA1Managed sha = new SHA1Managed())
                     {
-                        item.Verified = true;
+                        byte[] checksum = sha.ComputeHash(stream);
+                        if (BitConverter.ToString(checksum).Replace("-", string.Empty).ToLower() == item.Crc)
+                        {
+                            item.Verified = true;
+                        }
                     }
                 }
+                else
+                {
+                    item.Verified = false;
+                    updateRequired = true;
+                }
+                return item;
             }
-            return item;
+            catch
+            {
+                item.Verified = false;
+                updateRequired = true;
+                return item;
+            }
         }
 
         private async Task UpdateGameFilesAsync()
@@ -547,25 +564,18 @@ namespace cs_updater
             if (!hasWriteAccessToFolder(ActiveInstall.Path))
             {
                 //Generate the folder & set permissions to allow us to update the files
-                Process updater = new Process();
-                if (System.Environment.OSVersion.Version.Major >= 6)
+                if (!MakeFilesWriteable())
                 {
-                    updater.StartInfo.Verb = "runas"; //Run as admin, for UAC prompts
+                    throw new Exception("Cannot make the files writable");
                 }
-                updater.StartInfo.Verb = "runas"; //Run as admin, for UAC prompts
-                updater.StartInfo.FileName = "updater-permissions.exe";
-                updater.StartInfo.Arguments = "\"" + ActiveInstall.Path.Replace("\\", "\\\\") + "\"";
-                updater.StartInfo.UseShellExecute = true;
-                updater.Start();
-                updater.WaitForExit();
-                updater.Close();
+                WritableAttempted = false;
             }
 
             if (Directory.Exists(ActiveInstall.Path))
             {
                 if (hasWriteAccessToFolder(ActiveInstall.Path))
                 {
-                    await Task.Run(async () => await Update_Game_Files());
+                    await Update_Game_Files();
                 }
                 else
                 {
@@ -593,6 +603,7 @@ namespace cs_updater
                 System.IO.Directory.CreateDirectory(ActiveInstall.Path + f.Path);
             }
 
+
             while (pending.Count + working.Count != 0 && errors < 30)
             {
                 if (working.Count < 4 && pending.Count != 0)
@@ -608,20 +619,36 @@ namespace cs_updater
                 else
                 {
                     Task<UpdateHashItem> t = await Task.WhenAny(working);
-                    working.RemoveAll(x => x.IsCompleted);
+                    //working.RemoveAll(x => x.IsCompleted);
                     if (t.Result.Verified)
                     {
+                        working.Remove(t);
                         progress = ((count - pending.Count) / count) * 100;
                         progressText = "Updating files... " + (count - pending.Count) + " / " + count;
                     }
                     else
                     {
-                        errors++;
-                        pending.Enqueue(t.Result);
+                        if (t.Result.Writable == false && !WritableAttempted)
+                        {
+                            MakeFilesWriteable();
+                            pending.Enqueue(t.Result);
+                            working.Remove(t);
+                        }
+                        else if (t.Result.Writable == false && WritableAttempted)
+                        {
+                            pending.Clear();
+                            errors += 60;
+                            working.Remove(t);
+                        }
                     }
                 }
             }
-            if (errors >= 30)
+
+            if (errors >= 60)
+            {
+                throw new Exception("Unable to write the files - insufficient permissions.");
+            }
+            else if (errors >= 30)
             {
                 throw new Exception("Unable to download files from server. Please contact NI Support.");
             }
@@ -674,6 +701,12 @@ namespace cs_updater
                         }
                     }
                 }
+                catch (UnauthorizedAccessException ex)
+                {
+                    item.Writable = false;
+                    logger.Error(new Exception("Cannot write the file: " + item.Name + "  " + item.Path, ex));
+                    return item;
+                }
                 catch (Exception ex)
                 {
                     // something odd went wrong
@@ -702,6 +735,9 @@ namespace cs_updater
         {
             try
             {
+
+
+
                 // Attempt to get a list of security permissions from the folder. 
                 // This will raise an exception if the path is read only or do not have access to view the permissions. 
                 System.Security.AccessControl.DirectorySecurity ds = Directory.GetAccessControl(folderPath);
@@ -714,6 +750,55 @@ namespace cs_updater
             catch (DirectoryNotFoundException)
             {
                 return false;
+            }
+        }
+
+        private bool MakeFilesWriteable()
+        {
+            lock (locker)
+            {
+                if (WritableAttempted) return false;
+                WritableAttempted = true;
+                Process updater = new Process();
+                if (System.Environment.OSVersion.Version.Major >= 6)
+                {
+                    updater.StartInfo.Verb = "runas"; //Run as admin, for UAC prompts
+                }
+                updater.StartInfo.Verb = "runas"; //Run as admin, for UAC prompts
+                updater.StartInfo.FileName = "updater-permissions.exe";
+                updater.StartInfo.Arguments = "\"" + ActiveInstall.Path.Replace("\\", "\\\\") + "\"";
+                updater.StartInfo.UseShellExecute = true;
+                try
+                {
+                    updater.Start();
+                    updater.WaitForExit();
+                    int existCode = updater.ExitCode;
+                    if (existCode < 1)
+                    {
+                        updater.Close();
+                        return false;
+                    }
+                    updater.Close();
+                    return true;
+                }
+                catch (System.ComponentModel.Win32Exception ex)
+                {
+                    this.Dispatcher.Invoke(() =>
+                    {
+                        System.Windows.Forms.MessageBox.Show("Cannot update. Permission was denied when making the files writable.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        logger.Error(ex);
+                    });
+                    return false;
+                }
+                catch (Exception ex)
+                {
+                    this.Dispatcher.Invoke(() =>
+                    {
+                        System.Windows.Forms.MessageBox.Show("Cannot update. Unknown error occured when trying to make the files writable.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        logger.Error(ex);
+                    });
+                    return false;
+                }
             }
         }
 
@@ -899,6 +984,12 @@ namespace cs_updater
             Properties.Settings.Default.Save();
             LoadInstallDirs();
         }
+        private void Writable_Click(object sender, RoutedEventArgs e)
+        {
+            WritableAttempted = false;
+            MakeFilesWriteable();
+        }
+
         #endregion
     }
 }

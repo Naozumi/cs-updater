@@ -160,7 +160,7 @@ namespace updater_generator
             if (files == null) return count;
             foreach (var f in files)
             {
-                if (f.isFolder())
+                if (f.IsFolder())
                 {
                     if (f.Files != null) count = CompressFiles(outputDirectory, Path.Combine(subDirectory, f.Name), f.Files, path, progress, fileCount, count);
                 }

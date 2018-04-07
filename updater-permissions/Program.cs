@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NLog;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -11,6 +12,8 @@ namespace updater_permissions
 {
     class Program
     {
+        private static Logger logger = LogManager.GetCurrentClassLogger();
+
         static void Main(string[] args)
         {
             if (args[0] != null)
@@ -20,12 +23,19 @@ namespace updater_permissions
                 {
                     Directory.CreateDirectory(destinationDirectory);
                 }
-                SetFullControlPermissionsToEveryone(destinationDirectory);
+                //set to root directory first
+                SetPermissions(destinationDirectory);
+                //set inheritance to all other files
+                SetPermissionsToAllFiles(destinationDirectory);
             }
-            
+            else
+            {
+                Environment.Exit(-1);
+            }
+            Environment.ExitCode = 1;
         }
 
-        static void SetFullControlPermissionsToEveryone(string path)
+        static void SetPermissions(string path)
         {
             const FileSystemRights rights = FileSystemRights.FullControl;
 
@@ -39,15 +49,17 @@ namespace updater_permissions
                 PropagationFlags.NoPropagateInherit,
                 AccessControlType.Allow);
 
-            var info = new DirectoryInfo(path);
+            DirectoryInfo info = new DirectoryInfo(path);
             var security = info.GetAccessControl(AccessControlSections.Access);
 
             security.ModifyAccessRule(AccessControlModification.Set, accessRule, out bool result);
 
             if (!result)
             {
-                Console.Write("Failed to give full - control permission to all users for path " + path) ;
-                Console.Read();
+                //Console.Write("Failed to give full - control permission to all users for path " + path) ;
+                //Console.Read();
+                logger.Error("Permissions failed on: " + path);
+                Environment.Exit(-2);
                 throw new InvalidOperationException("Failed to give full-control permission to all users for path " + path);
             }
 
@@ -64,12 +76,44 @@ namespace updater_permissions
 
             if (!inheritedResult)
             {
-                Console.Write("Failed to give full-control permission inheritance to all users for " + path);
-                Console.Read();
+                //Console.Write("Failed to give full-control permission inheritance to all users for " + path);
+                //Console.Read();
+                logger.Error("Inheritance failed on: " + path);
+                Environment.Exit(-3);
                 throw new InvalidOperationException("Failed to give full-control permission inheritance to all users for " + path);
             }
 
-            info.SetAccessControl(security);
+            try
+            {
+                if (File.Exists(path))
+                {
+                    var fs = File.GetAccessControl(path);
+                    fs.SetAccessRuleProtection(false, false);
+                    File.SetAccessControl(path, fs);
+                }
+                security.SetAccessRuleProtection(false, false);
+                info.SetAccessControl(security);
+            }
+            catch (Exception ex)
+            {
+                logger.Error("Cannot set ACL on: " + path);
+            }
+
+        }
+
+        static void SetPermissionsToAllFiles(string path)
+        {
+            //do directories first, or else you cant read for the files.
+            foreach (string d in Directory.GetDirectories(path))
+            {
+                SetPermissions(d);
+                SetPermissionsToAllFiles(d);
+            }
+
+            foreach (string f in Directory.GetFiles(path))
+            {
+                SetPermissions(f);
+            }
         }
     }
 }
