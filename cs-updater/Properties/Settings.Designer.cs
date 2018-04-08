@@ -154,7 +154,7 @@ namespace cs_updater.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("3.1.0")]
+        [global::System.Configuration.DefaultSettingValueAttribute("3.1.1")]
         public string Version {
             get {
                 return ((string)(this["Version"]));

@@ -121,7 +121,7 @@ namespace cs_updater
 
         private void ShowFirstRun()
         {
-            System.Windows.Forms.MessageBox.Show("Welcome to the NI Updater.\n\nPlease set the Installation Path to continue.", "Welcome", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            System.Windows.Forms.MessageBox.Show("Welcome to the NI Launcher.\n\nPlease set the Installation Path to continue.", "Welcome", MessageBoxButtons.OK, MessageBoxIcon.Information);
             progressText = "Please set an installation path.";
             Menu_OptionsClick(null, null);
         }
@@ -943,12 +943,15 @@ namespace cs_updater
                 Process warband = new Process();
                 if (ActiveInstall.Executable.ToLower().EndsWith("steam.exe"))
                 {
+                    string[] words = ActiveInstall.Path.Split('\\');
                     warband.StartInfo.FileName = ActiveInstall.Executable;
-                    warband.StartInfo.Arguments = "steam://rungameid/48700";
+                    warband.StartInfo.Arguments = "-applaunch 48700 -sm " + words[words.Length - 2];
                 }
                 else
                 {
+                    string[] words = ActiveInstall.Path.Split('\\');
                     warband.StartInfo.FileName = ActiveInstall.Executable;
+                    warband.StartInfo.Arguments = "-sm " + words[words.Length - 2];
                 }
                 warband.StartInfo.UseShellExecute = false;
                 warband.Start();

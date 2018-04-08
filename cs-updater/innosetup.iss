@@ -1,10 +1,10 @@
 #include <idp.iss>
 
-#define MyAppName "NordInvasion Updater"
-#define MyAppVersion "3.1.0"
+#define MyAppName "NordInvasion Launcher"
+#define MyAppVersion "3.1.1"
 #define MyAppPublisher "NordInvasion"
 #define MyAppURL "https://nordinvasion.com"
-#define MyAppExeName "NordInvasion_Updater.exe"
+#define MyAppExeName "NordInvasion_Launcher.exe"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application.
@@ -23,7 +23,7 @@ DisableProgramGroupPage=yes
 LicenseFile=C:\Users\andy\source\repos\gpl-3.0.txt
 InfoAfterFile=C:\Users\andy\source\repos\postinstall.txt
 OutputDir=C:\Users\andy\source\repos
-OutputBaseFilename=niupdater{#MyAppVersion}
+OutputBaseFilename=ni_launcher{#MyAppVersion}
 VersionInfoVersion={#MyAppVersion}
 SetupIconFile=C:\Users\andy\source\repos\cs-updater\cs-updater\ni-badge.ico
 Compression=lzma
@@ -36,7 +36,7 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "C:\Users\andy\source\repos\cs-updater\cs-updater\bin\Release\NordInvasion_Updater.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "C:\Users\andy\source\repos\cs-updater\cs-updater\bin\Release\NordInvasion_Launcher.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "C:\Users\andy\source\repos\cs-updater\cs-updater\bin\Release\Microsoft.WindowsAPICodePack.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "C:\Users\andy\source\repos\cs-updater\cs-updater\bin\Release\Microsoft.WindowsAPICodePack.Shell.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "C:\Users\andy\source\repos\cs-updater\cs-updater\bin\Release\Microsoft.WindowsAPICodePack.Shell.xml"; DestDir: "{app}"; Flags: ignoreversion
@@ -46,8 +46,8 @@ Source: "C:\Users\andy\source\repos\cs-updater\cs-updater\bin\Release\Newtonsoft
 Source: "C:\Users\andy\source\repos\cs-updater\cs-updater\bin\Release\NLog.config"; DestDir: "{app}"; Flags: ignoreversion
 Source: "C:\Users\andy\source\repos\cs-updater\cs-updater\bin\Release\NLog.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "C:\Users\andy\source\repos\cs-updater\cs-updater\bin\Release\NLog.xml"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Users\andy\source\repos\cs-updater\cs-updater\bin\Release\NordInvasion_Updater.exe.config"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Users\andy\source\repos\cs-updater\cs-updater\bin\Release\NordInvasion_Updater.pdb"; DestDir: "{app}"; Flags: ignoreversion
+Source: "C:\Users\andy\source\repos\cs-updater\cs-updater\bin\Release\NordInvasion_Launcher.exe.config"; DestDir: "{app}"; Flags: ignoreversion
+Source: "C:\Users\andy\source\repos\cs-updater\cs-updater\bin\Release\NordInvasion_Launcher.pdb"; DestDir: "{app}"; Flags: ignoreversion
 Source: "C:\Users\andy\source\repos\cs-updater\cs-updater\bin\Release\updater-lib.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "C:\Users\andy\source\repos\cs-updater\cs-updater\bin\Release\updater-lib.pdb"; DestDir: "{app}"; Flags: ignoreversion
 Source: "C:\Users\andy\source\repos\cs-updater\cs-updater\bin\Release\updater-permissions.exe"; DestDir: "{app}"; Flags: ignoreversion
