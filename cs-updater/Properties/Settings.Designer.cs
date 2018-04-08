@@ -154,7 +154,7 @@ namespace cs_updater.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("3.0.0.10")]
+        [global::System.Configuration.DefaultSettingValueAttribute("3.1.0")]
         public string Version {
             get {
                 return ((string)(this["Version"]));
@@ -163,13 +163,25 @@ namespace cs_updater.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("4")]
-        public int Threads {
+        [global::System.Configuration.DefaultSettingValueAttribute("20")]
+        public int Threads_Check {
             get {
-                return ((int)(this["Threads"]));
+                return ((int)(this["Threads_Check"]));
             }
             set {
-                this["Threads"] = value;
+                this["Threads_Check"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("4")]
+        public int Threads_Download {
+            get {
+                return ((int)(this["Threads_Download"]));
+            }
+            set {
+                this["Threads_Download"] = value;
             }
         }
     }

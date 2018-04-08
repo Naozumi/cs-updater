@@ -29,7 +29,8 @@ namespace cs_updater
             data.Items.Refresh();
             cb_verify.IsChecked = Properties.Settings.Default.AutoVerify;
             cb_update.IsChecked = Properties.Settings.Default.AutoUpdate;
-            tb_threads.Text = Properties.Settings.Default.Threads.ToString();
+            tb_threads_ch.Text = Properties.Settings.Default.Threads_Check.ToString();
+            tb_threads_dl.Text = Properties.Settings.Default.Threads_Download.ToString();
 
             if (this.Installs.Count == 0) Help_Click(null, null);
         }
@@ -157,7 +158,25 @@ namespace cs_updater
                 DialogResult = true;
                 Properties.Settings.Default.AutoVerify = (bool)cb_verify.IsChecked;
                 Properties.Settings.Default.AutoUpdate = (bool)cb_update.IsChecked;
-                Properties.Settings.Default.Threads = Int32.Parse(tb_threads.Text);
+                int tc = Int32.Parse(tb_threads_ch.Text);
+                if (tc > 20)
+                {
+                    tc = 20;
+                }else if(tc < 1)
+                {
+                    tc = 4;
+                }
+                Properties.Settings.Default.Threads_Check = tc;
+                tc = Int32.Parse(tb_threads_dl.Text);
+                if (tc > 20)
+                {
+                    tc = 20;
+                }
+                else if (tc < 1)
+                {
+                    tc = 4;
+                }
+                Properties.Settings.Default.Threads_Download = tc;
                 Properties.Settings.Default.Save();
                 this.Close();
             }

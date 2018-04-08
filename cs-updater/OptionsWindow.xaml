@@ -17,7 +17,7 @@
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="10" />
-            <RowDefinition Height="60" />
+            <RowDefinition Height="80" />
             <RowDefinition Height="0" />
             <RowDefinition Height="*" />
             <RowDefinition Height="5" />
@@ -34,6 +34,7 @@
                 <RowDefinition Height="18"/>
                 <RowDefinition Height="18"/>
                 <RowDefinition Height="18"/>
+                <RowDefinition Height="18"/>
             </Grid.RowDefinitions>
             <CheckBox Grid.Row="0" Content="" x:Name="cb_verify" VerticalAlignment="Center" HorizontalAlignment="Right" Padding="0,-1,0,0" Margin="0,1,0,0" />
             <Label Grid.Row="0" Grid.Column="1" Content="Automatially verify files on startup." Margin="0,1,0,0" Padding="5,0" VerticalAlignment="Top" />
@@ -41,8 +42,11 @@
             <CheckBox Grid.Row="1" Content="" x:Name="cb_update" VerticalAlignment="Center" Padding="0" HorizontalAlignment="Right" Margin="0,1,0,0" />
             <Label Grid.Row="1" Grid.Column="1" Content="Automatially update if update is available." Margin="0,1,0,0" Padding="5,0" VerticalAlignment="Top" />
             
-            <TextBox Grid.Row="2" Name="tb_threads" PreviewTextInput="NumberValidationTextBox" Margin="1,0,1,0" Height="18" VerticalAlignment="Center" TextAlignment="Right" />
-            <Label Grid.Row="2" Grid.Column="1" Content="Number of concurrent downloads." Margin="0" Padding="5,0" VerticalAlignment="Top" />
+            <TextBox Grid.Row="2" Name="tb_threads_ch" PreviewTextInput="NumberValidationTextBox" Margin="1,0,1,0" Height="18" VerticalAlignment="Center" TextAlignment="Right" />
+            <Label Grid.Row="2" Grid.Column="1" Content="Number of concurrent checks (Default: 20, Max: 20)." Margin="0" Padding="5,0" VerticalAlignment="Top" />
+
+            <TextBox Grid.Row="3" Name="tb_threads_dl" PreviewTextInput="NumberValidationTextBox" Margin="1,0,1,0" Height="18" VerticalAlignment="Center" TextAlignment="Right" />
+            <Label Grid.Row="3" Grid.Column="1" Content="Number of concurrent downloads (Default: 4, Max: 20)." Margin="0" Padding="5,0" VerticalAlignment="Top" />
         </Grid>
 
         <Grid Grid.Column="1" Grid.Row="3">

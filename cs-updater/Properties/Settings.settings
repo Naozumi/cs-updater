@@ -39,9 +39,12 @@
       <Value Profile="(Default)">https://nordinvasion.com/download.php</Value>
     </Setting>
     <Setting Name="Version" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">3.0.0.10</Value>
+      <Value Profile="(Default)">3.1.0</Value>
     </Setting>
-    <Setting Name="Threads" Type="System.Int32" Scope="User">
+    <Setting Name="Threads_Check" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">20</Value>
+    </Setting>
+    <Setting Name="Threads_Download" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">4</Value>
     </Setting>
   </Settings>

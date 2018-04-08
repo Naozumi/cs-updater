@@ -26,7 +26,7 @@ namespace cs_updater
     {
         private UpdateHash hashObject = new UpdateHash();
         private HttpClient client = new HttpClient();
-        private String rootUrl = "";
+        private List<HostServer> servers = new List<HostServer>();
         private List<InstallPath> installDirs = new List<InstallPath>();
         private InstallPath ActiveInstall = new InstallPath();
         private List<News> news = new List<News>();
@@ -43,6 +43,8 @@ namespace cs_updater
         public MainWindow()
         {
             InitializeComponent();
+            logger.Info("Current Version: " + Properties.Settings.Default.Version);
+            System.Net.ServicePointManager.DefaultConnectionLimit = 20;
 
             if (Properties.Settings.Default.UpgradeRequired)
             {
@@ -148,7 +150,6 @@ namespace cs_updater
                 {
                     ActiveInstall = install;
                     mi.IsChecked = true;
-                    //menuInstallDirs.Header = "Active Installation: " + ActiveInstall.Name;
                     activeInstallText.Content = "Active Installation: " + ActiveInstall.Name;
                 }
                 menuInstallDirs.Items.Add(mi);
@@ -156,14 +157,17 @@ namespace cs_updater
 
             if (installDirs.Count > 0)
             {
-                btn_update.IsEnabled = true;
-                //menuInstallDirs.Header = "Active Installation: " + ActiveInstall.Name;
+                this.Dispatcher.Invoke(() =>
+                {
+                    btn_update.Content = "Check files";
+                    btn_update.IsEnabled = true;
+                });
                 progressText = "Awaiting file check";
+                filesVerified = false;
             }
             else
             {
                 btn_update.IsEnabled = false;
-                //menuInstallDirs.Header = "Active Installation";
                 progressText = "Please set an installation path.";
             }
         }
@@ -362,9 +366,9 @@ namespace cs_updater
                     {
                         errMessage = "Error launching game.\n\nIf the error persists then please contact the developers via forum.nordinvasion.com";
                     }
-                    else if (filesVerified && updateRequired)
+                    else if (updateRequired)
                     {
-                        errMessage = "Error downloading update.\n\nIf the error persists then please contact the developers via forum.nordinvasion.com";
+                        errMessage = ex.Message;
                     }
                     else if (!filesVerified)
                     {
@@ -400,6 +404,8 @@ namespace cs_updater
                     throw new Exception("Install directory not set.");
                 }
 
+                progressText = "Downloading update information...";
+
                 //Download JSON and decide on best host
                 List<HostServer> hosts = new List<HostServer>();
 
@@ -433,6 +439,16 @@ namespace cs_updater
                         }
                     }
                 }
+                if (!master.Url.EndsWith("/")) master.Url += "/";
+                servers.Add(master);
+                foreach (HostServer host in hosts)
+                {
+                    if (host.Working && host != master && (Version.Parse(host.Json.ModuleVersion) == Version.Parse(master.Json.ModuleVersion)))
+                    {
+                        if (!host.Url.EndsWith("/")) host.Url += "/";
+                        servers.Add(host);
+                    }
+                }
                 if (!master.Working)
                 {
                     foreach (HostServer host in hosts)
@@ -446,10 +462,7 @@ namespace cs_updater
                     throw new Exception("Unable to connect to download servers.");
                 }
 
-                rootUrl = master.Url;
-                if (!rootUrl.EndsWith("/")) rootUrl += "/";
                 hashObject = master.Json;
-
 
                 updateRequired = false;
                 hashObject.Source = ActiveInstall.Path;
@@ -466,7 +479,7 @@ namespace cs_updater
 
                 while (pending.Count + working.Count != 0)
                 {
-                    if (working.Count < Properties.Settings.Default.Threads && pending.Count != 0)
+                    if (working.Count < Properties.Settings.Default.Threads_Check && pending.Count != 0)
                     {
                         var item = (UpdateHashItem)pending.Dequeue();
                         working.Add(Task.Run(() => VerifyItem(item)));
@@ -564,10 +577,7 @@ namespace cs_updater
             if (!hasWriteAccessToFolder(ActiveInstall.Path))
             {
                 //Generate the folder & set permissions to allow us to update the files
-                if (!MakeFilesWriteable())
-                {
-                    throw new Exception("Cannot make the files writable");
-                }
+                MakeFilesWriteable();
                 WritableAttempted = false;
             }
 
@@ -575,29 +585,27 @@ namespace cs_updater
             {
                 if (hasWriteAccessToFolder(ActiveInstall.Path))
                 {
-                    await Update_Game_Files();
+                    int uacCount = 0;
+                    while (await Update_Game_Files() == false)
+                    {
+                        uacCount++;
+                        if (uacCount > 2) throw new Exception("Unable to write the files - insufficient permissions.");
+                    }
                 }
                 else
                 {
-                    System.Windows.Forms.MessageBox.Show("Unable to create the NordInvasion directory", "Error - Unable to continue.");
+                    throw new Exception("Unable to create the NordInvasion directory.");
                 }
             }
             else
             {
-                System.Windows.Forms.MessageBox.Show("Unable to create the NordInvasion directory", "Error - Unable to continue.");
+                throw new Exception("Unable to create the NordInvasion directory.");
             }
         }
 
         private async Task<Boolean> Update_Game_Files()
         {
-            Queue pending = new Queue(hashObject.getFiles());
-            List<Task<UpdateHashItem>> working = new List<Task<UpdateHashItem>>();
-            float count = pending.Count;
-            var errors = 0;
-
             hashObject.Source = ActiveInstall.Path;
-
-
 
             foreach (UpdateHashItem f in hashObject.getFolders())
             {
@@ -607,6 +615,7 @@ namespace cs_updater
                 }
                 catch
                 {
+                    logger.Info("Can't create directory: " + f.Path + "  - Running Permission Setter");
                     MakeFilesWriteable();
                     try
                     {
@@ -618,13 +627,24 @@ namespace cs_updater
                         throw new Exception("Unable to create the neccessary folders - insufficient permissions.");
                     }
                 }
-
             }
 
+            Queue pending = new Queue();
+            List<Task<UpdateHashItem>> working = new List<Task<UpdateHashItem>>();
+            var errors = 0;
+            
+            foreach (UpdateHashItem f in hashObject.getFiles())
+            {
+                if (f.Verified == false)
+                {
+                    pending.Enqueue(f);
+                }
+            }
+            float count = pending.Count;
 
             while (pending.Count + working.Count != 0 && errors < 30)
             {
-                if (working.Count < Properties.Settings.Default.Threads && pending.Count != 0)
+                if (working.Count < Properties.Settings.Default.Threads_Download && pending.Count != 0)
                 {
                     var item = (UpdateHashItem)pending.Dequeue();
                     if (item.Verified == false)
@@ -637,7 +657,6 @@ namespace cs_updater
                 else
                 {
                     Task<UpdateHashItem> t = await Task.WhenAny(working);
-                    //working.RemoveAll(x => x.IsCompleted);
                     if (t.Result.Verified)
                     {
                         working.Remove(t);
@@ -646,17 +665,20 @@ namespace cs_updater
                     }
                     else
                     {
-                        if (t.Result.Writable == false && !WritableAttempted)
+                        lock (locker)
                         {
-                            MakeFilesWriteable();
-                            pending.Enqueue(t.Result);
-                            working.Remove(t);
-                        }
-                        else if (t.Result.Writable == false && WritableAttempted)
-                        {
-                            pending.Clear();
-                            errors += 60;
-                            working.Remove(t);
+                            if (t.Result.Writable == false && !WritableAttempted)
+                            {
+                                pending.Clear();
+                                MakeFilesWriteable();
+                                return false;                              
+                            }
+                            else if (t.Result.Writable == false && WritableAttempted)
+                            {
+                                pending.Clear();
+                                errors += 60;
+                                working.Remove(t);
+                            }
                         }
                     }
                 }
@@ -679,74 +701,57 @@ namespace cs_updater
         {
 
             HttpResponseMessage response;
-            try
-            {
-                response = await client.GetAsync(rootUrl + "files/" + item.Crc + ".gz");
-            }
-            catch (Exception ex)
-            {
-                //web server sent an error message
-                logger.Error(new Exception("Error downloading the file: " + rootUrl + "files/" + item.Crc + ".gz" + "  " + item.Path, ex));
-                item.Attempts++;
-                if (item.Attempts > 3) throw;
-                return item;
-            }
-
-
-            if (response.IsSuccessStatusCode)
+            foreach (HostServer host in servers)
             {
                 try
                 {
-                    using (FileStream fileStream = new FileStream(ActiveInstall.Path + item.Path, FileMode.Create, FileAccess.Write, FileShare.None))
-                    using (Stream stream = await response.Content.ReadAsStreamAsync())
-                    using (GZipStream decompressedStream = new GZipStream(stream, CompressionMode.Decompress))
+                    response = await client.GetAsync(host.Url + "files/" + item.Crc + ".gz");
+                    if (response.IsSuccessStatusCode)
                     {
-                        decompressedStream.CopyTo(fileStream);
-                    }
 
-                    using (FileStream stream = new FileStream(ActiveInstall.Path + item.Path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
-                    using (SHA1Managed sha = new SHA1Managed())
+                        using (FileStream fileStream = new FileStream(ActiveInstall.Path + item.Path, FileMode.Create, FileAccess.Write, FileShare.None))
+                        using (Stream stream = await response.Content.ReadAsStreamAsync())
+                        using (GZipStream decompressedStream = new GZipStream(stream, CompressionMode.Decompress))
+                        {
+                            decompressedStream.CopyTo(fileStream);
+                        }
+
+                        using (FileStream stream = new FileStream(ActiveInstall.Path + item.Path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                        using (SHA1Managed sha = new SHA1Managed())
+                        {
+                            byte[] checksum = sha.ComputeHash(stream);
+                            if (BitConverter.ToString(checksum).Replace("-", string.Empty).ToLower() == item.Crc)
+                            {
+                                item.Verified = true;
+                                return item;
+                            }
+                        }
+                    }
+                    else
                     {
-                        byte[] checksum = sha.ComputeHash(stream);
-                        if (BitConverter.ToString(checksum).Replace("-", string.Empty).ToLower() == item.Crc)
-                        {
-                            item.Verified = true;
-                            return item;
-                        }
-                        else
-                        {
-                            return item;
-                        }
+                        // server said no
+                        logger.Info("Failed to download: " + item.Name +
+                        Environment.NewLine + " Attempt: " + item.Attempts.ToString() +
+                        Environment.NewLine + "Reason: " + response.ReasonPhrase +
+                        Environment.NewLine + "Request: " + response.RequestMessage);
                     }
                 }
                 catch (UnauthorizedAccessException ex)
                 {
                     item.Writable = false;
-                    logger.Error(new Exception("Cannot write the file: " + item.Name + "  " + item.Path, ex));
+                    logger.Error(new Exception("Cannot write the file: " + item.Name + " WA: " + WritableAttempted + "  " + item.Path, ex));
                     return item;
                 }
                 catch (Exception ex)
                 {
-                    // something odd went wrong
-                    logger.Error(new Exception("Error verifying the file: " + item.Name + "  " + item.Path, ex));
-                    if (item.Attempts >= 2) throw new Exception("Error:" + ex.InnerException.Message);
-                    item.Attempts++;
-                    return item;
+                    //web server sent an error message
+                    logger.Info(new Exception("Error downloading the file: " + host.Url + "files/" + item.Crc + ".gz" + "  " + item.Path, ex));
                 }
-
             }
-            else
-            {
-                // server said no
-                logger.Error("Failed to download: " + item.Name +
-                    Environment.NewLine + " Attempt: " + item.Attempts.ToString() +
-                    Environment.NewLine + "Reason: " + response.ReasonPhrase +
-                    Environment.NewLine + "Request: " + response.RequestMessage);
-                if (item.Attempts >= 2) throw new Exception("Error Code: " + response.ReasonPhrase + "\nFile: " + item.Name);
-                item.Attempts++;
-                return item;
-            }
-
+            logger.Error(new Exception("Cannot download file - tried all (" + servers.Count.ToString() + ") hosts. Filename: " + item.Crc + ".gz" + " -- " + item.Path));
+            item.Attempts++;
+            if (item.Attempts > 3) throw new Exception("Unable to find a server to download file(s).");
+            return item;
         }
 
         private bool hasWriteAccessToFolder(string folderPath)
@@ -773,50 +778,39 @@ namespace cs_updater
 
         private bool MakeFilesWriteable()
         {
-            lock (locker)
+            if (WritableAttempted) return false;
+            WritableAttempted = true;
+            Process updater = new Process();
+            if (System.Environment.OSVersion.Version.Major >= 6)
             {
-                if (WritableAttempted) return false;
-                WritableAttempted = true;
-                Process updater = new Process();
-                if (System.Environment.OSVersion.Version.Major >= 6)
-                {
-                    updater.StartInfo.Verb = "runas"; //Run as admin, for UAC prompts
-                }
                 updater.StartInfo.Verb = "runas"; //Run as admin, for UAC prompts
-                updater.StartInfo.FileName = "updater-permissions.exe";
-                updater.StartInfo.Arguments = "\"" + ActiveInstall.Path.Replace("\\", "\\\\") + "\"";
-                updater.StartInfo.UseShellExecute = true;
-                try
+            }
+            updater.StartInfo.Verb = "runas"; //Run as admin, for UAC prompts
+            updater.StartInfo.FileName = "updater-permissions.exe";
+            updater.StartInfo.Arguments = "\"" + ActiveInstall.Path.Replace("\\", "\\\\") + "\"";
+            updater.StartInfo.UseShellExecute = true;
+            try
+            {
+                updater.Start();
+                updater.WaitForExit();
+                int existCode = updater.ExitCode;
+                if (existCode < 1)
                 {
-                    updater.Start();
-                    updater.WaitForExit();
-                    int existCode = updater.ExitCode;
-                    if (existCode < 1)
-                    {
-                        updater.Close();
-                        return false;
-                    }
                     updater.Close();
-                    return true;
-                }
-                catch (System.ComponentModel.Win32Exception ex)
-                {
-                    this.Dispatcher.Invoke(() =>
-                    {
-                        System.Windows.Forms.MessageBox.Show("Cannot update. Permission was denied when making the files writable.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        logger.Error(ex);
-                    });
                     return false;
                 }
-                catch (Exception ex)
-                {
-                    this.Dispatcher.Invoke(() =>
-                    {
-                        System.Windows.Forms.MessageBox.Show("Cannot update. Unknown error occured when trying to make the files writable.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        logger.Error(ex);
-                    });
-                    return false;
-                }
+                updater.Close();
+                return true;
+            }
+            catch (System.ComponentModel.Win32Exception ex)
+            {
+                logger.Error(ex);
+                throw new Exception("Cannot update. Permission was denied when making the files writable.");
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex);
+                throw new Exception("Cannot update. Unknown error occured when trying to make the files writable.");
             }
         }
 
