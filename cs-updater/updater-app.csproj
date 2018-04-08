@@ -118,10 +118,19 @@
     </ApplicationDefinition>
     <Compile Include="AssemblyVersion.cs" />
     <Compile Include="BetaInfo.cs" />
+    <Compile Include="LocUtil.cs" />
     <Compile Include="OptionsWindow.xaml.cs">
       <DependentUpon>OptionsWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="UpdaterVersion.cs" />
+    <Content Include="Lang\MainWindow.en-GB.xaml">
+      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Lang\MainWindow.es-ES.xaml">
+      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

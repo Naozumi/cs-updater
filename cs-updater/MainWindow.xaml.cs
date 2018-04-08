@@ -5,8 +5,6 @@ using System.IO;
 using System.IO.Compression;
 using System.Security.Cryptography;
 using System.Windows;
-using System.Windows.Forms;
-using Microsoft.WindowsAPICodePack.Dialogs;
 using System.Threading.Tasks;
 using System.Net.Http;
 using System.Collections;
@@ -15,7 +13,6 @@ using NLog;
 using System.Windows.Input;
 using cs_updater_lib;
 using System.Windows.Threading;
-using System.Deployment.Application;
 
 namespace cs_updater
 {
@@ -38,13 +35,22 @@ namespace cs_updater
         private bool WritableAttempted = true;
 
         private double progress = 0;
-        private string progressText = "Loading...";
+        private string progressValue = "";
 
         public MainWindow()
         {
             InitializeComponent();
             logger.Info("Current Version: " + Properties.Settings.Default.Version);
             System.Net.ServicePointManager.DefaultConnectionLimit = 20;
+
+            LocUtil.SetDefaultLanguage(this);
+            SetProgressBarText("PB_loading");
+
+            foreach (System.Windows.Controls.MenuItem item in menuItemLanguages.Items)
+            {
+                if (item.Tag.ToString().Equals(LocUtil.GetCurrentCultureName(this)))
+                    item.IsChecked = true;
+            }
 
             if (Properties.Settings.Default.UpgradeRequired)
             {
@@ -63,8 +69,20 @@ namespace cs_updater
         void OnTimerTick(object sender, EventArgs e)
         {
             progressBar.Value = progress;
-            progressBarText.Content = progressText;
+            progressBarTextVersion.Content = progressValue;
             taskBarItemInfo.ProgressValue = progress / 100;
+        }
+
+        private void SetProgressBarText(string text)
+        {
+            progressBarText.SetResourceReference(System.Windows.Controls.Label.ContentProperty, text);
+            progressValue = "";
+            progressBarTextVersion.Content = progressValue;
+        }
+
+        private void SetButtonText(string text)
+        {
+            btn_update_text.SetResourceReference(System.Windows.Controls.TextBlock.TextProperty, text);
         }
 
         private async void CheckForUpdate()
@@ -80,7 +98,7 @@ namespace cs_updater
                     if (Version.Parse(UpdateJson.version) > Version.Parse(Properties.Settings.Default.Version))
                     {
                         var answer = System.Windows.Forms.MessageBox.Show("Update available for the updater.\n\nClick \"OK\" to download.",
-                        "Update required", MessageBoxButtons.OKCancel, MessageBoxIcon.Information);
+                        "Update required", System.Windows.Forms.MessageBoxButtons.OKCancel, System.Windows.Forms.MessageBoxIcon.Information);
                         if (answer == System.Windows.Forms.DialogResult.OK)
                         {
                             System.Diagnostics.Process.Start(UpdateJson.url);
@@ -121,8 +139,9 @@ namespace cs_updater
 
         private void ShowFirstRun()
         {
-            System.Windows.Forms.MessageBox.Show("Welcome to the NI Launcher.\n\nPlease set the Installation Path to continue.", "Welcome", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            progressText = "Please set an installation path.";
+            System.Windows.Forms.MessageBox.Show("Welcome to the NI Launcher.\n\nPlease set the Installation Path to continue.", "Welcome", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Information);
+            SetProgressBarText("PB_missingInstall");
+            activeInstallText.Content = " -";
             Menu_OptionsClick(null, null);
         }
 
@@ -150,7 +169,7 @@ namespace cs_updater
                 {
                     ActiveInstall = install;
                     mi.IsChecked = true;
-                    activeInstallText.Content = "Active Installation: " + ActiveInstall.Name;
+                    activeInstallText.Content = " " + ActiveInstall.Name;
                 }
                 menuInstallDirs.Items.Add(mi);
             }
@@ -159,16 +178,17 @@ namespace cs_updater
             {
                 this.Dispatcher.Invoke(() =>
                 {
-                    btn_update.Content = "Check files";
+                    SetButtonText("B_verify");
                     btn_update.IsEnabled = true;
                 });
-                progressText = "Awaiting file check";
+                SetProgressBarText("PB_verify");
                 filesVerified = false;
             }
             else
             {
                 btn_update.IsEnabled = false;
-                progressText = "Please set an installation path.";
+                SetProgressBarText("PB_missingInstall");
+                activeInstallText.Content = " -";
             }
         }
 
@@ -176,7 +196,7 @@ namespace cs_updater
         {
             filesVerified = false;
             updateRequired = false;
-            btn_update.Content = "Check files";
+            SetButtonText("B_verify");
             foreach (Object item in menuInstallDirs.Items)
             {
                 if (item.GetType() == typeof(System.Windows.Controls.MenuItem))
@@ -189,8 +209,8 @@ namespace cs_updater
             ActiveInstall = (InstallPath)mi.Tag;
             mi.IsChecked = true;
             //menuInstallDirs.Header = "Active Installation: " + ActiveInstall.Name;
-            activeInstallText.Content = "Active Installation: " + ActiveInstall.Name;
-            progressText = "Awaiting file check";
+            activeInstallText.Content = " " + ActiveInstall.Name;
+            SetProgressBarText("PB_verify");
         }
 
         private void Menu_OptionsClick(Object sender, RoutedEventArgs e)
@@ -309,11 +329,12 @@ namespace cs_updater
 
                 if (updateRequired)
                 {
-                    progressText = "Update is required - Latest version: " + hashObject.ModuleVersion;
+                    SetProgressBarText("PB_updateRequired");
+                    progressValue = " " + hashObject.ModuleVersion;
                     progress = 0;
                     this.Dispatcher.Invoke(() =>
                     {
-                        btn_update.Content = "Update files";
+                        SetButtonText("B_update");
                         btn_update.IsEnabled = true;
                         menuSettings.IsEnabled = true;
                     });
@@ -324,23 +345,24 @@ namespace cs_updater
                 }
                 else if (!filesVerified)
                 {
-                    progressText = "Error - Unable to verify files.";
+                    SetProgressBarText("PB_verifyFail");
                     progress = 0;
                     this.Dispatcher.Invoke(() =>
                     {
-                        btn_update.Content = "Check files";
+                        SetButtonText("B_verify");
                         btn_update.IsEnabled = true;
                         menuSettings.IsEnabled = true;
                     });
                 }
                 else
                 {
-                    progressText = "NI " + hashObject.ModuleVersion + " is ready to play";
+                    SetProgressBarText("PB_readyToPlay");
+                    progressValue = " " + hashObject.ModuleVersion;
                     progress = 100;
 
                     this.Dispatcher.Invoke(() =>
                     {
-                        btn_update.Content = "Play";
+                        SetButtonText("B_play");
                         btn_update.IsEnabled = true;
                         menuSettings.IsEnabled = true;
                     });
@@ -353,12 +375,12 @@ namespace cs_updater
             {
                 logger.Error("Error - \"Do Update\"");
                 logger.Error(ex);
-                progressText = "Error updating.";
+                SetProgressBarText("PB_updateError");
                 progress = 0;
                 taskBarItemInfo.ProgressState = System.Windows.Shell.TaskbarItemProgressState.Error;
                 this.Dispatcher.Invoke(() =>
                 {
-                    btn_update.Content = "Check files";
+                    SetButtonText("B_verify");
                     btn_update.IsEnabled = true;
                     menuSettings.IsEnabled = true;
                     var errMessage = "";
@@ -377,7 +399,7 @@ namespace cs_updater
                     filesVerified = false;
                     updateRequired = false;
 
-                    System.Windows.Forms.MessageBox.Show(errMessage, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    System.Windows.Forms.MessageBox.Show(errMessage, "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                 });
             }
 
@@ -389,11 +411,11 @@ namespace cs_updater
             filesVerified = false;
             updateRequired = false;
             progress = 0;
-            progressText = "Starting file check...";
+            SetProgressBarText("PB_verifyStart");
             this.Dispatcher.Invoke(() =>
             {
                 btn_update.IsEnabled = false;
-                btn_update.Content = "Checking files...";
+                SetButtonText("B_verifyProgress");
             });
             var failed = false;
 
@@ -404,7 +426,7 @@ namespace cs_updater
                     throw new Exception("Install directory not set.");
                 }
 
-                progressText = "Downloading update information...";
+                SetProgressBarText("PB_downloadHash");
 
                 //Download JSON and decide on best host
                 List<HostServer> hosts = new List<HostServer>();
@@ -476,6 +498,7 @@ namespace cs_updater
                 Queue pending = new Queue(hashObject.getFiles());
                 List<Task<UpdateHashItem>> working = new List<Task<UpdateHashItem>>();
                 float count = pending.Count;
+                SetProgressBarText("PB_verifyProgress");
 
                 while (pending.Count + working.Count != 0)
                 {
@@ -489,7 +512,7 @@ namespace cs_updater
                         Task<UpdateHashItem> t = await Task.WhenAny(working);
                         working.RemoveAll(x => x.IsCompleted);
                         progress = ((count - pending.Count) / count) * 100;
-                        progressText = "Checking files... " + (count - pending.Count) + " / " + count;
+                        progressValue = " " + (count - pending.Count) + " / " + count;
                     }
                 }
                 if (updateRequired == false) filesVerified = true;
@@ -503,11 +526,11 @@ namespace cs_updater
                     failed = true;
                     if (ex.Message == "401")
                     {
-                        progressText = "Incorrect beta password";
+                        SetProgressBarText("PB_betaPasswordError");
                         progress = 0;
                         this.Dispatcher.Invoke(() =>
                         {
-                            System.Windows.Forms.MessageBox.Show("Unabled to authenticate with download server.\n\nBeta password is incorrect.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            System.Windows.Forms.MessageBox.Show("Unabled to authenticate with download server.\n\nBeta password is incorrect.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                         });
                     }
                     else
@@ -516,17 +539,17 @@ namespace cs_updater
                         {
                             this.Dispatcher.Invoke(() =>
                             {
-                                System.Windows.Forms.MessageBox.Show("Unabled to verify files. \n\n" + ex.InnerException.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                System.Windows.Forms.MessageBox.Show("Unabled to verify files. \n\n" + ex.InnerException.Message, "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                             });
                         }
                         else
                         {
                             this.Dispatcher.Invoke(() =>
                             {
-                                System.Windows.Forms.MessageBox.Show("Unabled to verify files. \n\n" + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                System.Windows.Forms.MessageBox.Show("Unabled to verify files. \n\n" + ex.Message, "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                             });
                         }
-                        progressText = "Error verifying files";
+                        SetProgressBarText("PB_verifyFail");
                         progress = 0;
                     }
                 }
@@ -570,9 +593,9 @@ namespace cs_updater
             this.Dispatcher.Invoke(() =>
             {
                 btn_update.IsEnabled = false;
-                btn_update.Content = "Updating...";
+                SetButtonText("B_updateProgress");
                 progressBar.Value = 0;
-                progressText = "Starting file update...";
+                SetProgressBarText("PB_updateStart");
             });
             if (!hasWriteAccessToFolder(ActiveInstall.Path))
             {
@@ -606,6 +629,7 @@ namespace cs_updater
         private async Task<Boolean> Update_Game_Files()
         {
             hashObject.Source = ActiveInstall.Path;
+            SetProgressBarText("PB_updateProgress");
 
             foreach (UpdateHashItem f in hashObject.getFolders())
             {
@@ -650,7 +674,7 @@ namespace cs_updater
                     if (item.Verified == false)
                     {
                         progress = ((count - pending.Count) / count) * 100;
-                        progressText = "Updating files... " + (count - pending.Count) + " / " + count;
+                        progressValue = " " + (count - pending.Count) + " / " + count;
                         working.Add(Task.Run(async () => await Update_Item(item)));
                     }
                 }
@@ -661,7 +685,7 @@ namespace cs_updater
                     {
                         working.Remove(t);
                         progress = ((count - pending.Count) / count) * 100;
-                        progressText = "Updating files... " + (count - pending.Count) + " / " + count;
+                        progressValue = " " + (count - pending.Count) + " / " + count;
                     }
                     else
                     {
@@ -961,7 +985,7 @@ namespace cs_updater
             {
                 this.Dispatcher.Invoke(() =>
                 {
-                    System.Windows.Forms.MessageBox.Show("No launcher configured - please set the path to steam or mb_warband.exe to enable launching the game.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    System.Windows.Forms.MessageBox.Show("No launcher configured - please set the path to steam or mb_warband.exe to enable launching the game.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                 });
             }
         }
@@ -988,8 +1012,20 @@ namespace cs_updater
 
         private void Menu_About_Click(object sender, RoutedEventArgs e)
         {
-            System.Windows.Forms.MessageBox.Show("NordInvasion Updater\nVersion: " + Properties.Settings.Default.Version + "\n\nFor more info visit:\nhttps://nordinvasion.com",
-                        "About", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            System.Windows.Forms.MessageBox.Show("NordInvasion Launcher\nVersion: " + Properties.Settings.Default.Version + "\n\nFor more info visit:\nhttps://nordinvasion.com",
+                        "About", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Information);
+        }
+
+        private void Menu_Lang_Click(object sender, RoutedEventArgs e)
+        {
+            foreach (System.Windows.Controls.MenuItem item in menuItemLanguages.Items)
+            {
+                item.IsChecked = false;
+            }
+
+            System.Windows.Controls.MenuItem mi = sender as System.Windows.Controls.MenuItem;
+            mi.IsChecked = true;
+            LocUtil.SwitchLanguage(this, mi.Tag.ToString());
         }
 
         #region Dev Controls

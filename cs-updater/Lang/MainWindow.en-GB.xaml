@@ -1,0 +1,49 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+    
+    <sys:String x:Key="ResourceDictionaryName">Loc-en-GB</sys:String>
+
+    <sys:String x:Key="Title">NordInvasion Launcher</sys:String>
+
+    <!-- Menus -->
+    <sys:String x:Key="Settings">_Settings</sys:String>
+    <sys:String x:Key="M_ActiveInstall">Active _Installation...</sys:String>
+    <sys:String x:Key="M_Options">_Options</sys:String>
+    <sys:String x:Key="M_Logs">Open _Logs Folder</sys:String>
+    <sys:String x:Key="M_About">_About</sys:String>
+    <sys:String x:Key="Language">_Language</sys:String>
+
+    <!-- Progress Bar Text -->
+    <sys:String x:Key="PB_loading">Loading...</sys:String>
+    <sys:String x:Key="PB_missingInstall">Please set an installation path.</sys:String>
+    <sys:String x:Key="PB_updateRequired">Update is required - Latest version:</sys:String>
+    <sys:String x:Key="PB_readyToPlay">NI is ready to play - Version:</sys:String>
+    <sys:String x:Key="PB_verify">Awaiting file check</sys:String>
+    <sys:String x:Key="PB_verifyStart">Starting file check...</sys:String>
+    <sys:String x:Key="PB_verifyProgress">Checking files...</sys:String>
+    <sys:String x:Key="PB_verifyFail">Error - Unable to verify the files.</sys:String>
+    <sys:String x:Key="PB_updateStart">Starting file update...</sys:String>
+    <sys:String x:Key="PB_updateProgress">Updating files...</sys:String>
+    <sys:String x:Key="PB_updateError">Error updating.</sys:String>
+    
+    <sys:String x:Key="PB_downloadHash">Downloading update information...</sys:String>
+    <sys:String x:Key="PB_betaPasswordError">Incorrect beta password</sys:String>
+    
+    <!-- Button -->
+    <sys:String x:Key="B_verify">Check files</sys:String>
+    <sys:String x:Key="B_verifyProgress">Checking files...</sys:String>
+    <sys:String x:Key="B_update">Update files</sys:String>
+    <sys:String x:Key="B_updateProgress">Updating...</sys:String>
+    <sys:String x:Key="B_play">Play</sys:String>
+
+    <!-- Others -->
+    <sys:String x:Key="ActiveInstall">Active Installation:</sys:String>
+    <sys:String x:Key="ForumLink">Open forum thread...</sys:String>
+
+
+    
+
+
+
+</ResourceDictionary>

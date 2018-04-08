@@ -4,27 +4,34 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:cs_updater"
+        xmlns:p="clr-namespace:cs_updater.Properties"
         mc:Ignorable="d"
-        Title="NordInvasion Launcher"
+        Title="{DynamicResource ResourceKey=Title}"
         Height="550" Width="750"
         MinWidth="170" KeyDown="windowKeyPress" WindowStartupLocation="CenterScreen"
         >
     <Window.Resources>
-        <Style x:Key="GridSplitterStyle" TargetType="{x:Type GridSplitter}">
-            <Setter Property="Background">
-                <Setter.Value>
-                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
-                        <GradientStop Color="#FFFFFF" Offset="0"/>
-                        <GradientStop Color="#FFFFFF" Offset="0.40"/>
-                        <GradientStop Color="#FFA2760A" Offset="0.40"/>
-                        <GradientStop Color="#FFA2760A" Offset="0.60"/>
-                        <GradientStop Color="#FFFFFF" Offset="0.60"/>
-                        <GradientStop Color="#FFFFFF" Offset="1"/>
-                    </LinearGradientBrush>
-                </Setter.Value>
-            </Setter>
-        </Style>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Lang/MainWindow.en-GB.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <Style x:Key="GridSplitterStyle" TargetType="{x:Type GridSplitter}">
+                <Setter Property="Background">
+                    <Setter.Value>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                            <GradientStop Color="#FFFFFF" Offset="0"/>
+                            <GradientStop Color="#FFFFFF" Offset="0.40"/>
+                            <GradientStop Color="#FFA2760A" Offset="0.40"/>
+                            <GradientStop Color="#FFA2760A" Offset="0.60"/>
+                            <GradientStop Color="#FFFFFF" Offset="0.60"/>
+                            <GradientStop Color="#FFFFFF" Offset="1"/>
+                        </LinearGradientBrush>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+        </ResourceDictionary>
     </Window.Resources>
+
     <Window.TaskbarItemInfo>
         <TaskbarItemInfo x:Name="taskBarItemInfo" />
     </Window.TaskbarItemInfo>
@@ -54,15 +61,20 @@
 
         <Grid Grid.ColumnSpan="100">
             <Menu Background="#00000000" HorizontalAlignment="Stretch">
-                <MenuItem Header="_Settings" x:Name="menuSettings" IsEnabled="True">
-                    <MenuItem Header="_Active Installation" Name="menuInstallDirs">
+                <MenuItem Header="{DynamicResource Settings}" x:Name="menuSettings" IsEnabled="True">
+                    <MenuItem Header="{DynamicResource M_ActiveInstall}" Name="menuInstallDirs">
 
                     </MenuItem>
-                    <MenuItem Header="_Options" Name="menuOptions" Click="Menu_OptionsClick" />
+                    <MenuItem Header="{DynamicResource M_Options}" Name="menuOptions" Click="Menu_OptionsClick" />
                     <Separator />
-                    <MenuItem Header="Open _Logs Folder" Name="menuLogs" Click="Menu_Logs_Click"/>
+                    <MenuItem Header="{DynamicResource M_Logs}" Name="menuLogs" Click="Menu_Logs_Click"/>
                     <Separator />
-                    <MenuItem Header="A_bout" Name="menuAbout" Click="Menu_About_Click"/>
+                    <MenuItem Header="{DynamicResource M_About}" Name="menuAbout" Click="Menu_About_Click"/>
+                </MenuItem>
+
+                <MenuItem Header="{DynamicResource Language}" x:Name="menuItemLanguages" IsEnabled="True">
+                    <MenuItem Header="English (GB)" Tag="en-GB" IsCheckable="True" Click="Menu_Lang_Click" />
+                    <MenuItem Header="Español (ES)" Tag="es-ES" IsCheckable="True" Click="Menu_Lang_Click" />
                 </MenuItem>
 
                 <MenuItem x:Name="DevMenu" Header="_Dev" Visibility="Hidden">
@@ -88,19 +100,25 @@
                         <RowDefinition Height="20" />
                     </Grid.RowDefinitions>
                     <WebBrowser x:Name="Web_News" Grid.Row="0" Opacity="1" Height="Auto" Width="Auto" Navigating="Web_News_Navigating"/>
-                    <Label Grid.Row="1" FontStyle="Italic"  Content="Open forum thread..." HorizontalAlignment="Right" VerticalAlignment="Center" Foreground="#FF830606" FontSize="12" Cursor="Hand" MouseLeftButtonDown="Open_Thread_Click" Padding="0"/>
+                    <Label Grid.Row="1" FontStyle="Italic"  Content="{DynamicResource ForumLink}" HorizontalAlignment="Right" VerticalAlignment="Center" Foreground="#FF830606" FontSize="12" Cursor="Hand" MouseLeftButtonDown="Open_Thread_Click" Padding="0"/>
                 </Grid>
             </Grid>
         </Border>
 
 
 
-        <Label x:Name="progressBarText" HorizontalAlignment="Center" VerticalAlignment="Center" Content="Loading..." Padding="0,2" Grid.Column="1" Grid.Row="6" />
+        <StackPanel Grid.Column="1" Grid.Row="6" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" >
+            <Label x:Name="progressBarText" HorizontalAlignment="Center" VerticalAlignment="Center" Content="Loading..." Padding="0,2"  />
+            <Label x:Name="progressBarTextVersion" HorizontalAlignment="Center" VerticalAlignment="Center" Content="" Padding="0,2"/>
+        </StackPanel>
         <Grid Grid.Column="1" Grid.Row="7" Grid.ColumnSpan="1">
             <ProgressBar x:Name="progressBar"  Foreground="DarkGoldenrod" Background="#FFF7F3E4" Height="Auto" BorderBrush="#FFA2760A" />
         </Grid>
-        <Label x:Name="activeInstallText" HorizontalAlignment="Center" VerticalAlignment="Center" Content="" Padding="0,2" Grid.Column="1" Grid.Row="8" />
-        <Button x:Name="btn_update" Content="Check files" Grid.Column="3" Grid.Row="6" Grid.RowSpan="3" Click="Button_Update_Click" Foreground="White" IsEnabled="False" Height="50" Margin="0" VerticalAlignment="Top">
+        <StackPanel Grid.Column="1" Grid.Row="8" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" >
+            <Label x:Name="activeInstall" HorizontalAlignment="Center" VerticalAlignment="Center" Content="{DynamicResource ActiveInstall}" Padding="0,2"/>
+            <Label x:Name="activeInstallText" HorizontalAlignment="Center" VerticalAlignment="Center" Content=" -" Padding="0,2" />
+        </StackPanel>
+        <Button x:Name="btn_update" Grid.Column="3" Grid.Row="6" Grid.RowSpan="3" Click="Button_Update_Click" Foreground="White" IsEnabled="False" Height="50" Margin="0" VerticalAlignment="Top">
             <Button.Style>
                 <Style TargetType="{x:Type Button}">
                     <Setter Property="Background" Value="#FF830606"/>
@@ -123,11 +141,12 @@
                         </Trigger>
                         <Trigger Property="IsEnabled"  Value="False">
                             <Setter Property="Background" Value="#FF976B6B"/>
-                            <Setter Property="Foreground" Value="#888"/>
+                            <Setter Property="Foreground" Value="#0ace3b"/>
                         </Trigger>
                     </Style.Triggers>
                 </Style>
             </Button.Style>
+            <TextBlock x:Name="btn_update_text" Text="" TextWrapping="Wrap" TextAlignment="Center"/>
         </Button>
     </Grid>
 </Window>
