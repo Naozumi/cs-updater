@@ -1,10 +1,8 @@
-cs-updater
+NordInvasion Launcher
 ======
-C# Updater, designed for the game NordInvasion.
+Launcher and Updater written in C#. Designed for the game NordInvasion.
 
-Beta
-
-Current Features
+Features
 -----
 * Verify the existing files
 * Update only the altered files
@@ -12,20 +10,17 @@ Current Features
 * News feed
 * Mutiple installation directories
 * Check for updates and download the installer
+* Launch the game
 
-Intended Features
+Features Under Development
 -----
-
 * Dynamic language changing
-  * Intention is to use [WPFLocalizationExtension](https://github.com/SeriousM/WPFLocalizationExtension)
   * UI is currently in UK English
-* Better directory management
-* Improve error handeling
-  * Add ability to export logs for sharing to devs
   
-Under Consideration
+Features Under Consideration
 -----
 
 * Alter number of threads
 * "Native Feeling" message boxes rather than the annoying windows ones.
 * MVVM
+* Variable logging levels
