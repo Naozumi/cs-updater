@@ -4,7 +4,7 @@
     
     <sys:String x:Key="ResourceDictionaryName">Loc-es-ES</sys:String>
 
-    <sys:String x:Key="Title">NordInvasion Lanzacohetes</sys:String>
+    <sys:String x:Key="Title">NordInvasion Launcher</sys:String>
 
     <!-- Menus -->
     <sys:String x:Key="Settings">_Configuraciones</sys:String>

@@ -1026,6 +1026,8 @@ namespace cs_updater
             System.Windows.Controls.MenuItem mi = sender as System.Windows.Controls.MenuItem;
             mi.IsChecked = true;
             LocUtil.SwitchLanguage(this, mi.Tag.ToString());
+            Properties.Settings.Default.Language = mi.Tag.ToString();
+            Properties.Settings.Default.Save();
         }
 
         #region Dev Controls

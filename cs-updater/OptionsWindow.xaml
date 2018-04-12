@@ -5,7 +5,15 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:cs_updater"
         mc:Ignorable="d"
-        Title="Options" Height="345" Width="920" WindowStartupLocation="CenterOwner" Closing="Window_Closing">
+        Title="{DynamicResource ResourceKey=Title}" 
+        Height="345" Width="920" WindowStartupLocation="CenterOwner" Closing="Window_Closing">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Lang/OptionsWindow.en-GB.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
     <Grid>
         <Grid.Background>
             <ImageBrush ImageSource="Resources/ni_parch_body_mobile.jpg" TileMode="Tile" Viewport="0,0,828,314" ViewportUnits="Absolute"/>
@@ -37,16 +45,16 @@
                 <RowDefinition Height="18"/>
             </Grid.RowDefinitions>
             <CheckBox Grid.Row="0" Content="" x:Name="cb_verify" VerticalAlignment="Center" HorizontalAlignment="Right" Padding="0,-1,0,0" Margin="0,1,0,0" />
-            <Label Grid.Row="0" Grid.Column="1" Content="Automatially verify files on startup." Margin="0,1,0,0" Padding="5,0" VerticalAlignment="Top" />
+            <Label Grid.Row="0" Grid.Column="1" Content="{DynamicResource ResourceKey=Verify}" Margin="0,1,0,0" Padding="5,0" VerticalAlignment="Top" />
 
             <CheckBox Grid.Row="1" Content="" x:Name="cb_update" VerticalAlignment="Center" Padding="0" HorizontalAlignment="Right" Margin="0,1,0,0" />
-            <Label Grid.Row="1" Grid.Column="1" Content="Automatially update if update is available." Margin="0,1,0,0" Padding="5,0" VerticalAlignment="Top" />
+            <Label Grid.Row="1" Grid.Column="1" Content="{DynamicResource ResourceKey=Update}" Margin="0,1,0,0" Padding="5,0" VerticalAlignment="Top" />
             
             <TextBox Grid.Row="2" Name="tb_threads_ch" PreviewTextInput="NumberValidationTextBox" Margin="1,0,1,0" Height="18" VerticalAlignment="Center" TextAlignment="Right" />
-            <Label Grid.Row="2" Grid.Column="1" Content="Number of concurrent checks (Default: 20, Max: 20)." Margin="0" Padding="5,0" VerticalAlignment="Top" />
+            <Label Grid.Row="2" Grid.Column="1" Content="{DynamicResource ResourceKey=Verify_Threads}" Margin="0" Padding="5,0" VerticalAlignment="Top" />
 
             <TextBox Grid.Row="3" Name="tb_threads_dl" PreviewTextInput="NumberValidationTextBox" Margin="1,0,1,0" Height="18" VerticalAlignment="Center" TextAlignment="Right" />
-            <Label Grid.Row="3" Grid.Column="1" Content="Number of concurrent downloads (Default: 4, Max: 20)." Margin="0" Padding="5,0" VerticalAlignment="Top" />
+            <Label Grid.Row="3" Grid.Column="1" Content="{DynamicResource ResourceKey=Update_Threads}" Margin="0" Padding="5,0" VerticalAlignment="Top" />
         </Grid>
 
         <Grid Grid.Column="1" Grid.Row="3">
@@ -56,9 +64,9 @@
             </Grid.RowDefinitions>
             <DataGrid Grid.Row="1" x:Name="data"  ItemsSource="{Binding Installs}" AutoGenerateColumns="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" SelectionMode="Single">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="Name"  Binding="{Binding Name}" MinWidth="100"/>
-                    <DataGridCheckBoxColumn Header="Default" Binding="{Binding IsDefault}" />
-                    <DataGridTemplateColumn Header="Path to folder" MinWidth="200">
+                    <DataGridTextColumn Header="{DynamicResource ResourceKey=Name}"  Binding="{Binding Name}" MinWidth="100"/>
+                    <DataGridCheckBoxColumn Header="{DynamicResource ResourceKey=Default}" Binding="{Binding IsDefault}" />
+                    <DataGridTemplateColumn Header="{DynamicResource ResourceKey=Folder}" MinWidth="200">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding Path}"/>
@@ -77,7 +85,7 @@
                             </DataTemplate>
                         </DataGridTemplateColumn.CellEditingTemplate>
                     </DataGridTemplateColumn>
-                    <DataGridTemplateColumn Header="Path to launcher" MinWidth="200">
+                    <DataGridTemplateColumn Header="{DynamicResource ResourceKey=Launcher}" MinWidth="200">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding Executable}"/>
@@ -96,7 +104,7 @@
                             </DataTemplate>
                         </DataGridTemplateColumn.CellEditingTemplate>
                     </DataGridTemplateColumn>
-                    <DataGridTextColumn Header="Password (for NI Betas only)" Binding="{Binding Password}" />
+                    <DataGridTextColumn Header="{DynamicResource ResourceKey=Password}" Binding="{Binding Password}" />
                 </DataGrid.Columns>
             </DataGrid>
         </Grid>
@@ -113,7 +121,7 @@
                 <ColumnDefinition Width="5"/>
                 <ColumnDefinition Width="100"/>
             </Grid.ColumnDefinitions>
-            <Button Grid.Column="0"  Content="Automatically Find Installations" Click="AutomaticallyAddInstalls" Foreground="White">
+            <Button Grid.Column="0"  Content="{DynamicResource ResourceKey=Find}" Click="AutomaticallyAddInstalls" Foreground="White">
                 <Button.Style>
                     <Style TargetType="{x:Type Button}">
                         <Setter Property="Background" Value="#FF830606"/>
@@ -142,7 +150,7 @@
                     </Style>
                 </Button.Style>
             </Button>
-            <Button Grid.Column="4" Content="Help" Click="Help_Click" Foreground="White">
+            <Button Grid.Column="4" Content="{DynamicResource ResourceKey=Help}" Click="Help_Click" Foreground="White">
                 <Button.Style>
                     <Style TargetType="{x:Type Button}">
                         <Setter Property="Background" Value="#FF830606"/>
@@ -171,7 +179,7 @@
                     </Style>
                 </Button.Style>
             </Button>
-            <Button Grid.Column="6" Content="OK" Click="OK_Click" Foreground="White">
+            <Button Grid.Column="6" Content="{DynamicResource ResourceKey=OK}" Click="OK_Click" Foreground="White">
                 <Button.Style>
                     <Style TargetType="{x:Type Button}">
                         <Setter Property="Background" Value="#FF830606"/>
@@ -200,7 +208,7 @@
                     </Style>
                 </Button.Style>
             </Button>
-            <Button Grid.Column="8" Content="Cancel" Click="Cancel_Click" Foreground="White">
+            <Button Grid.Column="8" Content="{DynamicResource ResourceKey=Cancel}" Click="Cancel_Click" Foreground="White">
                 <Button.Style>
                     <Style TargetType="{x:Type Button}">
                         <Setter Property="Background" Value="#FF830606"/>

@@ -5,8 +5,15 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:cs_updater"
         mc:Ignorable="d"
-        Title="Help - Options" SizeToContent="Height" Width="400">
-    <Grid>
+        Title="{DynamicResource ResourceKey=Title}" SizeToContent="Height" Width="450" Height="500">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Lang/OptionsHelp.en-GB.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+    <Grid Margin="0,0,0,0">
         <Grid.Background>
             <ImageBrush ImageSource="Resources/ni_parch_body_mobile.jpg" TileMode="Tile" Viewport="0,0,828,314" ViewportUnits="Absolute"/>
         </Grid.Background>
@@ -16,32 +23,31 @@
         </Grid.RowDefinitions>
         <ScrollViewer VerticalScrollBarVisibility="Auto" Grid.Row="0">
 
-            <Label>
-                <TextBlock TextWrapping="Wrap" Margin="5,0" >
-                    <Run FontWeight="Bold">To Edit:</Run><LineBreak/>
-                    Double click any cell to start editing. Values are explained below.
-                    <LineBreak/><LineBreak/>
-                    <Run FontWeight="Bold">Name:</Run><LineBreak/>
-                    This is to help identify the installation to you and used only in the installation picker in the main window.
-                    <LineBreak/><LineBreak/>
-                    <Run FontWeight="Bold">Default:</Run><LineBreak/>
-                    When the updater starts, it will choose this installation as the default for updating. We recommend this is your primary install.
-                    <LineBreak/><LineBreak/>
-                    <Run FontWeight="Bold">Path to folder:</Run><LineBreak/>
-                    Use the file browser to point to the modules folder (a folder will automatically be created for the mod to download to) 
-                    or to the exact folder you want to download the files to (useful for with betas, for example).
-                    <LineBreak/><LineBreak/>
-                    <Run FontWeight="Bold">Path to launcher:</Run><LineBreak/>
-                    Use the file browser to point to the executable to launch the game. If you choose Steam, the launcher will attempt to find Steam for you.
-                    If it can't, use the file browser. If you click No, the launcher will attempt to find the warband launcher for you. If it finds it, you 
-                    will be asked to confirm. If it is wrong, use the file browser to find the correct file.
-                    <LineBreak/><LineBreak/>
-                    <Run FontWeight="Bold">Password:</Run><LineBreak/>
-                    If you are enrolled in a beta programme, it will require a password. Enter the password here.
-                </TextBlock>
-            </Label>
+            <StackPanel Orientation="Vertical" Margin="0">
+                <TextBlock TextWrapping="Wrap" Margin="5,0" Text="{DynamicResource ResourceKey=Verify_Title}" FontWeight="Bold" />
+                <TextBlock TextWrapping="Wrap" Margin="5,0" Text="{DynamicResource ResourceKey=Verify_Text}" />
+                <TextBlock TextWrapping="Wrap" Margin="5,10,5,0" Text="{DynamicResource ResourceKey=Update_Title}" FontWeight="Bold" />
+                <TextBlock TextWrapping="Wrap" Margin="5,0" Text="{DynamicResource ResourceKey=Update_Text}" />
+                <TextBlock TextWrapping="Wrap" Margin="5,10,5,0" Text="{DynamicResource ResourceKey=Verify_T_Title}" FontWeight="Bold"/>
+                <TextBlock TextWrapping="Wrap" Margin="5,0" Text="{DynamicResource ResourceKey=Verify_T_Text}" />
+                <TextBlock TextWrapping="Wrap" Margin="5,10,5,0" Text="{DynamicResource ResourceKey=Update_T_Title}" FontWeight="Bold" />
+                <TextBlock TextWrapping="Wrap" Margin="5,0" Text="{DynamicResource ResourceKey=Update_T_Text}" />
+
+                <TextBlock TextWrapping="Wrap" Margin="5,20,5,0" Text="{DynamicResource ResourceKey=Edit_Title}" FontWeight="Bold" />
+                <TextBlock TextWrapping="Wrap" Margin="5,0" Text="{DynamicResource ResourceKey=Edit_Text}" />
+                <TextBlock TextWrapping="Wrap" Margin="5,10,5,0" Text="{DynamicResource ResourceKey=Name_Title}" FontWeight="Bold" />
+                <TextBlock TextWrapping="Wrap" Margin="5,0" Text="{DynamicResource ResourceKey=Name_Text}" />
+                <TextBlock TextWrapping="Wrap" Margin="5,10,5,0" Text="{DynamicResource ResourceKey=Default_Title}" FontWeight="Bold"/>
+                <TextBlock TextWrapping="Wrap" Margin="5,0" Text="{DynamicResource ResourceKey=Name_Text}" />
+                <TextBlock TextWrapping="Wrap" Margin="5,5,5,0" Text="{DynamicResource ResourceKey=Folder_Title}" FontWeight="Bold" />
+                <TextBlock TextWrapping="Wrap" Margin="5,0" Text="{DynamicResource ResourceKey=Folder_Text}" />
+                <TextBlock TextWrapping="Wrap" Margin="5,10,5,0" Text="{DynamicResource ResourceKey=Launcher_Title}" FontWeight="Bold" />
+                <TextBlock TextWrapping="Wrap" Margin="5,0" Text="{DynamicResource ResourceKey=Launcher_Text}" />
+                <TextBlock TextWrapping="Wrap" Margin="5,10,5,0" Text="{DynamicResource ResourceKey=Password_Title}" FontWeight="Bold" />
+                <TextBlock TextWrapping="Wrap" Margin="5,0" Text="{DynamicResource ResourceKey=Password_Text}" />
+            </StackPanel>
         </ScrollViewer>
-        <Button Content="Close" Width="100" Margin="5" Grid.Row="1" Click="Close_Click" Foreground="White">
+        <Button Content="{DynamicResource ResourceKey=Close}" Width="100" Margin="5" Grid.Row="1" Click="Close_Click" Foreground="White">
             <Button.Style>
                 <Style TargetType="{x:Type Button}">
                     <Setter Property="Background" Value="#FF830606"/>

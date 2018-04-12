@@ -25,6 +25,7 @@ namespace cs_updater
         {
             this.Installs = installs;
             InitializeComponent();
+            LocUtil.SetDefaultLanguage(this);
             data.ItemsSource = this.Installs;
             data.Items.Refresh();
             cb_verify.IsChecked = Properties.Settings.Default.AutoVerify;
@@ -316,10 +317,7 @@ namespace cs_updater
 
         private void Help_Click(object sender, RoutedEventArgs e)
         {
-            if (help == null)
-            {
-                help = new OptionsHelp();
-            }
+            help = new OptionsHelp();
             help.Show();
         }
 

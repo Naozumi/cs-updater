@@ -40,8 +40,8 @@ namespace cs_updater
         /// <returns></returns>  
         public static string GetCurrentCultureName(FrameworkElement element)
         {
-            RegistryKey curLocInfo = Registry.CurrentUser.OpenSubKey("GsmLib" + @"\" + getAppName(element), false);  
-                var cultureName = CultureInfo.CurrentUICulture.Name;
+            RegistryKey curLocInfo = Registry.CurrentUser.OpenSubKey("GsmLib" + @"\" + getAppName(element), false);
+            var cultureName = CultureInfo.CurrentUICulture.Name;
             if (curLocInfo != null)
             {
                 cultureName = curLocInfo.GetValue(getElementName(element) + ".localization", "en-GB").ToString();
@@ -55,7 +55,15 @@ namespace cs_updater
         /// <param name="element"></param>  
         public static void SetDefaultLanguage(FrameworkElement element)
         {
-            SetLanguageResourceDictionary(element, GetLocXAMLFilePath(getElementName(element), GetCurrentCultureName(element)));
+            if (Properties.Settings.Default.Language == null || Properties.Settings.Default.Language == "")
+            {
+                SetLanguageResourceDictionary(element, GetLocXAMLFilePath(getElementName(element), GetCurrentCultureName(element)));
+            }
+            else
+            {
+                SetLanguageResourceDictionary(element, GetLocXAMLFilePath(getElementName(element), Properties.Settings.Default.Language));
+            }
+
         }
         /// <summary>  
         /// Dynamically load a Localization ResourceDictionary from a file  
@@ -65,8 +73,8 @@ namespace cs_updater
             Thread.CurrentThread.CurrentUICulture = new CultureInfo(inFiveCharLang);
             SetLanguageResourceDictionary(element, GetLocXAMLFilePath(getElementName(element), inFiveCharLang));
             // Save new culture info to registry  
-            RegistryKey UserPrefs = Registry.CurrentUser.OpenSubKey("GsmLib" + @"\" + getAppName(element), true);  
-                    if (UserPrefs == null)
+            RegistryKey UserPrefs = Registry.CurrentUser.OpenSubKey("GsmLib" + @"\" + getAppName(element), true);
+            if (UserPrefs == null)
             {
                 // Value does not already exist so create it  
                 RegistryKey newKey = Registry.CurrentUser.CreateSubKey("GsmLib");
@@ -83,7 +91,7 @@ namespace cs_updater
         {
             string locXamlFile = element + "." + inFiveCharLang + ".xaml";
             string directory = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-            if(File.Exists(Path.Combine(directory, "Lang", locXamlFile)))
+            if (File.Exists(Path.Combine(directory, "Lang", locXamlFile)))
             {
                 return Path.Combine(directory, "Lang", locXamlFile);
             }

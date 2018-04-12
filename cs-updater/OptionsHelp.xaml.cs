@@ -22,6 +22,7 @@ namespace cs_updater
         public OptionsHelp()
         {
             InitializeComponent();
+            LocUtil.SetDefaultLanguage(this);
         }
 
         private void Close_Click(object sender, RoutedEventArgs e)
