@@ -1,0 +1,39 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+    
+    <sys:String x:Key="ResourceDictionaryName">Loc-en-GB</sys:String>
+
+    <sys:String x:Key="Title">Help - Options</sys:String>
+
+    <!-- Top options -->
+    <sys:String x:Key="Verify_Title">Automatic verification</sys:String>
+    <sys:String x:Key="Verify_Text">Starts checking your files when you open the launcher so you are ready to go sooner.</sys:String>
+    <sys:String x:Key="Update_Title">Automatic update</sys:String>
+    <sys:String x:Key="Update_Text">Automatically downloads any updates so you are ready to go sooner.</sys:String>
+    <sys:String x:Key="Verify_T_Title">Number of concurrent checks</sys:String>
+    <sys:String x:Key="Verify_T_Text">How many files should be checked simultaneously. Increases the load on your PC but runs faster.</sys:String>
+    <sys:String x:Key="Update_T_Title">Number of concurrent downloads.</sys:String>
+    <sys:String x:Key="Update_T_Text">How many files should be downloaded simultaneously. Increases the loads on your PC and internet. If your internet or disk limits are reached, this may slow down your downloads.</sys:String>
+
+    <!-- Table -->
+    <sys:String x:Key="Edit_Title">To edit the installation lists</sys:String>
+    <sys:String x:Key="Edit_Text">Double click any cell to start editing. Values are explained below.</sys:String>
+    <sys:String x:Key="Name_Title">Name</sys:String>
+    <sys:String x:Key="Name_Text">This is to help identify the installation to you in the main window.</sys:String>
+    <sys:String x:Key="Default_Title">Default</sys:String>
+    <sys:String x:Key="Default_Text">Double click any cell to start editing. Values are explained below.</sys:String>
+    <sys:String x:Key="Folder_Title">Path to folder</sys:String>
+    <sys:String x:Key="Folder_Text">Use the file browser to point to the modules folder (a folder will automatically be created for the mod to download to) 
+        or to the exact folder you want to download the files to (useful for with betas, for example).</sys:String>
+    <sys:String x:Key="Launcher_Title">Path to launcher</sys:String>
+    <sys:String x:Key="Launcher_Text">Use the file browser to point to the executable to launch the game. If you choose Steam, the launcher will attempt to find Steam for you.
+                    If it can't, use the file browser. If you click No, the launcher will attempt to find the warband launcher for you. If it finds it, you 
+                    will be asked to confirm. If it is wrong, use the file browser to find the correct file.</sys:String>
+    <sys:String x:Key="Password_Title">Password</sys:String>
+    <sys:String x:Key="Password_Text">If you are enrolled in a beta programme, it will require a password. Enter the password here.</sys:String>
+
+    <!-- Others -->
+    <sys:String x:Key="Close">Close</sys:String>
+
+</ResourceDictionary>

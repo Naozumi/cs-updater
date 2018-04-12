@@ -192,39 +192,6 @@ namespace cs_updater
             }
         }
 
-        private void MenuInstallDir_Click(Object sender, RoutedEventArgs e)
-        {
-            filesVerified = false;
-            updateRequired = false;
-            SetButtonText("B_verify");
-            foreach (Object item in menuInstallDirs.Items)
-            {
-                if (item.GetType() == typeof(System.Windows.Controls.MenuItem))
-                {
-                    System.Windows.Controls.MenuItem i = (System.Windows.Controls.MenuItem)item;
-                    i.IsChecked = false;
-                }
-            }
-            System.Windows.Controls.MenuItem mi = sender as System.Windows.Controls.MenuItem;
-            ActiveInstall = (InstallPath)mi.Tag;
-            mi.IsChecked = true;
-            //menuInstallDirs.Header = "Active Installation: " + ActiveInstall.Name;
-            activeInstallText.Content = " " + ActiveInstall.Name;
-            SetProgressBarText("PB_verify");
-        }
-
-        private void Menu_OptionsClick(Object sender, RoutedEventArgs e)
-        {
-            OptionsWindow ipw = new OptionsWindow(installDirs);
-            ipw.Owner = this;
-            if ((bool)ipw.ShowDialog())
-            {
-                Properties.Settings.Default.installDirs = JsonConvert.SerializeObject(installDirs);
-                Properties.Settings.Default.Save();
-            }
-            LoadInstallDirs();
-        }
-
 
         #region News
         public async void LoadNews()
@@ -307,7 +274,8 @@ namespace cs_updater
         {
             try
             {
-                menuSettings.IsEnabled = false;
+                menuInstallDirs.IsEnabled = false;
+                menuOptions.IsEnabled = false;
                 taskBarItemInfo.ProgressState = System.Windows.Shell.TaskbarItemProgressState.Normal;
                 WritableAttempted = false;
 
@@ -336,7 +304,8 @@ namespace cs_updater
                     {
                         SetButtonText("B_update");
                         btn_update.IsEnabled = true;
-                        menuSettings.IsEnabled = true;
+                        menuInstallDirs.IsEnabled = true;
+                        menuOptions.IsEnabled = true;
                     });
                     if (Properties.Settings.Default.AutoUpdate)
                     {
@@ -351,7 +320,8 @@ namespace cs_updater
                     {
                         SetButtonText("B_verify");
                         btn_update.IsEnabled = true;
-                        menuSettings.IsEnabled = true;
+                        menuInstallDirs.IsEnabled = true;
+                        menuOptions.IsEnabled = true;
                     });
                 }
                 else
@@ -364,7 +334,8 @@ namespace cs_updater
                     {
                         SetButtonText("B_play");
                         btn_update.IsEnabled = true;
-                        menuSettings.IsEnabled = true;
+                        menuInstallDirs.IsEnabled = true;
+                        menuOptions.IsEnabled = true;
                     });
 
                     filesVerified = true;
@@ -382,7 +353,7 @@ namespace cs_updater
                 {
                     SetButtonText("B_verify");
                     btn_update.IsEnabled = true;
-                    menuSettings.IsEnabled = true;
+                    menuInstallDirs.IsEnabled = true; menuOptions.IsEnabled = true;
                     var errMessage = "";
                     if (filesVerified && !updateRequired)
                     {
@@ -1003,10 +974,44 @@ namespace cs_updater
             }
         }
 
+
+        private void MenuInstallDir_Click(Object sender, RoutedEventArgs e)
+        {
+            filesVerified = false;
+            updateRequired = false;
+            SetButtonText("B_verify");
+            foreach (Object item in menuInstallDirs.Items)
+            {
+                if (item.GetType() == typeof(System.Windows.Controls.MenuItem))
+                {
+                    System.Windows.Controls.MenuItem i = (System.Windows.Controls.MenuItem)item;
+                    i.IsChecked = false;
+                }
+            }
+            System.Windows.Controls.MenuItem mi = sender as System.Windows.Controls.MenuItem;
+            ActiveInstall = (InstallPath)mi.Tag;
+            mi.IsChecked = true;
+            //menuInstallDirs.Header = "Active Installation: " + ActiveInstall.Name;
+            activeInstallText.Content = " " + ActiveInstall.Name;
+            SetProgressBarText("PB_verify");
+        }
+
+        private void Menu_OptionsClick(Object sender, RoutedEventArgs e)
+        {
+            OptionsWindow ipw = new OptionsWindow(installDirs);
+            ipw.Owner = this;
+            if ((bool)ipw.ShowDialog())
+            {
+                Properties.Settings.Default.installDirs = JsonConvert.SerializeObject(installDirs);
+                Properties.Settings.Default.Save();
+            }
+            LoadInstallDirs();
+        }
+
         private void Menu_Logs_Click(object sender, RoutedEventArgs e)
         {
             string cmd = "explorer.exe";
-            string arg = "/e, " + Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "NordInvasion", "Updater");
+            string arg = "/e, " + Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "NordInvasion", "Launcher");
             Process.Start(cmd, arg);
         }
 
@@ -1041,6 +1046,16 @@ namespace cs_updater
         {
             WritableAttempted = false;
             MakeFilesWriteable();
+        }
+        private void Menu_Notification_Click(Object sender, RoutedEventArgs e)
+        {
+            NotificationWindow ipw = new NotificationWindow("Launcher_Text");
+            ipw.Owner = this;
+            if ((bool)ipw.ShowDialog())
+            {
+                Properties.Settings.Default.installDirs = JsonConvert.SerializeObject(installDirs);
+                Properties.Settings.Default.Save();
+            }
         }
 
         #endregion
