@@ -75,6 +75,7 @@
                 <MenuItem Header="{DynamicResource Language}" x:Name="menuItemLanguages" IsEnabled="True">
                     <MenuItem Header="English (GB)" Tag="en-GB" IsCheckable="True" Click="Menu_Lang_Click" />
                     <MenuItem Header="Español (ES)" Tag="es-ES" IsCheckable="True" Click="Menu_Lang_Click" />
+                    <MenuItem Header="Türkçe (TR)" Tag="tr-TR" IsCheckable="True" Click="Menu_Lang_Click" />
                 </MenuItem>
 
                 <MenuItem x:Name="DevMenu" Header="_Dev" Visibility="Hidden">
