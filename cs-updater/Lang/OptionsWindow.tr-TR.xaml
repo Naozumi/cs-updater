@@ -9,8 +9,8 @@
     <!-- Checkboxes -->
     <sys:String x:Key="Verify">Başlangıçta dosyaları otomatik olarak doğrula.</sys:String>
     <sys:String x:Key="Update">Güncelleme mevcutsa otomatik olarak güncelle.</sys:String>
-    <sys:String x:Key="Verify_Threads">Eşzamanlı kontrol sayısı (En Az: 20, En Fazla: 20).</sys:String>
-    <sys:String x:Key="Update_Threads">Eşzamanlı indirme sayısı (En Az: 4, En Fazla: 20).</sys:String>
+    <sys:String x:Key="Verify_Threads">Eşzamanlı Kontrol Sayısı (En Az: 20, En Fazla: 20).</sys:String>
+    <sys:String x:Key="Update_Threads">Eşzamanlı İndirme Sayısı (En Az: 4, En Fazla: 20).</sys:String>
 
     <!-- Button -->
     <sys:String x:Key="Name">İsim</sys:String>

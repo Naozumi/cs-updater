@@ -7,20 +7,20 @@
     <sys:String x:Key="Title">Yardım - Seçenekler</sys:String>
 
     <!-- Top options -->
-    <sys:String x:Key="Verify_Title">Otomatik doğrulama</sys:String>
-    <sys:String x:Key="Verify_Text">Başlatıcı açılır açılmaz dosyaları kontrol ederek oyunu daha hızlı güncellemenizi sağlar.</sys:String>
+    <sys:String x:Key="Verify_Title">Otomatik Doğrulama</sys:String>
+    <sys:String x:Key="Verify_Text">Başlatıcı açılır açılmaz dosyaları otomatik olarak kontrol ederek oyunu daha hızlı güncellemenizi sağlar.</sys:String>
     <sys:String x:Key="Update_Title">Otomatik Güncelleme</sys:String>
     <sys:String x:Key="Update_Text">Otomatik olarak son güncellemeleri indirir.</sys:String>
-    <sys:String x:Key="Verify_T_Title">Eşzamanlı kontrollerin sayısı</sys:String>
+    <sys:String x:Key="Verify_T_Title">Eşzamanlı Kontrollerin Sayısı</sys:String>
     <sys:String x:Key="Verify_T_Text">Aynı anda kaç dosya kontrol edilmeli. Bilgisayaranızın yükünü artırır ancak daha hızlı çalışır.</sys:String>
-    <sys:String x:Key="Update_T_Title">Eşzamanlı indirme sayısı</sys:String>
-    <sys:String x:Key="Update_T_Text">Aynı anda kaç tane dosya indirilmeli. Bilgisayaranızın ve internetinizin yüklerini artırır. İnternet veya disk sınırlarınıza ulaşılırsa, bu indirme işlemlerinizi yavaşlatabilir.</sys:String>
+    <sys:String x:Key="Update_T_Title">Eşzamanlı İndirme Sayısı</sys:String>
+    <sys:String x:Key="Update_T_Text">Aynı anda kaç tane dosya indirilmeli. Bilgisayaranızın ve internetinizin yüklerini artırır. İnternet veya disk sınırlarınıza ulaşılırsa, indirme işlemlerinizi yavaşlatabilir.</sys:String>
 
     <!-- Table -->
-    <sys:String x:Key="Edit_Title">Kurulum listelerini düzenlemek</sys:String>
+    <sys:String x:Key="Edit_Title">Kurulum Listelerini Düzenlemek</sys:String>
     <sys:String x:Key="Edit_Text">Düzenlemeye başlamak için herhangi bir hücreye çift tıklayın. Gerekli bilgiler aşağıda açıklanmıştır.</sys:String>
     <sys:String x:Key="Name_Title">İsim</sys:String>
-    <sys:String x:Key="Name_Text">Bu, yüklemeyi ana pencerede tanımlamanıza yardımcı olur.</sys:String>
+    <sys:String x:Key="Name_Text">İsim, yüklemeyi ana pencerede tanımlamanıza yardımcı olur.</sys:String>
     <sys:String x:Key="Default_Title">Varsayılan</sys:String>
     <sys:String x:Key="Default_Text">Düzenlemeye başlamak için herhangi bir hücreye çift tıklayın. Gerekli bilgiler aşağıda açıklanmıştır.</sys:String>
     <sys:String x:Key="Folder_Title">Klasör yolu</sys:String>
