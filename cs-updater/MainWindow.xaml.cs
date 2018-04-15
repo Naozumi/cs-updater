@@ -481,7 +481,11 @@ namespace cs_updater
                     else
                     {
                         Task<UpdateHashItem> t = await Task.WhenAny(working);
-                        working.RemoveAll(x => x.IsCompleted);
+                        if (t.Result.Verified != true)
+                        {
+                            updateRequired = true;
+                        }
+                        working.Remove(t);
                         progress = ((count - pending.Count) / count) * 100;
                         progressValue = " " + (count - pending.Count) + " / " + count;
                     }
@@ -540,7 +544,13 @@ namespace cs_updater
                         byte[] checksum = sha.ComputeHash(stream);
                         if (BitConverter.ToString(checksum).Replace("-", string.Empty).ToLower() == item.Crc)
                         {
+                            logger.Info(item.Name + " - local: " + BitConverter.ToString(checksum).Replace("-", string.Empty).ToLower() + " - json: " + item.Crc);
                             item.Verified = true;
+                        }
+                        else
+                        {
+                            logger.Info(item.Name + " - local: " + BitConverter.ToString(checksum).Replace("-", string.Empty).ToLower() + " - json: " + item.Crc);
+                            item.Verified = false;
                         }
                     }
                 }
@@ -627,7 +637,7 @@ namespace cs_updater
             Queue pending = new Queue();
             List<Task<UpdateHashItem>> working = new List<Task<UpdateHashItem>>();
             var errors = 0;
-            
+
             foreach (UpdateHashItem f in hashObject.getFiles())
             {
                 if (f.Verified == false)
@@ -666,7 +676,7 @@ namespace cs_updater
                             {
                                 pending.Clear();
                                 MakeFilesWriteable();
-                                return false;                              
+                                return false;
                             }
                             else if (t.Result.Writable == false && WritableAttempted)
                             {
