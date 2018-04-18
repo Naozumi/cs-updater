@@ -81,7 +81,6 @@
                 <MenuItem x:Name="DevMenu" Header="_Dev" Visibility="Hidden">
                     <MenuItem Header="_Clear Preferences" Click="Dev_Clear_Click"/>
                     <MenuItem Header="Make Dir _Writable" Click="Writable_Click"/>
-                    <MenuItem Header="_Notification" Click="Menu_Notification_Click"/>
                 </MenuItem>
             </Menu>
         </Grid>

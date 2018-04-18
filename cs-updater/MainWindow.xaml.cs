@@ -357,7 +357,8 @@ namespace cs_updater
                     var errMessage = "";
                     if (filesVerified && !updateRequired)
                     {
-                        errMessage = "Error launching game.\n\nIf the error persists then please contact the developers via forum.nordinvasion.com";
+
+                        errMessage = "Error_Launching"; //TODO
                     }
                     else if (updateRequired)
                     {
@@ -370,7 +371,13 @@ namespace cs_updater
                     filesVerified = false;
                     updateRequired = false;
 
-                    System.Windows.Forms.MessageBox.Show(errMessage, "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                    //NotificationWindow nw = new NotificationWindow(new string[] { errMessage })
+                    //{
+                    //    Owner = this
+                    //};
+                    //nw.ShowDialog();
+
+                    //System.Windows.Forms.MessageBox.Show(errMessage, "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                 });
             }
 
@@ -1027,8 +1034,12 @@ namespace cs_updater
 
         private void Menu_About_Click(object sender, RoutedEventArgs e)
         {
-            System.Windows.Forms.MessageBox.Show("NordInvasion Launcher\nVersion: " + Properties.Settings.Default.Version + "\n\nFor more info visit:\nhttps://nordinvasion.com",
-                        "About", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Information);
+
+            NotificationWindow nw = new NotificationWindow("About", new List<NotificationWindowItem> { new NotificationWindowItem("About1", true), new NotificationWindowItem(Properties.Settings.Default.Version + "\n", false), new NotificationWindowItem("About2", true) })
+            {
+                Owner = this
+            };
+            nw.ShowDialog();
         }
 
         private void Menu_Lang_Click(object sender, RoutedEventArgs e)
@@ -1056,16 +1067,6 @@ namespace cs_updater
         {
             WritableAttempted = false;
             MakeFilesWriteable();
-        }
-        private void Menu_Notification_Click(Object sender, RoutedEventArgs e)
-        {
-            NotificationWindow ipw = new NotificationWindow("Launcher_Text");
-            ipw.Owner = this;
-            if ((bool)ipw.ShowDialog())
-            {
-                Properties.Settings.Default.installDirs = JsonConvert.SerializeObject(installDirs);
-                Properties.Settings.Default.Save();
-            }
         }
 
         #endregion

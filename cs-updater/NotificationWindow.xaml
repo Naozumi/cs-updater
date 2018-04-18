@@ -8,7 +8,7 @@
         Title="NotificationWindow"
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize"
-        Height="200" Width="600" SizeToContent="Height">
+        Height="200" Width="600" SizeToContent="WidthAndHeight">
     <Window.Resources>
     <ResourceDictionary>
         <ResourceDictionary.MergedDictionaries>
@@ -24,11 +24,11 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="40" />
         </Grid.RowDefinitions>
-        <TextBlock Name="text" TextWrapping="Wrap" Margin="5">
+        <StackPanel Margin="20,20,20,10" Name="TextArea" Orientation="Vertical">
             
-        </TextBlock>
+        </StackPanel>
 
-        <Button Content="{DynamicResource ResourceKey=Close}" Width="100" Margin="5" Grid.Row="1" Click="Close_Click" Foreground="White">
+        <Button Content="{DynamicResource ResourceKey=Close}" Width="100" Margin="5,0,5,10" Grid.Row="1" Click="Close_Click" Foreground="White">
             <Button.Style>
                 <Style TargetType="{x:Type Button}">
                     <Setter Property="Background" Value="#FF830606"/>

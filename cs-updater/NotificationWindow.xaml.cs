@@ -19,10 +19,29 @@ namespace cs_updater
     /// </summary>
     public partial class NotificationWindow : Window
     {
-        public NotificationWindow(string text)
+        public NotificationWindow(string title, List<NotificationWindowItem> items)
         {
             InitializeComponent();
-            this.text.SetResourceReference(System.Windows.Controls.TextBlock.TextProperty, text);
+            LocUtil.SetDefaultLanguage(this);
+
+            string ti = this.FindResource(title) as string;
+            this.Title = ti;
+
+            foreach (NotificationWindowItem item in items)
+            {
+                var textblock = new TextBlock();
+                if (item.reference)
+                {
+                    textblock.SetResourceReference(System.Windows.Controls.TextBlock.TextProperty, item.text);
+                }
+                else
+                {
+                    textblock.Text = item.text;
+                }
+                
+                textblock.TextWrapping = TextWrapping.Wrap;
+                TextArea.Children.Add(textblock);
+            }
         }
 
         private void Close_Click(object sender, RoutedEventArgs e)
