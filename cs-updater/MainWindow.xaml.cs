@@ -265,11 +265,19 @@ namespace cs_updater
 
 
         #region Verify_&_Update
+        /// <summary>
+        /// Just calls DoUpdate to actually do the stuff
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Button_Update_Click(object sender, RoutedEventArgs e)
         {
             DoUpdate();
         }
 
+        /// <summary>
+        /// Actual functionality behind the button but can run async
+        /// </summary>
         private async void DoUpdate()
         {
             try
@@ -383,6 +391,11 @@ namespace cs_updater
 
         }
 
+        /// <summary>
+        /// Master driver for verifying items. Spawns process to check actual item.
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
         private async Task<Boolean> VerifyGameFiles()
         {
 
@@ -539,6 +552,11 @@ namespace cs_updater
             return true;
         }
 
+       /// <summary>
+       /// Checks inividual item checksums.
+       /// </summary>
+       /// <param name="item"></param>
+       /// <returns></returns>
         private UpdateHashItem VerifyItem(UpdateHashItem item)
         {
             try
@@ -576,6 +594,10 @@ namespace cs_updater
             }
         }
 
+        /// <summary>
+        /// Holder of the update process. Does some folder stuff.
+        /// </summary>
+        /// <returns></returns>
         private async Task UpdateGameFilesAsync()
         {
             this.Dispatcher.Invoke(() =>
@@ -614,6 +636,10 @@ namespace cs_updater
             }
         }
 
+        /// <summary>
+        /// Holds the queue of all items needing updated and watches progress.
+        /// </summary>
+        /// <returns></returns>
         private async Task<Boolean> Update_Game_Files()
         {
             hashObject.Source = ActiveInstall.Path;
@@ -709,6 +735,11 @@ namespace cs_updater
             return true;
         }
 
+        /// <summary>
+        /// Updates the relevant item
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
         private async Task<UpdateHashItem> Update_Item(UpdateHashItem item)
         {
 
