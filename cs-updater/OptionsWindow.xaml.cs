@@ -18,6 +18,8 @@ namespace cs_updater
     /// </summary>
     public partial class OptionsWindow : Window
     {
+        //TODO: Convert to new NW
+
         private OptionsHelp help = null;
         private static Logger logger = LogManager.GetCurrentClassLogger();
 
@@ -71,6 +73,7 @@ namespace cs_updater
 
             if (!(dir.FullName.ToUpper().Contains(@"\MODULES") || dir.FullName.ToUpper().EndsWith(@"\MODULES\NORDINVASION")))
             {
+                //TODO: Convert to new NW
                 DialogResult sure = System.Windows.Forms.MessageBox.Show("This does not appear to be the Modules or NordInvasion folder.\n\nAre you sure you want to download here?", "Are you sure?", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
                 if (sure == System.Windows.Forms.DialogResult.No)
                 {
@@ -136,6 +139,7 @@ namespace cs_updater
                 if (install.IsDefault) d++;
                 if (install.Path == "" || install.Path == null)
                 {
+                    //TODO: Convert to new NW
                     System.Windows.Forms.MessageBox.Show("Woops - looks like you added a directory without a path.\n\nPlease ensure all paths are set, or delete any options you don't want.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
@@ -146,11 +150,13 @@ namespace cs_updater
             if (Installs.Count == 0)
             {
                 //No installs
+                //TODO: Convert to new NW
                 System.Windows.Forms.MessageBox.Show("Please set a directory to continue.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             else if (d < 1)
             {
                 //No installs
+                //TODO: Convert to new NW
                 System.Windows.Forms.MessageBox.Show("Please set one of the installations as default to continue.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             else if (d == 1)
@@ -184,6 +190,7 @@ namespace cs_updater
             else if (d > 1)
             {
                 //Too many defaults
+                //TODO: Convert to new NW
                 System.Windows.Forms.MessageBox.Show("Sorry, you can only have one default.\n\nPlease set only one directory as default to continue.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
 

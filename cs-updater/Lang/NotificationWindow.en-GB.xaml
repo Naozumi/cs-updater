@@ -4,20 +4,48 @@
     
     <sys:String x:Key="ResourceDictionaryName">Loc-en-GB</sys:String>
 
-    <sys:String x:Key="Error_Title">Error</sys:String>
-    <sys:String x:Key="Error_Launching">Error launching game.\n\nIf the error persists then please contact the developers via forum.nordinvasion.com</sys:String>
-    <sys:String x:Key="Error_1">Error launching game.\n\nIf the error persists then please contact the developers via forum.nordinvasion.com</sys:String>
+    <sys:String x:Key="Welcome_Title">Welcome</sys:String>
+    <sys:String x:Key="Welcome1">Welcome to the NI Launcher.</sys:String>
+    <sys:String x:Key="Welcome2">Please set the Installation Path to continue.</sys:String>
+    
+    <sys:String x:Key="Error">Error</sys:String>
+
+    <sys:String x:Key="Error_Launching">Error launching game.</sys:String>
+    <sys:String x:Key="Error_Verify">Error verifying files.</sys:String>
+    <sys:String x:Key="Error_Update">Error updating files.</sys:String>
+    <sys:String x:Key="Error_Creating">Unable to create the NordInvasion directory.</sys:String>
+    <sys:String x:Key="Error_Creating_Permissions">Unable to create the neccessary folders - insufficient permissions.</sys:String>
+    <sys:String x:Key="Error_Writing_Permissions">Unable to save the files - insufficient permissions.</sys:String>
+    <sys:String x:Key="Error_Permissions">Unable to write the files - insufficient permissions.</sys:String>
+    <sys:String x:Key="Error_Download_Excess">Unable to download files from server.</sys:String>
+    <sys:String x:Key="Error_Server_Connection">Unable to connect to download servers.</sys:String>
+    <sys:String x:Key="Error_Server_Files">Unable to find a server to download file(s).</sys:String>
+    <sys:String x:Key="Error_No_Dir">Install directory not set.</sys:String>
+
+    <sys:String x:Key="Error_UAC_Denied">Cannot update. Permission was denied when making the files writable.</sys:String>
+    <sys:String x:Key="Error_UAC_Unknown">Cannot update. Unknown error occured when trying to make the files writable.</sys:String>
+
+
+
+    <sys:String x:Key="Error_Contact">If the error persists then please contact the developers via forum.nordinvasion.com</sys:String>
+    
+    <sys:String x:Key="No_Launcher">No launcher configured&#10;&#10;please set the path to steam or mb_warband.exe to enable launching the game.</sys:String>
     <sys:String x:Key="Error_2">Error launching game.\n\nIf the error persists then please contact the developers via forum.nordinvasion.com</sys:String>
     <sys:String x:Key="Error_3">Error launching game.\n\nIf the error persists then please contact the developers via forum.nordinvasion.com</sys:String>
     <sys:String x:Key="Error_4">Error launching game.\n\nIf the error persists then please contact the developers via forum.nordinvasion.com</sys:String>
     <sys:String x:Key="Error_5">Error launching game.\n\nIf the error persists then please contact the developers via forum.nordinvasion.com</sys:String>
     <sys:String x:Key="Error_6">Error launching game.\n\nIf the error persists then please contact the developers via forum.nordinvasion.com</sys:String>
-    <sys:String x:Key="Error_7">Error launching game.\n\nIf the error persists then please contact the developers via forum.nordinvasion.com</sys:String>
-    <sys:String x:Key="Error_8">Error launching game.\n\nIf the error persists then please contact the developers via forum.nordinvasion.com</sys:String>
+    
+    <sys:String x:Key="Update_Title">Launcher Update Available</sys:String>
+    <sys:String x:Key="Update_Text1">Update available for the NI launcher.</sys:String>
+    <sys:String x:Key="Update_Text2">Download now?</sys:String>
+
+
 
     <sys:String x:Key="About" xml:space="preserve">About</sys:String>
-    <sys:String x:Key="About1" xml:space="preserve">NordInvasion Launcher</sys:String>
-    <sys:String x:Key="About2" xml:space="preserve">For more info visit:&#10;https://nordinvasion.com</sys:String>
+    <sys:String x:Key="About1">NordInvasion Launcher</sys:String>
+    <sys:String x:Key="About2">For more info visit:</sys:String>
+    <sys:String x:Key="About3">https://nordinvasion.com</sys:String>
 
 
 

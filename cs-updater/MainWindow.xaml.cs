@@ -22,7 +22,10 @@ namespace cs_updater
     public partial class MainWindow
     {
         private UpdateHash hashObject = new UpdateHash();
-        private HttpClient client = new HttpClient();
+        private HttpClient client = new HttpClient()
+        {
+            Timeout = TimeSpan.FromSeconds(300)
+        };
         private List<HostServer> servers = new List<HostServer>();
         private List<InstallPath> installDirs = new List<InstallPath>();
         private InstallPath ActiveInstall = new InstallPath();
@@ -63,6 +66,8 @@ namespace cs_updater
             {
                 DevMenu.Visibility = Visibility.Visible;
             }
+
+            SetNews(this.FindResource("NewsLoading") as string);
             CheckForUpdate();
         }
 
@@ -85,9 +90,7 @@ namespace cs_updater
             btn_update_text.SetResourceReference(System.Windows.Controls.TextBlock.TextProperty, text);
         }
 
-        private async void CheckForUpdate()
-        {
-            SetNews("Checking for update...");
+        private async void CheckForUpdate() {
             try
             {
                 String versionString = await Task.Run(() => Download_JSON_File(Properties.Settings.Default.UpdaterVersionCheck));
@@ -97,9 +100,18 @@ namespace cs_updater
                     UpdaterVersion UpdateJson = await Task.Run(() => JsonConvert.DeserializeObject<UpdaterVersion>(versionString));
                     if (Version.Parse(UpdateJson.version) > Version.Parse(Properties.Settings.Default.Version))
                     {
-                        var answer = System.Windows.Forms.MessageBox.Show("Update available for the updater.\n\nClick \"OK\" to download.",
-                        "Update required", System.Windows.Forms.MessageBoxButtons.OKCancel, System.Windows.Forms.MessageBoxIcon.Information);
-                        if (answer == System.Windows.Forms.DialogResult.OK)
+                        NotificationWindow nw = new NotificationWindow("Update_Title",
+                            new List<NotificationWindowItem> {
+                                new NotificationWindowItem("Update_Text1"),
+                                new NotificationWindowItem(""),
+                                new NotificationWindowItem("Update_Text2") },
+                            3)
+                        {
+                            Owner = this
+                        };
+                        nw.ShowDialog();
+
+                        if (nw.Result > 0)
                         {
                             System.Diagnostics.Process.Start(UpdateJson.url);
                             System.Windows.Application.Current.Shutdown();
@@ -139,7 +151,17 @@ namespace cs_updater
 
         private void ShowFirstRun()
         {
-            System.Windows.Forms.MessageBox.Show("Welcome to the NI Launcher.\n\nPlease set the Installation Path to continue.", "Welcome", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Information);
+            NotificationWindow nw = new NotificationWindow("Welcome",
+                            new List<NotificationWindowItem> {
+                                new NotificationWindowItem("Welcome1"),
+                                new NotificationWindowItem(""),
+                                new NotificationWindowItem("Welcome2") },
+                            0)
+            {
+                Owner = this
+            };
+            nw.ShowDialog();
+
             SetProgressBarText("PB_missingInstall");
             activeInstallText.Content = " -";
             Menu_OptionsClick(null, null);
@@ -212,7 +234,7 @@ namespace cs_updater
             }
             catch (Exception ex)
             {
-                SetNews("Unable to load news.");
+                SetNews(this.FindResource("NewsFailed") as string);
                 logger.Error("Unable to load news.");
                 logger.Error(ex);
             }
@@ -365,27 +387,62 @@ namespace cs_updater
                     var errMessage = "";
                     if (filesVerified && !updateRequired)
                     {
-
                         errMessage = "Error_Launching"; //TODO
                     }
                     else if (updateRequired)
                     {
-                        errMessage = ex.Message;
+                        errMessage = "Error_Update";
                     }
                     else if (!filesVerified)
                     {
-                        errMessage = "Error verifying files.\n\nIf the error persists then please contact the developers via forum.nordinvasion.com";
+                        errMessage = "Error_Verify";
                     }
                     filesVerified = false;
                     updateRequired = false;
 
-                    //NotificationWindow nw = new NotificationWindow(new string[] { errMessage })
-                    //{
-                    //    Owner = this
-                    //};
-                    //nw.ShowDialog();
-
-                    //System.Windows.Forms.MessageBox.Show(errMessage, "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                    if (ex.InnerException.Message.StartsWith("Error_"))
+                    {
+                        NotificationWindow nw = new NotificationWindow("Error",
+                            new List<NotificationWindowItem> {
+                                new NotificationWindowItem(errMessage),
+                                new NotificationWindowItem(""),
+                                new NotificationWindowItem(ex.InnerException.Message),
+                                new NotificationWindowItem(""),
+                                new NotificationWindowItem("Error_Contact") },
+                            0)
+                        {
+                            Owner = this
+                        };
+                        nw.ShowDialog();
+                    }
+                    else if (ex.Message.StartsWith("Error_"))
+                    {
+                        NotificationWindow nw = new NotificationWindow("Error",
+                            new List<NotificationWindowItem> {
+                                new NotificationWindowItem(errMessage),
+                                new NotificationWindowItem(""),
+                                new NotificationWindowItem(ex.Message),
+                                new NotificationWindowItem(""),
+                                new NotificationWindowItem("Error_Contact") },
+                            0)
+                        {
+                            Owner = this
+                        };
+                        nw.ShowDialog();
+                    }
+                    else
+                    {
+                        NotificationWindow nw = new NotificationWindow("Error",
+                            new List<NotificationWindowItem> {
+                                new NotificationWindowItem(errMessage),
+                                new NotificationWindowItem(""),
+                                new NotificationWindowItem("Error_Contact") },
+                            0)
+                        {
+                            Owner = this
+                        };
+                        nw.ShowDialog();
+                    }
                 });
             }
 
@@ -414,7 +471,7 @@ namespace cs_updater
             {
                 if (ActiveInstall.Path == "")
                 {
-                    throw new Exception("Install directory not set.");
+                    throw new Exception("Error_No_Dir");
                 }
 
                 SetProgressBarText("PB_downloadHash");
@@ -472,7 +529,7 @@ namespace cs_updater
                         }
                     }
                     logger.Error("Unable to connect to download servers.");
-                    throw new Exception("Unable to connect to download servers.");
+                    throw new Exception("Error_Server_Connection");
                 }
 
                 hashObject = master.Json;
@@ -525,6 +582,7 @@ namespace cs_updater
                         progress = 0;
                         this.Dispatcher.Invoke(() =>
                         {
+                            //TODO: convert to NW
                             System.Windows.Forms.MessageBox.Show("Unabled to authenticate with download server.\n\nBeta password is incorrect.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                         });
                     }
@@ -534,6 +592,7 @@ namespace cs_updater
                         {
                             this.Dispatcher.Invoke(() =>
                             {
+                                //TODO: convert to NW
                                 System.Windows.Forms.MessageBox.Show("Unabled to verify files. \n\n" + ex.InnerException.Message, "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                             });
                         }
@@ -541,6 +600,7 @@ namespace cs_updater
                         {
                             this.Dispatcher.Invoke(() =>
                             {
+                                //TODO: convert to NW
                                 System.Windows.Forms.MessageBox.Show("Unabled to verify files. \n\n" + ex.Message, "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                             });
                         }
@@ -552,11 +612,11 @@ namespace cs_updater
             return true;
         }
 
-       /// <summary>
-       /// Checks inividual item checksums.
-       /// </summary>
-       /// <param name="item"></param>
-       /// <returns></returns>
+        /// <summary>
+        /// Checks inividual item checksums.
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
         private UpdateHashItem VerifyItem(UpdateHashItem item)
         {
             try
@@ -569,12 +629,12 @@ namespace cs_updater
                         byte[] checksum = sha.ComputeHash(stream);
                         if (BitConverter.ToString(checksum).Replace("-", string.Empty).ToLower() == item.Crc)
                         {
-                            logger.Info(item.Name + " - local: " + BitConverter.ToString(checksum).Replace("-", string.Empty).ToLower() + " - json: " + item.Crc);
+                            //logger.Info(item.Name + " - local: " + BitConverter.ToString(checksum).Replace("-", string.Empty).ToLower() + " - json: " + item.Crc);
                             item.Verified = true;
                         }
                         else
                         {
-                            logger.Info(item.Name + " - local: " + BitConverter.ToString(checksum).Replace("-", string.Empty).ToLower() + " - json: " + item.Crc);
+                            //logger.Info(item.Name + " - local: " + BitConverter.ToString(checksum).Replace("-", string.Empty).ToLower() + " - json: " + item.Crc);
                             item.Verified = false;
                         }
                     }
@@ -622,17 +682,20 @@ namespace cs_updater
                     while (await Update_Game_Files() == false)
                     {
                         uacCount++;
-                        if (uacCount > 2) throw new Exception("Unable to write the files - insufficient permissions.");
+                        logger.Info("UAC attempts triggered: " + uacCount.ToString());
+                        if (uacCount > 2) throw new Exception("Error_Permissions");
                     }
                 }
                 else
                 {
-                    throw new Exception("Unable to create the NordInvasion directory.");
+                    logger.Error("Can't create directory");
+                    throw new Exception("Error_Creating");
                 }
             }
             else
             {
-                throw new Exception("Unable to create the NordInvasion directory.");
+                logger.Error("Can't create directory");
+                throw new Exception("Error_Creating");
             }
         }
 
@@ -662,7 +725,7 @@ namespace cs_updater
                     catch (Exception ex)
                     {
                         logger.Error(new Exception("Cannot create folder: " + f.Path, ex));
-                        throw new Exception("Unable to create the neccessary folders - insufficient permissions.");
+                        throw new Exception("Error_Creating_Permissions");
                     }
                 }
             }
@@ -682,7 +745,7 @@ namespace cs_updater
 
             while (pending.Count + working.Count != 0 && errors < 30)
             {
-                if (working.Count < Properties.Settings.Default.Threads_Download && pending.Count != 0)
+                if (working.Count < Properties.Settings.Default.Threads_Download && pending.Count > 0)
                 {
                     var item = (UpdateHashItem)pending.Dequeue();
                     if (item.Verified == false)
@@ -717,18 +780,26 @@ namespace cs_updater
                                 errors += 60;
                                 working.Remove(t);
                             }
+                            else
+                            {
+                                working.Remove(t);
+                                pending.Enqueue(t.Result);
+                                errors++;
+                            }
                         }
                     }
                 }
             }
 
-            if (errors >= 60)
+            if (errors >= 50)
             {
-                throw new Exception("Unable to write the files - insufficient permissions.");
+                logger.Error("Download Errors - Writable false and attempted true.");
+                throw new Exception("Error_Writing_Permissions");
             }
-            else if (errors >= 30)
+            else if (errors >= 4)
             {
-                throw new Exception("Unable to download files from server. Please contact NI Support.");
+                logger.Error("Download Errors - Tried to download too many files (4) and failed.");
+                throw new Exception("Error_Download_Excess");
             }
             updateRequired = false;
             filesVerified = true;
@@ -793,7 +864,7 @@ namespace cs_updater
             }
             logger.Error(new Exception("Cannot download file - tried all (" + servers.Count.ToString() + ") hosts. Filename: " + item.Crc + ".gz" + " -- " + item.Path));
             item.Attempts++;
-            if (item.Attempts > 3) throw new Exception("Unable to find a server to download file(s).");
+            if (item.Attempts > 3) throw new Exception("Error_Server_Files");
             return item;
         }
 
@@ -801,9 +872,6 @@ namespace cs_updater
         {
             try
             {
-
-
-
                 // Attempt to get a list of security permissions from the folder. 
                 // This will raise an exception if the path is read only or do not have access to view the permissions. 
                 System.Security.AccessControl.DirectorySecurity ds = Directory.GetAccessControl(folderPath);
@@ -848,12 +916,12 @@ namespace cs_updater
             catch (System.ComponentModel.Win32Exception ex)
             {
                 logger.Error(ex);
-                throw new Exception("Cannot update. Permission was denied when making the files writable.");
+                throw new Exception("Error_UAC_Denied");
             }
             catch (Exception ex)
             {
                 logger.Error(ex);
-                throw new Exception("Cannot update. Unknown error occured when trying to make the files writable.");
+                throw new Exception("Error_UAC_Unknown");
             }
         }
 
@@ -966,6 +1034,7 @@ namespace cs_updater
                 {
                     Exception e = new Exception("Beta password is incorrect.", ex);
                     logger.Error(e);
+                    //TODO: Convert to new Error
                     throw new Exception("401");
                 }
                 else if (count <= 1)
@@ -1004,7 +1073,11 @@ namespace cs_updater
             {
                 this.Dispatcher.Invoke(() =>
                 {
-                    System.Windows.Forms.MessageBox.Show("No launcher configured - please set the path to steam or mb_warband.exe to enable launching the game.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                    NotificationWindow nw = new NotificationWindow("Error", new List<NotificationWindowItem> { new NotificationWindowItem("No_Launcher", true) }, 0)
+                    {
+                        Owner = this
+                    };
+                    nw.ShowDialog();
                 });
             }
         }
@@ -1039,7 +1112,6 @@ namespace cs_updater
             System.Windows.Controls.MenuItem mi = sender as System.Windows.Controls.MenuItem;
             ActiveInstall = (InstallPath)mi.Tag;
             mi.IsChecked = true;
-            //menuInstallDirs.Header = "Active Installation: " + ActiveInstall.Name;
             activeInstallText.Content = " " + ActiveInstall.Name;
             SetProgressBarText("PB_verify");
         }
@@ -1066,7 +1138,14 @@ namespace cs_updater
         private void Menu_About_Click(object sender, RoutedEventArgs e)
         {
 
-            NotificationWindow nw = new NotificationWindow("About", new List<NotificationWindowItem> { new NotificationWindowItem("About1", true), new NotificationWindowItem(Properties.Settings.Default.Version + "\n", false), new NotificationWindowItem("About2", true) })
+            NotificationWindow nw = new NotificationWindow("About",
+                new List<NotificationWindowItem> {
+                    new NotificationWindowItem("About1"),
+                    new NotificationWindowItem(Properties.Settings.Default.Version + "\n", false),
+                    new NotificationWindowItem(""),
+                    new NotificationWindowItem("About2"),
+                    new NotificationWindowItem("About3"), },
+                1)
             {
                 Owner = this
             };

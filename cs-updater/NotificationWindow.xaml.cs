@@ -1,24 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace cs_updater
 {
     /// <summary>
     /// Interaction logic for NotificationWindow.xaml
+    /// 0 = ok
+    /// 1 = close
+    /// 2 = ok/cancel
+    /// 3 = yes/no
     /// </summary>
     public partial class NotificationWindow : Window
     {
+        public int Result { get; private set; }
+
         public NotificationWindow(string title, List<NotificationWindowItem> items, int options = 0)
         {
             InitializeComponent();
@@ -39,24 +35,29 @@ namespace cs_updater
                 {
                     textblock.Text = item.text;
                 }
-
+                textblock.HorizontalAlignment = HorizontalAlignment.Center;
                 textblock.TextWrapping = TextWrapping.Wrap;
                 TextArea.Children.Add(textblock);
             }
 
             switch (options){
                 case 0:
-                    Btn_1.SetResourceReference(System.Windows.Controls.Button.ContentProperty, "Close");
+                    Btn_1.SetResourceReference(System.Windows.Controls.Button.ContentProperty, "OK");
                     Btn_1.Visibility = Visibility.Visible;
                     Btn_2.Visibility = Visibility.Collapsed;
                     break;
                 case 1:
+                    Btn_1.SetResourceReference(System.Windows.Controls.Button.ContentProperty, "Close");
+                    Btn_1.Visibility = Visibility.Visible;
+                    Btn_2.Visibility = Visibility.Collapsed;
+                    break;
+                case 2:
                     Btn_1.SetResourceReference(System.Windows.Controls.Button.ContentProperty, "OK");
                     Btn_1.Visibility = Visibility.Visible;
                     Btn_2.SetResourceReference(System.Windows.Controls.Button.ContentProperty, "Cancel");
                     Btn_2.Visibility = Visibility.Visible;
                     break;
-                case 2:
+                case 3:
                     Btn_1.SetResourceReference(System.Windows.Controls.Button.ContentProperty, "Yes");
                     Btn_1.Visibility = Visibility.Visible;
                     Btn_2.SetResourceReference(System.Windows.Controls.Button.ContentProperty, "No");
@@ -76,7 +77,5 @@ namespace cs_updater
             this.Result = -1;
             this.Close();
         }
-
-        public int Result { get; private set; }
     }
 }

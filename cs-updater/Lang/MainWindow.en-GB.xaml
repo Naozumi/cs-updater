@@ -40,6 +40,8 @@
     <!-- Others -->
     <sys:String x:Key="ActiveInstall">Active Installation:</sys:String>
     <sys:String x:Key="ForumLink">Open forum thread...</sys:String>
+    <sys:String x:Key="NewsLoading">Loading the latest news...</sys:String>
+    <sys:String x:Key="NewsFailed">Unable to load news</sys:String>
 
 
     

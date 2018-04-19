@@ -126,7 +126,7 @@ namespace cs_updater.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("https://nordinvasion.com/mod/updater-check.ajax.php")]
+        [global::System.Configuration.DefaultSettingValueAttribute("https://nordinvasion.com/releases/updater-check.ajax.php")]
         public string UpdaterVersionCheck {
             get {
                 return ((string)(this["UpdaterVersionCheck"]));
