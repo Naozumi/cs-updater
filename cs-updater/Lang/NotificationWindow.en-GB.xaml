@@ -18,10 +18,14 @@
     <sys:String x:Key="About" xml:space="preserve">About</sys:String>
     <sys:String x:Key="About1" xml:space="preserve">NordInvasion Launcher</sys:String>
     <sys:String x:Key="About2" xml:space="preserve">For more info visit:&#10;https://nordinvasion.com</sys:String>
-    
-    
-    
 
+
+
+
+    <sys:String x:Key="OK">OK</sys:String>
+    <sys:String x:Key="Yes">Yes</sys:String>
+    <sys:String x:Key="No">No</sys:String>
+    <sys:String x:Key="Cancel">Cancel</sys:String>
     <sys:String x:Key="Close">Close</sys:String>
 
 </ResourceDictionary>
