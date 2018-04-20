@@ -12,17 +12,23 @@
     <sys:String x:Key="Verify_Threads">Number of concurrent checks (Default: 20, Max: 20).</sys:String>
     <sys:String x:Key="Update_Threads">Number of concurrent downloads (Default: 4, Max: 20).</sys:String>
 
-    <!-- Button -->
+    <!-- Table -->
     <sys:String x:Key="Name">Name</sys:String>
     <sys:String x:Key="Default">Default</sys:String>
     <sys:String x:Key="Folder">Path to folder</sys:String>
     <sys:String x:Key="Launcher">Path to launcher</sys:String>
     <sys:String x:Key="Password">Password (for NI Betas only)</sys:String>
 
-    <!-- Others -->
+    <!-- Button -->
     <sys:String x:Key="Find">Automatically Find Installations</sys:String>
     <sys:String x:Key="Help">Help</sys:String>
     <sys:String x:Key="OK">OK</sys:String>
     <sys:String x:Key="Cancel">Cancel</sys:String>
+
+    <!-- File Finder -->
+    <sys:String x:Key="Warband_Modules">Select the Warband Modules folder</sys:String>
+    <sys:String x:Key="Select_Steam">Select the Steam executable</sys:String>
+    <sys:String x:Key="Select_Warband">Select the Warband executable</sys:String>
+    <sys:String x:Key="Executables">Executables</sys:String>
 
 </ResourceDictionary>

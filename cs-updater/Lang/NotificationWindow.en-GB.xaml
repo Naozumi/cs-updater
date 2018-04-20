@@ -32,7 +32,8 @@
     <sys:String x:Key="Error_Contact">If the error persists then please contact the developers via forum.nordinvasion.com</sys:String>
     
     <!-- TODO: Fix this -->
-    <sys:String x:Key="No_Launcher">No launcher configured&#10;&#10;please set the path to steam or mb_warband.exe to enable launching the game.</sys:String>
+    <sys:String x:Key="No_Launcher1">No launcher configured.</sys:String>
+    <sys:String x:Key="No_Launcher2">Please set the path to steam or mb_warband.exe to enable launching the game.</sys:String>
     
 
     <sys:String x:Key="Download_Confim_Title">Launcher Update Available</sys:String>

@@ -104,7 +104,7 @@ namespace cs_updater
                         NotificationWindow nw = new NotificationWindow("Update_Title",
                             new List<NotificationWindowItem> {
                                 new NotificationWindowItem("Update_Text1"),
-                                new NotificationWindowItem(""),
+                                new NotificationWindowItem("", false),
                                 new NotificationWindowItem("Update_Text2") },
                             3)
                         {
@@ -155,7 +155,7 @@ namespace cs_updater
             NotificationWindow nw = new NotificationWindow("Welcome_Title",
                 new List<NotificationWindowItem> {
                     new NotificationWindowItem("Welcome1"),
-                    new NotificationWindowItem(""),
+                    new NotificationWindowItem("", false),
                     new NotificationWindowItem("Welcome2") },
                 0)
             {
@@ -406,9 +406,9 @@ namespace cs_updater
                         NotificationWindow nw = new NotificationWindow("Error",
                             new List<NotificationWindowItem> {
                                 new NotificationWindowItem(errMessage),
-                                new NotificationWindowItem(""),
+                                new NotificationWindowItem("", false),
                                 new NotificationWindowItem(ex.InnerException.Message),
-                                new NotificationWindowItem(""),
+                                new NotificationWindowItem("", false),
                                 new NotificationWindowItem("Error_Contact") },
                             0)
                         {
@@ -421,9 +421,9 @@ namespace cs_updater
                         NotificationWindow nw = new NotificationWindow("Error",
                             new List<NotificationWindowItem> {
                                 new NotificationWindowItem(errMessage),
-                                new NotificationWindowItem(""),
+                                new NotificationWindowItem("", false),
                                 new NotificationWindowItem(ex.Message),
-                                new NotificationWindowItem(""),
+                                new NotificationWindowItem("", false),
                                 new NotificationWindowItem("Error_Contact") },
                             0)
                         {
@@ -436,7 +436,7 @@ namespace cs_updater
                         NotificationWindow nw = new NotificationWindow("Error",
                             new List<NotificationWindowItem> {
                                 new NotificationWindowItem(errMessage),
-                                new NotificationWindowItem(""),
+                                new NotificationWindowItem("", false),
                                 new NotificationWindowItem("Error_Contact") },
                             0)
                         {
@@ -586,9 +586,9 @@ namespace cs_updater
                             NotificationWindow nw = new NotificationWindow("Error",
                                 new List<NotificationWindowItem> {
                                     new NotificationWindowItem("Error_Beta_Auth"),
-                                    new NotificationWindowItem(""),
+                                    new NotificationWindowItem("", false),
                                     new NotificationWindowItem("Error_Beta_Pw"),
-                                    new NotificationWindowItem(""),
+                                    new NotificationWindowItem("", false),
                                     new NotificationWindowItem("Error_Contact") },
                                 0)
                             {
@@ -606,9 +606,9 @@ namespace cs_updater
                                 NotificationWindow nw = new NotificationWindow("Error",
                                     new List<NotificationWindowItem> {
                                         new NotificationWindowItem("Error_Verify"),
-                                        new NotificationWindowItem(""),
+                                        new NotificationWindowItem("", false),
                                         new NotificationWindowItem(ex.InnerException.Message, false),
-                                        new NotificationWindowItem(""),
+                                        new NotificationWindowItem("", false),
                                         new NotificationWindowItem("Error_Contact") },
                                     0)
                                 {
@@ -624,9 +624,9 @@ namespace cs_updater
                                 NotificationWindow nw = new NotificationWindow("Error",
                                         new List<NotificationWindowItem> {
                                         new NotificationWindowItem("Error_Verify"),
-                                        new NotificationWindowItem(""),
+                                        new NotificationWindowItem("", false),
                                         new NotificationWindowItem(ex.Message, false),
-                                        new NotificationWindowItem(""),
+                                        new NotificationWindowItem("", false),
                                         new NotificationWindowItem("Error_Contact") },
                                         0)
                                 {
@@ -1103,7 +1103,12 @@ namespace cs_updater
             {
                 this.Dispatcher.Invoke(() =>
                 {
-                    NotificationWindow nw = new NotificationWindow("Error", new List<NotificationWindowItem> { new NotificationWindowItem("No_Launcher", true) }, 0)
+                    NotificationWindow nw = new NotificationWindow("Error",
+                        new List<NotificationWindowItem> {
+                            new NotificationWindowItem("No_Launcher1"),
+                            new NotificationWindowItem("", false),
+                            new NotificationWindowItem("No_Launcher2")
+                        }, 0)
                     {
                         Owner = this
                     };
@@ -1172,7 +1177,7 @@ namespace cs_updater
                 new List<NotificationWindowItem> {
                     new NotificationWindowItem("About1"),
                     new NotificationWindowItem(Properties.Settings.Default.Version + "\n", false),
-                    new NotificationWindowItem(""),
+                    new NotificationWindowItem("", false),
                     new NotificationWindowItem("About2"),
                     new NotificationWindowItem("About3"), },
                 1)

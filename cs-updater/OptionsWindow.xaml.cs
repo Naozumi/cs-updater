@@ -56,7 +56,7 @@ namespace cs_updater
             {
                 InitialDirectory = initialPath,
                 IsFolderPicker = true,
-                Title = "Select the Warband Modules folder"
+                Title = this.FindResource("Warband_Modules") as string
             };
             if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
             {
@@ -76,7 +76,7 @@ namespace cs_updater
                         new NotificationWindowItem("Download_Confim1"),
                         new NotificationWindowItem("", false),
                         new NotificationWindowItem("Download_Confim2") },
-                    2)
+                    3)
                 {
                     Owner = this
                 };
@@ -400,7 +400,7 @@ namespace cs_updater
             NotificationWindow nw = new NotificationWindow("Steam_Check_Title",
                 new List<NotificationWindowItem> {
                     new NotificationWindowItem("Steam_Check_Text")
-                }, 2)
+                }, 3)
             {
                 Owner = this
             };
@@ -462,11 +462,11 @@ namespace cs_updater
                 string dialogTitle = "";
                 if (steam)
                 {
-                    dialogTitle = "Select the Steam.exe executable";
+                    dialogTitle = this.FindResource("Select_Steam") as string;
                 }
                 else
                 {
-                    dialogTitle = "Select the Warband executable";
+                    dialogTitle = this.FindResource("Select_Warband") as string;
                 }
                 CommonOpenFileDialog dialog = new CommonOpenFileDialog
                 {
@@ -474,7 +474,7 @@ namespace cs_updater
                     IsFolderPicker = false,
                     Title = dialogTitle
                 };
-                dialog.Filters.Add(new CommonFileDialogFilter("Executables", "*.exe"));
+                dialog.Filters.Add(new CommonFileDialogFilter(this.FindResource("Executables") as string, "*.exe"));
                 if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
                 {
                     file = new FileInfo(dialog.FileName);
