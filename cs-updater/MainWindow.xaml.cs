@@ -90,7 +90,8 @@ namespace cs_updater
             btn_update_text.SetResourceReference(System.Windows.Controls.TextBlock.TextProperty, text);
         }
 
-        private async void CheckForUpdate() {
+        private async void CheckForUpdate()
+        {
             try
             {
                 String versionString = await Task.Run(() => Download_JSON_File(Properties.Settings.Default.UpdaterVersionCheck));
@@ -151,7 +152,7 @@ namespace cs_updater
 
         private void ShowFirstRun()
         {
-            NotificationWindow nw = new NotificationWindow("Welcome",
+            NotificationWindow nw = new NotificationWindow("Welcome_Title",
                             new List<NotificationWindowItem> {
                                 new NotificationWindowItem("Welcome1"),
                                 new NotificationWindowItem(""),
@@ -387,7 +388,7 @@ namespace cs_updater
                     var errMessage = "";
                     if (filesVerified && !updateRequired)
                     {
-                        errMessage = "Error_Launching"; //TODO
+                        errMessage = "Error_Launching";
                     }
                     else if (updateRequired)
                     {
@@ -582,8 +583,18 @@ namespace cs_updater
                         progress = 0;
                         this.Dispatcher.Invoke(() =>
                         {
-                            //TODO: convert to NW
-                            System.Windows.Forms.MessageBox.Show("Unabled to authenticate with download server.\n\nBeta password is incorrect.", "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                            NotificationWindow nw = new NotificationWindow("Error",
+                                new List<NotificationWindowItem> {
+                                    new NotificationWindowItem("Error_Beta_Auth"),
+                                    new NotificationWindowItem(""),
+                                    new NotificationWindowItem("Error_Beta_Pw"),
+                                    new NotificationWindowItem(""),
+                                    new NotificationWindowItem("Error_Contact") },
+                                0)
+                            {
+                                Owner = this
+                            };
+                            nw.ShowDialog();
                         });
                     }
                     else
@@ -592,16 +603,36 @@ namespace cs_updater
                         {
                             this.Dispatcher.Invoke(() =>
                             {
-                                //TODO: convert to NW
-                                System.Windows.Forms.MessageBox.Show("Unabled to verify files. \n\n" + ex.InnerException.Message, "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                                NotificationWindow nw = new NotificationWindow("Error",
+                                    new List<NotificationWindowItem> {
+                                        new NotificationWindowItem("Error_Verify"),
+                                        new NotificationWindowItem(""),
+                                        new NotificationWindowItem(ex.InnerException.Message, false),
+                                        new NotificationWindowItem(""),
+                                        new NotificationWindowItem("Error_Contact") },
+                                    0)
+                                {
+                                    Owner = this
+                                };
+                                nw.ShowDialog();
                             });
                         }
                         else
                         {
                             this.Dispatcher.Invoke(() =>
                             {
-                                //TODO: convert to NW
-                                System.Windows.Forms.MessageBox.Show("Unabled to verify files. \n\n" + ex.Message, "Error", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                                NotificationWindow nw = new NotificationWindow("Error",
+                                        new List<NotificationWindowItem> {
+                                        new NotificationWindowItem("Error_Verify"),
+                                        new NotificationWindowItem(""),
+                                        new NotificationWindowItem(ex.Message, false),
+                                        new NotificationWindowItem(""),
+                                        new NotificationWindowItem("Error_Contact") },
+                                        0)
+                                {
+                                    Owner = this
+                                };
+                                nw.ShowDialog();
                             });
                         }
                         SetProgressBarText("PB_verifyFail");
@@ -1034,7 +1065,6 @@ namespace cs_updater
                 {
                     Exception e = new Exception("Beta password is incorrect.", ex);
                     logger.Error(e);
-                    //TODO: Convert to new Error
                     throw new Exception("401");
                 }
                 else if (count <= 1)
