@@ -43,9 +43,4 @@
     <sys:String x:Key="NewsLoading">Loading the latest news...</sys:String>
     <sys:String x:Key="NewsFailed">Unable to load news</sys:String>
 
-
-    
-
-
-
 </ResourceDictionary>

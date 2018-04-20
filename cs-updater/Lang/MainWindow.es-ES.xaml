@@ -40,5 +40,7 @@
     <!-- Others -->
     <sys:String x:Key="ActiveInstall">Instalación activa:</sys:String>
     <sys:String x:Key="ForumLink">Abrir el hilo del foro...</sys:String>
+    <sys:String x:Key="NewsLoading">Loading the latest news...</sys:String>
+    <sys:String x:Key="NewsFailed">Unable to load news</sys:String>
     
 </ResourceDictionary>
