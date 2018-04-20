@@ -27,31 +27,48 @@
 
     <sys:String x:Key="Error_Beta_Auth">Unabled to authenticate with download server.</sys:String>
     <sys:String x:Key="Error_Beta_Pw">Beta password is incorrect.</sys:String>
-    <sys:String x:Key="Error_No_Dir">Install directory not set.</sys:String>
-    <sys:String x:Key="Error_No_Dir">Install directory not set.</sys:String>
 
 
     <sys:String x:Key="Error_Contact">If the error persists then please contact the developers via forum.nordinvasion.com</sys:String>
     
+    <!-- TODO: Fix this -->
     <sys:String x:Key="No_Launcher">No launcher configured&#10;&#10;please set the path to steam or mb_warband.exe to enable launching the game.</sys:String>
-    <sys:String x:Key="Error_2">Error launching game.\n\nIf the error persists then please contact the developers via forum.nordinvasion.com</sys:String>
-    <sys:String x:Key="Error_3">Error launching game.\n\nIf the error persists then please contact the developers via forum.nordinvasion.com</sys:String>
-    <sys:String x:Key="Error_4">Error launching game.\n\nIf the error persists then please contact the developers via forum.nordinvasion.com</sys:String>
-    <sys:String x:Key="Error_5">Error launching game.\n\nIf the error persists then please contact the developers via forum.nordinvasion.com</sys:String>
-    <sys:String x:Key="Error_6">Error launching game.\n\nIf the error persists then please contact the developers via forum.nordinvasion.com</sys:String>
     
+
+    <sys:String x:Key="Download_Confim_Title">Launcher Update Available</sys:String>
+    <sys:String x:Key="Download_Confim1">This does not appear to be the Modules or NordInvasion folder.</sys:String>
+    <sys:String x:Key="Download_Confim2">Are you sure you want to download here?</sys:String>
+    
+    <sys:String x:Key="Dir_No_Path_Title">Install Path Error</sys:String>
+    <sys:String x:Key="Dir_No_Path1">Woops - looks like you added a directory without a path.</sys:String>
+    <sys:String x:Key="Dir_No_Path2">Please ensure all paths are set or delete any options you don't want.</sys:String>
+
+    <sys:String x:Key="Dir_Not_Set">Please set a directory to continue.</sys:String>
+    <sys:String x:Key="Default_Not_Set">Please set one of the installations as default to continue.</sys:String>
+    <sys:String x:Key="Default_Excess1">Sorry, you can only have one default.</sys:String>
+    <sys:String x:Key="Default_Excess2">Please set only one directory as default to continue.</sys:String>
+
+    <sys:String x:Key="Installs_Found_Title">Installations Found</sys:String>
+    <sys:String x:Key="Installs_Found_Text">Number of new installations found:</sys:String>
+    <sys:String x:Key="Installs_Not_Found_Title">No Installations Found</sys:String>
+    <sys:String x:Key="Installs_Not_Found_Text">No new installations found.</sys:String>
+    <sys:String x:Key="Installs_Fail">Unable to search for installations.</sys:String>
+
+    <sys:String x:Key="Steam_Check_Title">Steam check</sys:String>
+    <sys:String x:Key="Steam_Check_Text">Was this game installed via Steam?</sys:String>
+    <sys:String x:Key="Steam_Find_Title">Can't Find Steam</sys:String>
+    <sys:String x:Key="Steam_Find_Text">Could not find Steam - please locate it manually.</sys:String>
+
+
     <sys:String x:Key="Update_Title">Launcher Update Available</sys:String>
     <sys:String x:Key="Update_Text1">Update available for the NI launcher.</sys:String>
     <sys:String x:Key="Update_Text2">Download now?</sys:String>
-
 
 
     <sys:String x:Key="About" xml:space="preserve">About</sys:String>
     <sys:String x:Key="About1">NordInvasion Launcher</sys:String>
     <sys:String x:Key="About2">For more info visit:</sys:String>
     <sys:String x:Key="About3">https://nordinvasion.com</sys:String>
-
-
 
 
     <sys:String x:Key="OK">OK</sys:String>

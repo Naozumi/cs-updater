@@ -153,11 +153,11 @@ namespace cs_updater
         private void ShowFirstRun()
         {
             NotificationWindow nw = new NotificationWindow("Welcome_Title",
-                            new List<NotificationWindowItem> {
-                                new NotificationWindowItem("Welcome1"),
-                                new NotificationWindowItem(""),
-                                new NotificationWindowItem("Welcome2") },
-                            0)
+                new List<NotificationWindowItem> {
+                    new NotificationWindowItem("Welcome1"),
+                    new NotificationWindowItem(""),
+                    new NotificationWindowItem("Welcome2") },
+                0)
             {
                 Owner = this
             };

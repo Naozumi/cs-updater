@@ -18,8 +18,6 @@ namespace cs_updater
     /// </summary>
     public partial class OptionsWindow : Window
     {
-        //TODO: Convert to new NW
-
         private OptionsHelp help = null;
         private static Logger logger = LogManager.GetCurrentClassLogger();
 
@@ -73,9 +71,18 @@ namespace cs_updater
 
             if (!(dir.FullName.ToUpper().Contains(@"\MODULES") || dir.FullName.ToUpper().EndsWith(@"\MODULES\NORDINVASION")))
             {
-                //TODO: Convert to new NW
-                DialogResult sure = System.Windows.Forms.MessageBox.Show("This does not appear to be the Modules or NordInvasion folder.\n\nAre you sure you want to download here?", "Are you sure?", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
-                if (sure == System.Windows.Forms.DialogResult.No)
+                NotificationWindow nw = new NotificationWindow("Download_Confim_Title",
+                    new List<NotificationWindowItem> {
+                        new NotificationWindowItem("Download_Confim1"),
+                        new NotificationWindowItem("", false),
+                        new NotificationWindowItem("Download_Confim2") },
+                    2)
+                {
+                    Owner = this
+                };
+                nw.ShowDialog();
+
+                if (nw.Result < 1)
                 {
                     this.Activate();
                     return;
@@ -139,8 +146,16 @@ namespace cs_updater
                 if (install.IsDefault) d++;
                 if (install.Path == "" || install.Path == null)
                 {
-                    //TODO: Convert to new NW
-                    System.Windows.Forms.MessageBox.Show("Woops - looks like you added a directory without a path.\n\nPlease ensure all paths are set, or delete any options you don't want.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    NotificationWindow nw = new NotificationWindow("Dir_No_Path_Title",
+                    new List<NotificationWindowItem> {
+                        new NotificationWindowItem("Dir_No_Path1"),
+                        new NotificationWindowItem("", false),
+                        new NotificationWindowItem("Dir_No_Path2")
+                    }, 0)
+                    {
+                        Owner = this
+                    };
+                    nw.ShowDialog();
                     return;
                 }
                 if (!install.Path.EndsWith(@"\")) install.Path += @"\";
@@ -150,14 +165,26 @@ namespace cs_updater
             if (Installs.Count == 0)
             {
                 //No installs
-                //TODO: Convert to new NW
-                System.Windows.Forms.MessageBox.Show("Please set a directory to continue.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                NotificationWindow nw = new NotificationWindow("Error",
+                    new List<NotificationWindowItem> {
+                        new NotificationWindowItem("Dir_Not_Set")
+                    }, 0)
+                {
+                    Owner = this
+                };
+                nw.ShowDialog();
             }
             else if (d < 1)
             {
                 //No installs
-                //TODO: Convert to new NW
-                System.Windows.Forms.MessageBox.Show("Please set one of the installations as default to continue.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                NotificationWindow nw = new NotificationWindow("Error",
+                    new List<NotificationWindowItem> {
+                        new NotificationWindowItem("Default_Not_Set")
+                    }, 0)
+                {
+                    Owner = this
+                };
+                nw.ShowDialog();
             }
             else if (d == 1)
             {
@@ -190,8 +217,16 @@ namespace cs_updater
             else if (d > 1)
             {
                 //Too many defaults
-                //TODO: Convert to new NW
-                System.Windows.Forms.MessageBox.Show("Sorry, you can only have one default.\n\nPlease set only one directory as default to continue.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                NotificationWindow nw = new NotificationWindow("Error",
+                    new List<NotificationWindowItem> {
+                        new NotificationWindowItem("Default_Excess1"),
+                        new NotificationWindowItem("", false),
+                        new NotificationWindowItem("Default_Excess2")
+                    }, 0)
+                {
+                    Owner = this
+                };
+                nw.ShowDialog();
             }
 
         }
@@ -217,12 +252,27 @@ namespace cs_updater
                 }
                 if (newInstalls.Count > 0)
                 {
-                    System.Windows.Forms.MessageBox.Show(newInstalls.Count + " new installs found and added to the list.", newInstalls.Count + " installs found.", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    NotificationWindow nw = new NotificationWindow("Installs_Found_Title",
+                    new List<NotificationWindowItem> {
+                        new NotificationWindowItem("Installs_Found_Text"),
+                        new NotificationWindowItem(newInstalls.Count.ToString(), false)
+                    }, 0)
+                    {
+                        Owner = this
+                    };
+                    nw.ShowDialog();
                     Installs.AddRange(newInstalls);
                 }
                 else
                 {
-                    System.Windows.Forms.MessageBox.Show("No new installs found.", newInstalls.Count + " new installs found.", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    NotificationWindow nw = new NotificationWindow("Installs_Not_Found_Title",
+                    new List<NotificationWindowItem> {
+                        new NotificationWindowItem("Installs_Not_Found_Text")
+                    }, 0)
+                    {
+                        Owner = this
+                    };
+                    nw.ShowDialog();
                 }
 
                 data.Items.Refresh();
@@ -231,7 +281,14 @@ namespace cs_updater
             {
                 logger.Error("Error finding directories");
                 logger.Error(ex);
-                System.Windows.Forms.MessageBox.Show("Sorry, unable to locate installs.", "Unable to locate installs", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                NotificationWindow nw = new NotificationWindow("Error",
+                    new List<NotificationWindowItem> {
+                        new NotificationWindowItem("Installs_Fail")
+                    }, 0)
+                {
+                    Owner = this
+                };
+                nw.ShowDialog();
             }
         }
 
@@ -340,11 +397,18 @@ namespace cs_updater
         {
             InstallPath selected = (InstallPath)data.CurrentCell.Item;
 
-            var answer = System.Windows.Forms.MessageBox.Show("Was this game installed via Steam?", "Steam installation check.", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            NotificationWindow nw = new NotificationWindow("Steam_Check_Title",
+                new List<NotificationWindowItem> {
+                    new NotificationWindowItem("Steam_Check_Text")
+                }, 2)
+            {
+                Owner = this
+            };
+            nw.ShowDialog();
 
             bool need2find = true;
             bool steam = false;
-            if (answer == System.Windows.Forms.DialogResult.Yes)
+            if (nw.Result == 1)
             {
                 steam = true;
                 try
@@ -357,7 +421,14 @@ namespace cs_updater
                     }
                     else
                     {
-                        System.Windows.Forms.MessageBox.Show("Could not find steam - please locate it manually.", "Unable to locate steam.", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        nw = new NotificationWindow("Steam_Find_Title",
+                            new List<NotificationWindowItem> {
+                                new NotificationWindowItem("Steam_Find_Text")
+                            }, 0)
+                        {
+                            Owner = this
+                        };
+                        nw.ShowDialog();
                     }
                 }
                 catch
