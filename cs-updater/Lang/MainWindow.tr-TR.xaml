@@ -40,7 +40,7 @@
     <!-- Others -->
     <sys:String x:Key="ActiveInstall">Aktif kurulu:</sys:String>
     <sys:String x:Key="ForumLink">Forum konusunu aç...</sys:String>
-    <sys:String x:Key="NewsLoading">Loading the latest news...</sys:String>
-    <sys:String x:Key="NewsFailed">Unable to load news</sys:String>
+    <sys:String x:Key="NewsLoading">En son haberler yükleniyor...</sys:String>
+    <sys:String x:Key="NewsFailed">Haberler yüklenemiyor</sys:String>
 
 </ResourceDictionary>

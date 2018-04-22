@@ -1,10 +1,11 @@
 #include <idp.iss>
 
 #define MyAppName "NordInvasion Launcher"
-#define MyAppVersion "3.1.1"
+#define MyAppVersion "3.2.0"
 #define MyAppPublisher "NordInvasion"
 #define MyAppURL "https://nordinvasion.com"
 #define MyAppExeName "NordInvasion_Launcher.exe"
+#define RepoPath "C:\Users\andy\source\repos"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application.
@@ -20,12 +21,12 @@ AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
 DefaultDirName={pf}\{#MyAppName}
 DisableProgramGroupPage=yes
-LicenseFile=C:\Users\andy\source\repos\gpl-3.0.txt
-InfoAfterFile=C:\Users\andy\source\repos\postinstall.txt
-OutputDir=C:\Users\andy\source\repos
+LicenseFile={#RepoPath}\gpl-3.0.txt
+InfoAfterFile={#RepoPath}\postinstall.txt
+OutputDir={#RepoPath}
 OutputBaseFilename=ni_launcher_{#MyAppVersion}
 VersionInfoVersion={#MyAppVersion}
-SetupIconFile=C:\Users\andy\source\repos\cs-updater\cs-updater\ni-badge.ico
+SetupIconFile={#RepoPath}\cs-updater\cs-updater\ni-badge.ico
 Compression=lzma
 SolidCompression=yes
 
