@@ -10,7 +10,7 @@
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="Lang/OptionsWindow.en-GB.xaml" />
+                <ResourceDictionary Source="Lang/en-GB/OptionsWindow.en-GB.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Window.Resources>

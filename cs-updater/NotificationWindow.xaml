@@ -12,7 +12,7 @@
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="Lang/NotificationWindow.en-GB.xaml" />
+                <ResourceDictionary Source="Lang/en-GB/NotificationWindow.en-GB.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Window.Resources>

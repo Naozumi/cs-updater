@@ -1,7 +1,7 @@
 #include <idp.iss>
 
 #define MyAppName "NordInvasion Launcher"
-#define MyAppVersion "3.2.0"
+#define MyAppVersion "3.1.3"
 #define MyAppPublisher "NordInvasion"
 #define MyAppURL "https://nordinvasion.com"
 #define MyAppExeName "NordInvasion_Launcher.exe"
@@ -54,6 +54,10 @@ Source: "C:\Users\andy\source\repos\cs-updater\cs-updater\bin\Release\updater-li
 Source: "C:\Users\andy\source\repos\cs-updater\cs-updater\bin\Release\updater-permissions.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "C:\Users\andy\source\repos\cs-updater\cs-updater\bin\Release\updater-permissions.exe.config"; DestDir: "{app}"; Flags: ignoreversion
 Source: "C:\Users\andy\source\repos\cs-updater\cs-updater\bin\Release\updater-permissions.pdb"; DestDir: "{app}"; Flags: ignoreversion
+Source: "C:\Users\andy\source\repos\cs-updater\cs-updater\bin\Release\Lang\en-GB\MainWindow.en-GB.xaml"; DestDir: "{app}\Lang\en-GB\"; Flags: ignoreversion
+Source: "C:\Users\andy\source\repos\cs-updater\cs-updater\bin\Release\Lang\en-GB\NotificationWindow.en-GB.xaml"; DestDir: "{app}\Lang\en-GB\"; Flags: ignoreversion
+Source: "C:\Users\andy\source\repos\cs-updater\cs-updater\bin\Release\Lang\en-GB\OptionsHelp.en-GB.xaml"; DestDir: "{app}\Lang\en-GB\"; Flags: ignoreversion
+Source: "C:\Users\andy\source\repos\cs-updater\cs-updater\bin\Release\Lang\en-GB\OptionsWindow.en-GB.xaml"; DestDir: "{app}\Lang\en-GB\"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]

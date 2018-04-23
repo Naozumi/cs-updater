@@ -96,7 +96,7 @@ namespace updater_permissions
             }
             catch (Exception ex)
             {
-                logger.Error("Cannot set ACL on: " + path);
+                logger.Error("Cannot set ACL on: " + path + "   " + ex);
             }
 
         }

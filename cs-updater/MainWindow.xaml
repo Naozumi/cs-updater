@@ -13,7 +13,7 @@
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="Lang/MainWindow.en-GB.xaml" />
+                <ResourceDictionary Source="Lang/en-GB/MainWindow.en-GB.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <Style x:Key="GridSplitterStyle" TargetType="{x:Type GridSplitter}">
                 <Setter Property="Background">
@@ -72,13 +72,13 @@
                     <MenuItem Header="{DynamicResource M_About}" Name="menuAbout" Click="Menu_About_Click"/>
                 </MenuItem>
 
-                <MenuItem Header="{DynamicResource Language}" x:Name="menuItemLanguages" IsEnabled="True">
+                <!--<MenuItem Header="{DynamicResource Language}" x:Name="menuItemLanguages" IsEnabled="True">
                     <MenuItem Header="English (GB)" Tag="en-GB" IsCheckable="True" Click="Menu_Lang_Click" />
                     <MenuItem Header="Dansk (Da)" Tag="da-DK" IsCheckable="True" Click="Menu_Lang_Click" />
                     <MenuItem Header="Español (ES)" Tag="es-ES" IsCheckable="True" Click="Menu_Lang_Click" />
                     <MenuItem Header="Italiano (IT)" Tag="it-IT" IsCheckable="True" Click="Menu_Lang_Click" />
                     <MenuItem Header="Türkçe (TR)" Tag="tr-TR" IsCheckable="True" Click="Menu_Lang_Click" />
-                </MenuItem>
+                </MenuItem>-->
 
                 <MenuItem x:Name="DevMenu" Header="_Dev" Visibility="Hidden">
                     <MenuItem Header="_Clear Preferences" Click="Dev_Clear_Click"/>

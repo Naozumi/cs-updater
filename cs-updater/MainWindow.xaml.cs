@@ -49,11 +49,11 @@ namespace cs_updater
             //LocUtil.SetDefaultLanguage(this);
             SetProgressBarText("PB_loading");
 
-            foreach (System.Windows.Controls.MenuItem item in menuItemLanguages.Items)
-            {
-                if (item.Tag.ToString().Equals(LocUtil.GetCurrentCultureName(this)))
-                    item.IsChecked = true;
-            }
+            //foreach (System.Windows.Controls.MenuItem item in menuItemLanguages.Items)
+            //{
+            //    if (item.Tag.ToString().Equals(LocUtil.GetCurrentCultureName(this)))
+            //        item.IsChecked = true;
+            //}
 
             if (Properties.Settings.Default.UpgradeRequired)
             {
@@ -1187,19 +1187,19 @@ namespace cs_updater
             nw.ShowDialog();
         }
 
-        private void Menu_Lang_Click(object sender, RoutedEventArgs e)
-        {
-            foreach (System.Windows.Controls.MenuItem item in menuItemLanguages.Items)
-            {
-                item.IsChecked = false;
-            }
+        //private void Menu_Lang_Click(object sender, RoutedEventArgs e)
+        //{
+        //    foreach (System.Windows.Controls.MenuItem item in menuItemLanguages.Items)
+        //    {
+        //        item.IsChecked = false;
+        //    }
 
-            System.Windows.Controls.MenuItem mi = sender as System.Windows.Controls.MenuItem;
-            mi.IsChecked = true;
-            LocUtil.SwitchLanguage(this, mi.Tag.ToString());
-            Properties.Settings.Default.Language = mi.Tag.ToString();
-            Properties.Settings.Default.Save();
-        }
+        //    System.Windows.Controls.MenuItem mi = sender as System.Windows.Controls.MenuItem;
+        //    mi.IsChecked = true;
+        //    LocUtil.SwitchLanguage(this, mi.Tag.ToString());
+        //    Properties.Settings.Default.Language = mi.Tag.ToString();
+        //    Properties.Settings.Default.Save();
+        //}
 
         #region Dev Controls
         private void Dev_Clear_Click(object sender, RoutedEventArgs e)
