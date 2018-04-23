@@ -1,8 +1,8 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:sys="clr-namespace:System;assembly=mscorlib">
-    
-    <sys:String x:Key="ResourceDictionaryName">Loc-en-GB</sys:String>
+
+    <sys:String x:Key="ResourceDictionaryName">Loc-da-DK</sys:String>
 
     <sys:String x:Key="Welcome_Title">Welcome</sys:String>
     <sys:String x:Key="Welcome1">Welcome to the NI Launcher.</sys:String>

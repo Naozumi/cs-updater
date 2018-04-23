@@ -46,7 +46,7 @@ namespace cs_updater
             logger.Info("Current Version: " + Properties.Settings.Default.Version);
             System.Net.ServicePointManager.DefaultConnectionLimit = 20;
 
-            LocUtil.SetDefaultLanguage(this);
+            //LocUtil.SetDefaultLanguage(this);
             SetProgressBarText("PB_loading");
 
             foreach (System.Windows.Controls.MenuItem item in menuItemLanguages.Items)

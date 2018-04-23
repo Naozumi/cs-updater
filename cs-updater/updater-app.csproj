@@ -196,19 +196,19 @@
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Lang\MainWindow.de-DE.xaml">
+    <Content Include="Lang\MainWindow.da-DK.xaml">
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Lang\NotificationWindow.de-DE.xaml">
+    <Content Include="Lang\NotificationWindow.da-DK.xaml">
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Lang\OptionsHelp.de-DE.xaml">
+    <Content Include="Lang\OptionsHelp.da-DK.xaml">
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Lang\OptionsWindow.de-DE.xaml">
+    <Content Include="Lang\OptionsWindow.da-DK.xaml">
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

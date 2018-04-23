@@ -2,7 +2,7 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:sys="clr-namespace:System;assembly=mscorlib">
 
-    <sys:String x:Key="ResourceDictionaryName">Loc-de-DE</sys:String>
+    <sys:String x:Key="ResourceDictionaryName">Loc-da-DK</sys:String>
 
     <sys:String x:Key="Title">Optionen</sys:String>
 

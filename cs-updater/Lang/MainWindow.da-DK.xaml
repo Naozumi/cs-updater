@@ -2,7 +2,7 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:sys="clr-namespace:System;assembly=mscorlib">
 
-    <sys:String x:Key="ResourceDictionaryName">Loc-de-DE</sys:String>
+    <sys:String x:Key="ResourceDictionaryName">Loc-da-DK</sys:String>
 
     <sys:String x:Key="Title">NordInvasion Launcher</sys:String>
 
@@ -15,7 +15,7 @@
     <sys:String x:Key="Language">_Sprog</sys:String>
 
     <!-- Progress Bar Text -->
-    <sys:String x:Key="PB_loading">Loading...</sys:String>
+    <sys:String x:Key="PB_loading">Laden...</sys:String>
     <sys:String x:Key="PB_missingInstall">Angiv en installationssti.</sys:String>
     <sys:String x:Key="PB_updateRequired">Opdatering nødvendig - Latest version:</sys:String>
     <sys:String x:Key="PB_readyToPlay">NI er klar til at spille - Version:</sys:String>
@@ -40,7 +40,7 @@
     <!-- Others -->
     <sys:String x:Key="ActiveInstall">Aktive Installation:</sys:String>
     <sys:String x:Key="ForumLink">Åben forums...</sys:String>
-    <sys:String x:Key="NewsLoading">Loading the latest news...</sys:String>
-    <sys:String x:Key="NewsFailed">Unable to load news</sys:String>
+    <sys:String x:Key="NewsLoading">Indlæser seneste nyheder...</sys:String>
+    <sys:String x:Key="NewsFailed">Kan ikke indlæse nyheder</sys:String>
 
 </ResourceDictionary>
