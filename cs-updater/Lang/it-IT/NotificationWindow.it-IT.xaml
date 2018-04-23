@@ -1,0 +1,81 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+    
+    <sys:String x:Key="ResourceDictionaryName">Loc-it-IT</sys:String>
+
+    <sys:String x:Key="Welcome_Title">Welcome</sys:String>
+    <sys:String x:Key="Welcome1">Welcome to the NI Launcher.</sys:String>
+    <sys:String x:Key="Welcome2">Please set the Installation Path to continue.</sys:String>
+    
+    <sys:String x:Key="Error">Error</sys:String>
+
+    <sys:String x:Key="Error_Launching">Error launching game.</sys:String>
+    <sys:String x:Key="Error_Verify">Error verifying files.</sys:String>
+    <sys:String x:Key="Error_Update">Error updating files.</sys:String>
+    <sys:String x:Key="Error_Creating">Unable to create the NordInvasion directory.</sys:String>
+    <sys:String x:Key="Error_Creating_Permissions">Unable to create the neccessary folders - insufficient permissions.</sys:String>
+    <sys:String x:Key="Error_Writing_Permissions">Unable to save the files - insufficient permissions.</sys:String>
+    <sys:String x:Key="Error_Permissions">Unable to write the files - insufficient permissions.</sys:String>
+    <sys:String x:Key="Error_Download_Excess">Unable to download files from server.</sys:String>
+    <sys:String x:Key="Error_Server_Connection">Unable to connect to download servers.</sys:String>
+    <sys:String x:Key="Error_Server_Files">Unable to find a server to download file(s).</sys:String>
+    <sys:String x:Key="Error_No_Dir">Install directory not set.</sys:String>
+
+    <sys:String x:Key="Error_UAC_Denied">Cannot update. Permission was denied when making the files writable.</sys:String>
+    <sys:String x:Key="Error_UAC_Unknown">Cannot update. Unknown error occured when trying to make the files writable.</sys:String>
+
+    <sys:String x:Key="Error_Beta_Auth">Unabled to authenticate with download server.</sys:String>
+    <sys:String x:Key="Error_Beta_Pw">Beta password is incorrect.</sys:String>
+
+
+    <sys:String x:Key="Error_Contact">If the error persists then please contact the developers via forum.nordinvasion.com</sys:String>
+    
+    <!-- TODO: Fix this -->
+    <sys:String x:Key="No_Launcher1">No launcher configured.</sys:String>
+    <sys:String x:Key="No_Launcher2">Please set the path to steam or mb_warband.exe to enable launching the game.</sys:String>
+    
+
+    <sys:String x:Key="Download_Confim_Title">Launcher Update Available</sys:String>
+    <sys:String x:Key="Download_Confim1">This does not appear to be the Modules or NordInvasion folder.</sys:String>
+    <sys:String x:Key="Download_Confim2">Are you sure you want to download here?</sys:String>
+    
+    <sys:String x:Key="Dir_No_Path_Title">Install Path Error</sys:String>
+    <sys:String x:Key="Dir_No_Path1">Woops - looks like you added a directory without a path.</sys:String>
+    <sys:String x:Key="Dir_No_Path2">Please ensure all paths are set or delete any options you don't want.</sys:String>
+
+    <sys:String x:Key="Dir_Not_Set">Please set a directory to continue.</sys:String>
+    <sys:String x:Key="Default_Not_Set">Please set one of the installations as default to continue.</sys:String>
+    <sys:String x:Key="Default_Excess1">Sorry, you can only have one default.</sys:String>
+    <sys:String x:Key="Default_Excess2">Please set only one directory as default to continue.</sys:String>
+
+    <sys:String x:Key="Installs_Found_Title">Installations Found</sys:String>
+    <sys:String x:Key="Installs_Found_Text">Number of new installations found:</sys:String>
+    <sys:String x:Key="Installs_Not_Found_Title">No Installations Found</sys:String>
+    <sys:String x:Key="Installs_Not_Found_Text">No new installations found.</sys:String>
+    <sys:String x:Key="Installs_Fail">Unable to search for installations.</sys:String>
+
+    <sys:String x:Key="Steam_Check_Title">Steam check</sys:String>
+    <sys:String x:Key="Steam_Check_Text">Was this game installed via Steam?</sys:String>
+    <sys:String x:Key="Steam_Find_Title">Can't Find Steam</sys:String>
+    <sys:String x:Key="Steam_Find_Text">Could not find Steam - please locate it manually.</sys:String>
+
+
+    <sys:String x:Key="Update_Title">Launcher Update Available</sys:String>
+    <sys:String x:Key="Update_Text1">Update available for the NI launcher.</sys:String>
+    <sys:String x:Key="Update_Text2">Download now?</sys:String>
+
+
+    <sys:String x:Key="About" xml:space="preserve">About</sys:String>
+    <sys:String x:Key="About1">NordInvasion Launcher</sys:String>
+    <sys:String x:Key="About2">For more info visit:</sys:String>
+    <sys:String x:Key="About3">https://nordinvasion.com</sys:String>
+
+
+    <sys:String x:Key="OK">OK</sys:String>
+    <sys:String x:Key="Yes">Yes</sys:String>
+    <sys:String x:Key="No">No</sys:String>
+    <sys:String x:Key="Cancel">Cancel</sys:String>
+    <sys:String x:Key="Close">Close</sys:String>
+
+</ResourceDictionary>

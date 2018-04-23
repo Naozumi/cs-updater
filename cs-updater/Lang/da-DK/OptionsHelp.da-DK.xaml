@@ -1,0 +1,39 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+
+    <sys:String x:Key="ResourceDictionaryName">Loc-da-DK</sys:String>
+
+    <sys:String x:Key="Title">Hjælp - Optionen</sys:String>
+
+    <!-- Top options -->
+    <sys:String x:Key="Verify_Title">Automatisk verifikation</sys:String>
+    <sys:String x:Key="Verify_Text">Begynder at kontrollere dine filer, når du åbner launcheren, så du er klar til at spille hurtigere.</sys:String>
+    <sys:String x:Key="Update_Title">Opdatere automatisk</sys:String>
+    <sys:String x:Key="Update_Text">Downloader automatisk opdateringer, så du er klar til at spille hurtigere.</sys:String>
+    <sys:String x:Key="Verify_T_Title">Antal samtidige checks</sys:String>
+    <sys:String x:Key="Verify_T_Text">Hvor mange filer skal kontrolleres samtidigt. Øger belastningen på din pc, men kører hurtigere.</sys:String>
+    <sys:String x:Key="Update_T_Title">Antal samtidige downloads.</sys:String>
+    <sys:String x:Key="Update_T_Text">Hvor mange filer skal downloades samtidigt. Øger belastningerne på din pc og internettet. Hvis dit internet- eller diskgrænser er nået, kan dette nedsænke dit download hastighed.</sys:String>
+
+    <!-- Table -->
+    <sys:String x:Key="Edit_Title">Redigere installationslisterne</sys:String>
+    <sys:String x:Key="Edit_Text">Dobbeltklik på en celle for at begynde at redigere. Værdier forklares nedenfor.</sys:String>
+    <sys:String x:Key="Name_Title">Navn</sys:String>
+    <sys:String x:Key="Name_Text">Dette er for at hjælpe med at identificere installationen til dig i hovedvinduet.</sys:String>
+    <sys:String x:Key="Default_Title">Default</sys:String>
+    <sys:String x:Key="Default_Text">Dobbeltklik på en celle for at begynde at redigere. Værdier forklares nedenfor.</sys:String>
+    <sys:String x:Key="Folder_Title">Sti til mappe</sys:String>
+    <sys:String x:Key="Folder_Text">Brug filbrowseren til at finde på modulmappen (en mappe vil automatisk blive oprettet for mods at downloade til) 
+        eller til den nøjagtige mappe, du ønsker at downloade filerne til (nyttig til betas, for eksempel).</sys:String>
+    <sys:String x:Key="Launcher_Title">Sti til launcher</sys:String>
+    <sys:String x:Key="Launcher_Text">Brug filbrowseren til at pege på den rigtige fil for at starte spillet. Hvis du vælger steam, vil lanceringen forsøge at finde steam til dig.
+                    Hvis den ikke kan, skal du bruge filbrowseren. Hvis du klikker på Nej, vil launcheren forsøge at finde warband launcher for dig. Hvis den finder den,
+                    vil du blive bedt om at bekræfte. Hvis det er forkert, skal du bruge filbrowseren til at finde den rigtige fil.</sys:String>
+    <sys:String x:Key="Password_Title">kodeord</sys:String>
+    <sys:String x:Key="Password_Text">Hvis du er tilmeldt et beta-program, vil det kræve et kodeord. Indtast adgangskoden her.</sys:String>
+
+    <!-- Others -->
+    <sys:String x:Key="Close">Close</sys:String>
+
+</ResourceDictionary>

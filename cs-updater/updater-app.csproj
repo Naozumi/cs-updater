@@ -132,7 +132,7 @@
       <DependentUpon>OptionsWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="UpdaterVersion.cs" />
-    <Content Include="Lang\MainWindow.en-GB.xaml">
+    <Content Include="Lang\en-GB\MainWindow.en-GB.xaml">
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -140,11 +140,11 @@
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Lang\OptionsWindow.en-GB.xaml">
+    <Content Include="Lang\en-GB\OptionsWindow.en-GB.xaml">
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Lang\OptionsHelp.en-GB.xaml">
+    <Content Include="Lang\en-GB\OptionsHelp.en-GB.xaml">
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -156,7 +156,7 @@
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Lang\NotificationWindow.en-GB.xaml">
+    <Content Include="Lang\en-GB\NotificationWindow.en-GB.xaml">
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

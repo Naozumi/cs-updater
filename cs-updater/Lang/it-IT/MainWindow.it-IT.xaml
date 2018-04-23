@@ -1,0 +1,46 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+    
+    <sys:String x:Key="ResourceDictionaryName">Loc-it-IT</sys:String>
+
+    <sys:String x:Key="Title">NordInvasion Launcher</sys:String>
+
+    <!-- Menus -->
+    <sys:String x:Key="Settings">_Impostazioni</sys:String>
+    <sys:String x:Key="M_ActiveInstall">Installazione _Attiva...</sys:String>
+    <sys:String x:Key="M_Options">_Opzioni</sys:String>
+    <sys:String x:Key="M_Logs">Apri Cartella Dei _Registri</sys:String>
+    <sys:String x:Key="M_About">_Di</sys:String>
+    <sys:String x:Key="Language">_Linguaggio</sys:String>
+
+    <!-- Progress Bar Text -->
+    <sys:String x:Key="PB_loading">Caricamento in corso...</sys:String>
+    <sys:String x:Key="PB_missingInstall">Si prega di impostare un percorso di installazione</sys:String>
+    <sys:String x:Key="PB_updateRequired">È richiesto l&#39;aggiornamento - Ultima versione:</sys:String>
+    <sys:String x:Key="PB_readyToPlay">NI è pronto per giocare - Versione:</sys:String>
+    <sys:String x:Key="PB_verify">Attesa di controllo del file</sys:String>
+    <sys:String x:Key="PB_verifyStart">Inizio il controllo del file...</sys:String>
+    <sys:String x:Key="PB_verifyProgress">Controllo dei file...</sys:String>
+    <sys:String x:Key="PB_verifyFail">Errore - Impossibile verificare i file</sys:String>
+    <sys:String x:Key="PB_updateStart">Iniziando file aggiornamento...</sys:String>
+    <sys:String x:Key="PB_updateProgress">Aggiornamento dei file...</sys:String>
+    <sys:String x:Key="PB_updateError">Errore durante l&#39;aggiornamento</sys:String>
+
+    <sys:String x:Key="PB_downloadHash">Download delle informazioni di aggiornamento...</sys:String>
+    <sys:String x:Key="PB_betaPasswordError">Parola d&#39;ordine scorretto</sys:String>
+    
+    <!-- Button -->
+    <sys:String x:Key="B_verify">Controlla i file</sys:String>
+    <sys:String x:Key="B_verifyProgress">Controllo dei file...</sys:String>
+    <sys:String x:Key="B_update">Aggiorna i file</sys:String>
+    <sys:String x:Key="B_updateProgress">In aggiornamento...</sys:String>
+    <sys:String x:Key="B_play">Giocare</sys:String>
+
+    <!-- Others -->
+    <sys:String x:Key="ActiveInstall">Installazione Attiva:</sys:String>
+    <sys:String x:Key="ForumLink">Apri thread del forum...</sys:String>
+    <sys:String x:Key="NewsLoading">Caricamento delle ultime notizie...</sys:String>
+    <sys:String x:Key="NewsFailed">Impossibile caricare notizie</sys:String>
+
+</ResourceDictionary>
