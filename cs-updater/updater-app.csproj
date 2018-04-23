@@ -136,7 +136,7 @@
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Lang\MainWindow.es-ES.xaml">
+    <Content Include="Lang\es-ES\MainWindow.es-ES.xaml">
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -148,11 +148,11 @@
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Lang\OptionsHelp.es-ES.xaml">
+    <Content Include="Lang\es-ES\OptionsHelp.es-ES.xaml">
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Lang\OptionsWindow.es-ES.xaml">
+    <Content Include="Lang\es-ES\OptionsWindow.es-ES.xaml">
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -160,55 +160,55 @@
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Lang\MainWindow.tr-TR.xaml">
+    <Content Include="Lang\tr-TR\MainWindow.tr-TR.xaml">
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Lang\OptionsHelp.tr-TR.xaml">
+    <Content Include="Lang\tr-TR\OptionsHelp.tr-TR.xaml">
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Lang\OptionsWindow.tr-TR.xaml">
+    <Content Include="Lang\tr-TR\OptionsWindow.tr-TR.xaml">
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Lang\NotificationWindow.tr-TR.xaml">
+    <Content Include="Lang\tr-TR\NotificationWindow.tr-TR.xaml">
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Lang\NotificationWindow.es-ES.xaml">
+    <Content Include="Lang\es-ES\NotificationWindow.es-ES.xaml">
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Lang\MainWindow.it-IT.xaml">
+    <Content Include="Lang\it-IT\MainWindow.it-IT.xaml">
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Lang\NotificationWindow.it-IT.xaml">
+    <Content Include="Lang\it-IT\NotificationWindow.it-IT.xaml">
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Lang\OptionsHelp.it-IT.xaml">
+    <Content Include="Lang\it-IT\OptionsHelp.it-IT.xaml">
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Lang\OptionsWindow.it-IT.xaml">
+    <Content Include="Lang\it-IT\OptionsWindow.it-IT.xaml">
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Lang\MainWindow.da-DK.xaml">
+    <Content Include="Lang\da-DK\MainWindow.da-DK.xaml">
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Lang\NotificationWindow.da-DK.xaml">
+    <Content Include="Lang\da-DK\NotificationWindow.da-DK.xaml">
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Lang\OptionsHelp.da-DK.xaml">
+    <Content Include="Lang\da-DK\OptionsHelp.da-DK.xaml">
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Lang\OptionsWindow.da-DK.xaml">
+    <Content Include="Lang\da-DK\OptionsWindow.da-DK.xaml">
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
