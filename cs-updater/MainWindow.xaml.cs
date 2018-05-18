@@ -916,6 +916,11 @@ namespace cs_updater
             {
                 return false;
             }
+            catch (Exception ex)
+            {
+                logger.Info(ex);
+                return false;
+            }
         }
 
         private bool MakeFilesWriteable()
