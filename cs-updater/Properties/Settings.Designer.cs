@@ -35,7 +35,7 @@ namespace cs_updater.Properties {
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.SpecialSettingAttribute(global::System.Configuration.SpecialSetting.WebServiceUrl)]
-        [global::System.Configuration.DefaultSettingValueAttribute("https://odin.nordinvasion.com/mod/,http://thor.nordinvasion.com/mod/")]
+        [global::System.Configuration.DefaultSettingValueAttribute("https://forseti.nordinvasion.com/mod/,https://thor.nordinvasion.com/mod/")]
         public string urls {
             get {
                 return ((string)(this["urls"]));
@@ -154,7 +154,7 @@ namespace cs_updater.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("3.1.5")]
+        [global::System.Configuration.DefaultSettingValueAttribute("3.1.6")]
         public string Version {
             get {
                 return ((string)(this["Version"]));
