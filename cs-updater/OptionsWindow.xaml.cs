@@ -32,8 +32,7 @@ namespace cs_updater
             cb_update.IsChecked = Properties.Settings.Default.AutoUpdate;
             tb_threads_ch.Text = Properties.Settings.Default.Threads_Check.ToString();
             tb_threads_dl.Text = Properties.Settings.Default.Threads_Download.ToString();
-
-            if (this.Installs.Count == 0) Help_Click(null, null);
+            help = new OptionsHelp();
         }
 
         public List<InstallPath> Installs { get; set; }
@@ -381,7 +380,6 @@ namespace cs_updater
 
         private void Help_Click(object sender, RoutedEventArgs e)
         {
-            help = new OptionsHelp();
             help.Show();
         }
 
@@ -593,6 +591,11 @@ namespace cs_updater
         {
             Regex regex = new Regex("[^0-9]+");
             e.Handled = regex.IsMatch(e.Text);
+        }
+
+        private void Grid_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (this.Installs.Count == 0) help.Show();
         }
     }
 }
