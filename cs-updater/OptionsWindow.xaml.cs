@@ -26,8 +26,19 @@ namespace cs_updater
             this.Installs = installs;
             InitializeComponent();
             LocUtil.SetDefaultLanguage(this);
-            data.ItemsSource = this.Installs;
-            data.Items.Refresh();
+            //foreach (InstallPath install in Installs)
+            //{
+            //    if (install.IsDefault)
+            //    {
+            //        dataList.Items.Add(install.Name + " (Default)");
+            //    }
+            //    else
+            //    {
+            //        dataList.Items.Add(install.Name);
+            //    }
+            //}
+            dataList.ItemsSource = this.Installs;
+            dataList.Items.Refresh();
             cb_verify.IsChecked = Properties.Settings.Default.AutoVerify;
             cb_update.IsChecked = Properties.Settings.Default.AutoUpdate;
             tb_threads_ch.Text = Properties.Settings.Default.Threads_Check.ToString();
