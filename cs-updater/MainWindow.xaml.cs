@@ -228,7 +228,7 @@ namespace cs_updater
                     news = await Task.Run(() => JsonConvert.DeserializeObject<List<News>>(newsString));
                     foreach (var item in news)
                     {
-                        list_news.Items.Add(item.subject);
+                        list_news.Items.Add(item);
                     }
                     list_news.SelectedItem = list_news.Items.GetItemAt(0);
                 }
@@ -1220,6 +1220,11 @@ namespace cs_updater
         }
 
         #endregion
+
+        private void List_news_Scroll(object sender, System.Windows.Controls.Primitives.ScrollEventArgs e)
+        {
+
+        }
     }
 }
 
