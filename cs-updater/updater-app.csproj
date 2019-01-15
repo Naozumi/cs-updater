@@ -131,6 +131,9 @@
     <Compile Include="OptionsWindow.xaml.cs">
       <DependentUpon>OptionsWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="OptionsInstallWindow.xaml.cs">
+      <DependentUpon>OptionsInstallWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UpdaterVersion.cs" />
     <Content Include="Lang\en-GB\MainWindow.en-GB.xaml">
       <SubType>Designer</SubType>
@@ -196,6 +199,10 @@
     <Content Include="Lang\OptionsWindow.da-DK.xaml">
       <SubType>Designer</SubType>
     </Content>
+    <Page Include="Lang\en-GB\OptionsInstallWindow.en-GB.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -217,6 +224,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="OptionsHelp.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="OptionsInstallWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
