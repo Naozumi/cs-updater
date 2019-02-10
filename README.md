@@ -9,6 +9,7 @@ Features
 * Threaded downloads
 * News feed
 * Mutiple installation directories
+* "Native Feeling" message boxes rather than the annoying windows ones.
 * Check for updates and download the installer
 * Launch the game
 
@@ -21,6 +22,5 @@ Features Under Consideration
 -----
 
 * Alter number of threads
-* "Native Feeling" message boxes rather than the annoying windows ones.
 * MVVM
 * Variable logging levels
