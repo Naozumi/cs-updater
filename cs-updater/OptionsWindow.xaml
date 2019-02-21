@@ -151,7 +151,7 @@
                     <RowDefinition Height="30" />
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
-                <Button Grid.Row="1" Click="Cancel_Click" Foreground="White" FontSize="16" FontFamily="{StaticResource FontAwesome}" Content="&#xf067;" ToolTip="Add a new installation." >
+                <Button Grid.Row="1" Click="Add_Installation" Foreground="White" FontSize="16" FontFamily="{StaticResource FontAwesome}" Content="&#xf067;" ToolTip="Add a new installation." >
                     <Button.Style>
                         <Style TargetType="{x:Type Button}">
                             <Setter Property="Background" Value="#FF830606"/>
@@ -180,7 +180,7 @@
                         </Style>
                     </Button.Style>
                 </Button>
-                <Button Grid.Row="3" Click="Cancel_Click" Foreground="White" FontSize="16" FontFamily="{StaticResource FontAwesome}" Content="&#xf304;" ToolTip="Edit the selected installation." >
+                <Button Grid.Row="3" Click="Edit_Installation" Foreground="White" FontSize="16" FontFamily="{StaticResource FontAwesome}" Content="&#xf304;" ToolTip="Edit the selected installation." >
                     <Button.Style>
                         <Style TargetType="{x:Type Button}">
                             <Setter Property="Background" Value="#FF830606"/>

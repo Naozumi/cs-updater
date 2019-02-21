@@ -135,12 +135,12 @@
                     </ListBox.ItemTemplate>
                 </ListBox>
                 <GridSplitter Grid.Column="1" Width="8" Margin="0" HorizontalAlignment="Stretch" Style="{DynamicResource GridSplitterStyle}" />
-                <Grid Grid.Column="2" Background="#FFFFFF">
+                <Grid Grid.Column="2" Background="#FFFFFF" Name="browser_grid">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*" />
                         <RowDefinition Height="20" />
                     </Grid.RowDefinitions>
-                    <WebBrowser x:Name="Web_News" Grid.Row="0" Opacity="1" Height="Auto" Width="Auto" Navigating="Web_News_Navigating"/>
+                    <WebBrowser x:Name="Web_News" Grid.Row="0" Opacity="1" Height="Auto" Width="Auto" Navigating="Web_News_Navigating" />
                     <Label Grid.Row="1" FontStyle="Italic"  Content="{DynamicResource ForumLink}" HorizontalAlignment="Right" VerticalAlignment="Center" Foreground="#FF830606" FontSize="12" Cursor="Hand" MouseLeftButtonDown="Open_Thread_Click" Padding="0"/>
                 </Grid>
             </Grid>

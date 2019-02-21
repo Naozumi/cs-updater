@@ -246,6 +246,35 @@ namespace cs_updater
             this.Close();
         }
 
+        private void Add_Installation(object sender, RoutedEventArgs e)
+        {
+            InstallPath newInstallPath = new InstallPath();
+            OptionsEditorWindow installWindow = new OptionsEditorWindow(newInstallPath);
+            installWindow.ShowDialog();
+
+            if ((bool)installWindow.DialogResult)
+            {
+                Installs.Add(newInstallPath);
+            }
+            newInstallPath = null;
+            installWindow = null;
+        }
+
+        private void Edit_Installation(object sender, RoutedEventArgs e)
+        {
+            if (dataList.SelectedIndex < 0) return;
+            InstallPath editInstallPath = Installs[dataList.SelectedIndex];
+            OptionsEditorWindow installWindow = new OptionsEditorWindow(editInstallPath);
+            installWindow.Show();
+
+            if ((bool)installWindow.DialogResult)
+            {
+                Installs[dataList.SelectedIndex] = installWindow.Install;
+            }
+            editInstallPath = null;
+            installWindow = null;
+        }
+
         private void AutomaticallyAddInstalls(Object sender, RoutedEventArgs e)
         {
             try

@@ -13,6 +13,10 @@ using NLog;
 using System.Windows.Input;
 using cs_updater_lib;
 using System.Windows.Threading;
+using System.Windows.Controls;
+using System.Reflection;
+using System.Runtime.InteropServices;
+using System.Windows.Navigation;
 
 namespace cs_updater
 {
@@ -43,8 +47,10 @@ namespace cs_updater
         public MainWindow()
         {
             InitializeComponent();
+
             logger.Info("Current Version: " + Properties.Settings.Default.Version);
             System.Net.ServicePointManager.DefaultConnectionLimit = 20;
+            
 
             //LocUtil.SetDefaultLanguage(this);
             SetProgressBarText("PB_loading");
@@ -67,7 +73,7 @@ namespace cs_updater
                 DevMenu.Visibility = Visibility.Visible;
             }
 
-            SetNews(this.FindResource("NewsLoading") as string);
+            SetNewsString(this.FindResource("NewsLoading") as string);
             CheckForUpdate();
         }
 
@@ -235,18 +241,23 @@ namespace cs_updater
             }
             catch (Exception ex)
             {
-                SetNews(this.FindResource("NewsFailed") as string);
+                SetNewsString(this.FindResource("NewsFailed") as string);
                 logger.Error("Unable to load news.");
                 logger.Error(ex);
             }
         }
 
-        private void SetNews(string body)
+        private void SetNewsString(string body)
         {
             allowWebNavigation = true;
             Web_News.NavigateToString("<html><head><style>html{background-color:'#fff'; font-family: Tahoma, Verdana, Arial, Sans-Serif; font-size: 14px;} a:link {color: #d97b33;" +
                 "text-decoration: none;}a:visited{color:#d97b33;text-decoration:none;}a:hover,a:active{color: #886203;text-decoration: underline;}img{border:none}</style>" +
                 "</head><body oncontextmenu='return false; '>" + body + "</body></html>");
+        }
+        private void SetNewsTid(int tid)
+        {
+            allowWebNavigation = true;
+            Web_News.Navigate("https://forum-api.nordinvasion.com/item.php?tid=" + tid.ToString());
         }
 
         private void Web_News_Navigating(object sender, System.Windows.Navigation.NavigatingCancelEventArgs e)
@@ -273,7 +284,7 @@ namespace cs_updater
         {
             if (list_news.SelectedIndex > -1 && list_news.SelectedIndex < news.Count)
             {
-                SetNews(news[list_news.SelectedIndex].message);
+                SetNewsTid(news[list_news.SelectedIndex].tid);
             }
         }
 
@@ -281,7 +292,7 @@ namespace cs_updater
         {
             if (list_news.SelectedIndex > -1 && list_news.SelectedIndex < news.Count)
             {
-                System.Diagnostics.Process.Start("http://forum.nordinvasion.com/showthread.php?tid=" + news[list_news.SelectedIndex].tid);
+                System.Diagnostics.Process.Start("https://forum.nordinvasion.com/showthread.php?tid=" + news[list_news.SelectedIndex].tid);
             }
         }
         #endregion
@@ -1225,6 +1236,8 @@ namespace cs_updater
         {
 
         }
+
     }
 }
+
 

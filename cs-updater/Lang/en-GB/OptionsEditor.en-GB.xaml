@@ -9,6 +9,7 @@
     <!-- Installations -->
     <sys:String x:Key="Name">Name: </sys:String>
     <sys:String x:Key="Path">Download path: </sys:String>
+    <sys:String x:Key="Beta">Beta: </sys:String>
     <sys:String x:Key="Password">Password: </sys:String>
     <sys:String x:Key="IsDefault">Default: </sys:String>
     <sys:String x:Key="Executable">Executable path: </sys:String>

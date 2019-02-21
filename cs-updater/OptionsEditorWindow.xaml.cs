@@ -22,10 +22,10 @@ namespace cs_updater
 
         public OptionsEditorWindow(InstallPath install)
         {
-            tb_name.Text = install.Name;
-            tb_path.Text = install.Path;
-            tb_executable.Text = install.Executable;
-            tb_password.Text = install.Password;
+            this.tb_name.Text = install.Name;
+            this.tb_path.Text = install.Path;
+            this.tb_executable.Text = install.Executable;
+            this.tb_password.Text = install.Password;
         }
 
         public InstallPath Install { get; set; }
@@ -38,7 +38,7 @@ namespace cs_updater
 
         private void Save_Click(object sender, RoutedEventArgs e)
         {
-            DialogResult = false;
+            DialogResult = true;
             this.Close();
         }
 
