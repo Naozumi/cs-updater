@@ -48,26 +48,20 @@ namespace cs_updater
         {
             InitializeComponent();
 
-            logger.Info("Current Version: " + Properties.Settings.Default.Version);
+            logger.Error("Current Version: " + Properties.Settings.Default.Version);
             System.Net.ServicePointManager.DefaultConnectionLimit = 20;
 
-
-            //LocUtil.SetDefaultLanguage(this);
             SetProgressBarText("PB_loading");
 
-            //foreach (System.Windows.Controls.MenuItem item in menuItemLanguages.Items)
-            //{
-            //    if (item.Tag.ToString().Equals(LocUtil.GetCurrentCultureName(this)))
-            //        item.IsChecked = true;
-            //}
 
             if (Properties.Settings.Default.UpgradeRequired)
             {
                 Properties.Settings.Default.Upgrade();
                 Properties.Settings.Default.UpgradeRequired = false;
                 Properties.Settings.Default.Save();
+                logger.Error("Current Version (Updated Properties): " + Properties.Settings.Default.Version);
             }
-
+            
             if (Properties.Settings.Default.Dev == true)
             {
                 DevMenu.Visibility = Visibility.Visible;
@@ -1122,7 +1116,7 @@ namespace cs_updater
                 {
                     Exception e = new Exception("Beta password is incorrect.", ex);
                     logger.Error(e);
-                    throw new Exception("401");
+                    throw new Exception("Error_Beta_Pw");
                 }
                 else if (count <= 1)
                 {

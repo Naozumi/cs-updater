@@ -292,7 +292,7 @@
     <None Include="app.manifest" />
     <None Include="cs-updater_TemporaryKey.pfx" />
     <Content Include="NLog.config">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Resource Include="Resources\fal.otf" />
     <None Include="NLog.xsd">

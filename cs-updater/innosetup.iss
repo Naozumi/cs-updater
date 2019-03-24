@@ -1,7 +1,7 @@
 #include <idp.iss>
 
 #define MyAppName "NordInvasion Launcher"
-#define MyAppVersion "3.1.8"
+#define MyAppVersion "3.1.10"
 #define MyAppPublisher "NordInvasion"
 #define MyAppURL "https://nordinvasion.com"
 #define MyAppExeName "NordInvasion_Launcher.exe"
@@ -27,6 +27,7 @@ OutputDir={#RepoPath}
 OutputBaseFilename=ni_launcher_{#MyAppVersion}
 VersionInfoVersion={#MyAppVersion}
 SetupIconFile={#RepoPath}\cs-updater\cs-updater\ni-badge.ico
+UninstallDisplayIcon={#RepoPath}\cs-updater\cs-updater\ni-badge.ico
 Compression=lzma
 SolidCompression=yes
 
@@ -37,7 +38,8 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "C:\Users\andy\source\repos\cs-updater\cs-updater\bin\x86\Release\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs
+Source: "C:\Users\andy\source\repos\cs-updater\cs-updater\bin\x86\Release\*"; DestDir: "{app}"; Flags: ignoreversion
+Source: "C:\Users\andy\source\repos\cs-updater\cs-updater\bin\x86\Release\Lang\en-GB\*"; DestDir: "{app}\Lang\en-GB\"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]

@@ -198,28 +198,38 @@ namespace cs_updater
         {
             try
             {
-                List<InstallPath> foundInstalls = getInstallationDirectories();
-                List<InstallPath> newInstalls = new List<InstallPath>();
-                foreach (InstallPath foundInstall in foundInstalls)
+                List<InstallPath> foundInstallsReg = getInstallationDirectoriesViaRegistry();
+                List<InstallPath> foundInstallsSteam = getSteamInstalls();
+                int newInstalls = 0;
+                foreach (InstallPath foundInstall in foundInstallsReg)
                 {
                     var item = Installs.FirstOrDefault(o => o.Path == foundInstall.Path);
                     if (item == null)
                     {
-                        newInstalls.Add(foundInstall);
+                        Installs.Add(foundInstall);
+                        newInstalls++;
                     }
                 }
-                if (newInstalls.Count > 0)
+                foreach (InstallPath foundInstall in foundInstallsSteam)
+                {
+                    var item = Installs.FirstOrDefault(o => o.Path == foundInstall.Path);
+                    if (item == null)
+                    {
+                        Installs.Add(foundInstall);
+                        newInstalls++;
+                    }
+                }
+                if (newInstalls > 0)
                 {
                     NotificationWindow nw = new NotificationWindow("Installs_Found_Title",
                     new List<NotificationWindowItem> {
                         new NotificationWindowItem("Installs_Found_Text"),
-                        new NotificationWindowItem(newInstalls.Count.ToString(), false)
+                        new NotificationWindowItem(newInstalls.ToString(), false)
                     }, 0)
                     {
                         Owner = this
                     };
                     nw.ShowDialog();
-                    Installs.AddRange(newInstalls);
                 }
                 else
                 {
@@ -232,7 +242,6 @@ namespace cs_updater
                     };
                     nw.ShowDialog();
                 }
-
             }
             catch (Exception ex)
             {
@@ -250,7 +259,7 @@ namespace cs_updater
             dataList.Items.Refresh();
         }
 
-        private List<InstallPath> getInstallationDirectories()
+        private List<InstallPath> getInstallationDirectoriesViaRegistry()
         {
             var installs = new List<InstallPath>();
             List<String> registry_key = new List<string>
@@ -333,6 +342,49 @@ namespace cs_updater
             }
 
             return installs;
+        }
+
+        private List<InstallPath> getSteamInstalls()
+        {
+            List <InstallPath> steamInstalls = new List<InstallPath>(); //just incase we find multiple, somehow...
+            string steamexe = GetSteamPath();
+            if (File.Exists(steamexe.Replace(@"\steam.exe", @"\steamapps\libraryfolders.vdf")))
+            {
+                try
+                {
+                    List<string> steamFolders = new List<string>();
+                    if (Directory.Exists(steamexe.Replace(@"\steam.exe",@"\steamapps\common"))) steamFolders.Add(steamexe.Replace(@"\steam.exe", @"\steamapps\common"));
+                    string[] steamLibraryFile = File.ReadAllLines(steamexe.Replace(@"\steam.exe", @"\steamapps\libraryfolders.vdf"));
+                    foreach (string line in steamLibraryFile)
+                    {
+                        if (line.Contains(@":\\"))
+                        {
+                            string subline = line.Replace("\"", "");
+                            string[] blocks = subline.Trim().Split();
+                            for (int i = blocks.Count()-1; i > -1; i--)
+                            {
+                                if (blocks[i].Length > 2 && !int.TryParse(blocks[i], out int n))
+                                {
+                                    steamFolders.Add(blocks[i] + @"\steamapps\common");
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    foreach (string library in steamFolders)
+                    {
+                        if (Directory.Exists(library+ @"\MountBlade Warband"))
+                        {
+                            steamInstalls.Add(new InstallPath("Mount & Blade Warband (Steam) ", library + @"\MountBlade Warband\Modules\NordInvasion\", "", false, steamexe));
+                        }
+                    }
+                }catch(Exception e)
+                {
+                    logger.Error("Steam checking error");
+                    logger.Error(e);
+                }
+            }
+            return steamInstalls;
         }
 
         private string GetSteamPath()

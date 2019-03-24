@@ -49,11 +49,27 @@ namespace cs_updater
                 tb_name.BorderBrush = Brushes.Red;
                 valid = false;
             }
+
             if (tb_path.Text.Length < 1)
             {
                 tb_path.BorderBrush = Brushes.Red;
                 valid = false;
             }
+            System.IO.FileInfo fi = null;
+            try
+            {
+                fi = new System.IO.FileInfo(tb_path.Text);
+            }
+            catch (ArgumentException) { }
+            catch (System.IO.PathTooLongException) { }
+            catch (NotSupportedException) { }
+            if (ReferenceEquals(fi, null) || !System.IO.Path.IsPathRooted(tb_path.Text))
+            {
+                // file name is not valid
+                tb_path.BorderBrush = Brushes.Red;
+                valid = false;
+            }
+
             if ((bool)cb_beta.IsChecked && tb_password.Text.Length < 1)
             {
                 tb_password.BorderBrush = Brushes.Red;
