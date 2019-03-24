@@ -13,7 +13,7 @@
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="Lang/MainWindow.en-GB.xaml" />
+                <ResourceDictionary Source="Lang/en-GB/MainWindow.en-GB.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <Style x:Key="GridSplitterStyle" TargetType="{x:Type GridSplitter}">
                 <Setter Property="Background">
@@ -72,13 +72,13 @@
                     <MenuItem Header="{DynamicResource M_About}" Name="menuAbout" Click="Menu_About_Click"/>
                 </MenuItem>
 
-                <MenuItem Header="{DynamicResource Language}" x:Name="menuItemLanguages" IsEnabled="True">
+                <!--<MenuItem Header="{DynamicResource Language}" x:Name="menuItemLanguages" IsEnabled="True">
                     <MenuItem Header="English (GB)" Tag="en-GB" IsCheckable="True" Click="Menu_Lang_Click" />
                     <MenuItem Header="Dansk (Da)" Tag="da-DK" IsCheckable="True" Click="Menu_Lang_Click" />
                     <MenuItem Header="Español (ES)" Tag="es-ES" IsCheckable="True" Click="Menu_Lang_Click" />
                     <MenuItem Header="Italiano (IT)" Tag="it-IT" IsCheckable="True" Click="Menu_Lang_Click" />
                     <MenuItem Header="Türkçe (TR)" Tag="tr-TR" IsCheckable="True" Click="Menu_Lang_Click" />
-                </MenuItem>
+                </MenuItem>-->
 
                 <MenuItem x:Name="DevMenu" Header="_Dev" Visibility="Hidden">
                     <MenuItem Header="_Clear Preferences" Click="Dev_Clear_Click"/>
@@ -95,14 +95,52 @@
                     <ColumnDefinition Width="8" />
                     <ColumnDefinition Width="3*" />
                 </Grid.ColumnDefinitions>
-                <ListBox Grid.Column="0" Grid.Row="0" Opacity="1" BorderThickness="0" Name="list_news" SelectionChanged="list_news_SelectionChanged"/>
+                <ListBox Grid.Column="0" Grid.Row="0" Opacity="1" BorderThickness="0" Name="list_news" SelectionChanged="list_news_SelectionChanged" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="ListBoxItem">
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="ListBoxItem">
+                                        <StackPanel>
+                                            <Separator x:Name="Separator"/>
+                                            <ContentPresenter/>
+                                        </StackPanel>
+                                        <ControlTemplate.Triggers>
+                                            <DataTrigger Binding="{Binding RelativeSource={RelativeSource PreviousData}}" Value="{x:Null}">
+                                                <Setter Property="Visibility" TargetName="Separator" Value="Collapsed"/>
+                                            </DataTrigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                            <Style.Triggers>
+                                <Trigger Property="IsSelected"  Value="True">
+                                    <Setter Property="FontWeight" Value="Bold"/>
+                                    <Setter Property="Background" Value="Transparent" />
+                                </Trigger>
+                            </Style.Triggers>
+                            <Style.Resources>
+                                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="Transparent" />
+                                <SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}" Color="Transparent" />
+                            </Style.Resources>
+                        </Style>
+                    </ListBox.ItemContainerStyle>
+
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel>
+                                <TextBlock Text="{Binding Path=subject}" TextWrapping="WrapWithOverflow" Margin="0,4,0,4"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
                 <GridSplitter Grid.Column="1" Width="8" Margin="0" HorizontalAlignment="Stretch" Style="{DynamicResource GridSplitterStyle}" />
-                <Grid Grid.Column="2" Background="#FFFFFF">
+                <Grid Grid.Column="2" Background="#FFFFFF" Name="browser_grid">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*" />
                         <RowDefinition Height="20" />
                     </Grid.RowDefinitions>
-                    <WebBrowser x:Name="Web_News" Grid.Row="0" Opacity="1" Height="Auto" Width="Auto" Navigating="Web_News_Navigating"/>
+                    <WebBrowser x:Name="Web_News" Grid.Row="0" Opacity="1" Height="Auto" Width="Auto" Navigating="Web_News_Navigating" />
                     <Label Grid.Row="1" FontStyle="Italic"  Content="{DynamicResource ForumLink}" HorizontalAlignment="Right" VerticalAlignment="Center" Foreground="#FF830606" FontSize="12" Cursor="Hand" MouseLeftButtonDown="Open_Thread_Click" Padding="0"/>
                 </Grid>
             </Grid>

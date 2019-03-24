@@ -1,0 +1,201 @@
+﻿<Page x:Class="cs_updater.Page_OptionsEdit"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:cs_updater"
+      mc:Ignorable="d" 
+      d:DesignHeight="330" d:DesignWidth="500"
+      Title="Edit Installation">
+
+    <Page.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Lang/en-GB/OptionsEditor.en-GB.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Page.Resources>
+
+    <StackPanel Margin="10" Orientation="Vertical">
+
+        <Grid Grid.Column="1" Grid.Row="1" Margin="0,0,0,5">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="100"/>
+                <ColumnDefinition Width="10"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Label Grid.Row="0" Content="{DynamicResource ResourceKey=Name}" Margin="0" Padding="5,0" VerticalAlignment="Top" />
+            <TextBox Grid.Row="0" Grid.Column="2" Name="tb_name" PreviewTextInput="NumberValidationTextBox" Margin="1,0,1,0" Height="18" VerticalAlignment="Center" TextAlignment="Right" />
+        </Grid>
+
+        <Grid Grid.Column="1" Grid.Row="1" Margin="0,0,0,5">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="100"/>
+                <ColumnDefinition Width="10"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="10"/>
+                <ColumnDefinition Width="30"/>
+            </Grid.ColumnDefinitions>
+            <Label Grid.Row="0" Content="{DynamicResource ResourceKey=Path}" Margin="0" Padding="5,0" VerticalAlignment="Top" />
+            <TextBox Grid.Row="0" Grid.Column="2" Name="tb_path" PreviewTextInput="NumberValidationTextBox" Margin="1,0,1,0" Height="18" VerticalAlignment="Center" TextAlignment="Right" />
+            <Button Grid.Column="4" Content="..." Click="Path_Click" Foreground="White">
+                <Button.Style>
+                    <Style TargetType="{x:Type Button}">
+                        <Setter Property="Background" Value="#FF830606"/>
+                        <Setter Property="BorderBrush" Value="#FFA2760A"/>
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="{x:Type Button}">
+                                    <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}">
+                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                        <Style.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#FFA80303"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed"  Value="True">
+                                <Setter Property="BorderBrush" Value="#FF915252"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled"  Value="False">
+                                <Setter Property="Background" Value="#FF976B6B"/>
+                                <Setter Property="Foreground" Value="#888"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+            </Button>
+        </Grid>
+
+        <Grid Grid.Column="1" Grid.Row="1" Margin="0,0,0,5">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="100"/>
+                <ColumnDefinition Width="10"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="10"/>
+                <ColumnDefinition Width="30"/>
+            </Grid.ColumnDefinitions>
+            <Label Grid.Row="0" Content="{DynamicResource ResourceKey=Executable}" Margin="0" Padding="5,0" VerticalAlignment="Top" />
+            <TextBox Grid.Row="0" Grid.Column="2" Name="tb_executable" PreviewTextInput="NumberValidationTextBox" Margin="1,0,1,0" Height="18" VerticalAlignment="Center" TextAlignment="Right" />
+            <Button Grid.Column="4" Content="..." Click="Executable_Click" Foreground="White">
+                <Button.Style>
+                    <Style TargetType="{x:Type Button}">
+                        <Setter Property="Background" Value="#FF830606"/>
+                        <Setter Property="BorderBrush" Value="#FFA2760A"/>
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="{x:Type Button}">
+                                    <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}">
+                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                        <Style.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#FFA80303"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed"  Value="True">
+                                <Setter Property="BorderBrush" Value="#FF915252"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled"  Value="False">
+                                <Setter Property="Background" Value="#FF976B6B"/>
+                                <Setter Property="Foreground" Value="#888"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+            </Button>
+        </Grid>
+
+        <Grid Grid.Column="1" Grid.Row="1" Margin="0,0,0,5">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="100"/>
+                <ColumnDefinition Width="10"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Label Grid.Row="0" Content="{DynamicResource ResourceKey=Beta}" Margin="0" Padding="5,0" VerticalAlignment="Top" />
+            <CheckBox Name="cb_beta" Grid.Column="2" Height="18"/>
+        </Grid>
+
+        <Grid Grid.Column="1" Grid.Row="1" Margin="0,0,0,5">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="100"/>
+                <ColumnDefinition Width="10"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Label Grid.Row="0" Content="{DynamicResource ResourceKey=Password}" Margin="0" Padding="5,0" VerticalAlignment="Top" />
+            <TextBox Grid.Row="0" Grid.Column="2" Name="tb_password" PreviewTextInput="NumberValidationTextBox" Margin="1,0,1,0" Height="18" VerticalAlignment="Center" TextAlignment="Right" IsEnabled="False" />
+        </Grid>
+
+        <Grid Grid.Column="1" Grid.Row="3" Height="30">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*" MaxWidth="100"/>
+                <ColumnDefinition Width="10"/>
+                <ColumnDefinition Width="*" MaxWidth="100"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Button Grid.Column="1" Content="{DynamicResource ResourceKey=Save}" Click="Save_Click" Foreground="White">
+                <Button.Style>
+                    <Style TargetType="{x:Type Button}">
+                        <Setter Property="Background" Value="#FF830606"/>
+                        <Setter Property="BorderBrush" Value="#FFA2760A"/>
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="{x:Type Button}">
+                                    <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}">
+                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                        <Style.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#FFA80303"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed"  Value="True">
+                                <Setter Property="BorderBrush" Value="#FF915252"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled"  Value="False">
+                                <Setter Property="Background" Value="#FF976B6B"/>
+                                <Setter Property="Foreground" Value="#888"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+            </Button>
+            <Button Grid.Column="3" Content="{DynamicResource ResourceKey=Cancel}" Click="Cancel_Click" Foreground="White">
+                <Button.Style>
+                    <Style TargetType="{x:Type Button}">
+                        <Setter Property="Background" Value="#FF830606"/>
+                        <Setter Property="BorderBrush" Value="#FFA2760A"/>
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="{x:Type Button}">
+                                    <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}">
+                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                        <Style.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#FFA80303"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed"  Value="True">
+                                <Setter Property="BorderBrush" Value="#FF915252"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled"  Value="False">
+                                <Setter Property="Background" Value="#FF976B6B"/>
+                                <Setter Property="Foreground" Value="#888"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+            </Button>
+        </Grid>
+    </StackPanel>
+</Page>

@@ -91,14 +91,19 @@ namespace cs_updater
         {
             string locXamlFile = element + "." + inFiveCharLang + ".xaml";
             string directory = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-            if (File.Exists(Path.Combine(directory, "Lang", locXamlFile)))
-            {
-                return Path.Combine(directory, "Lang", locXamlFile);
-            }
-            else
-            {
-                return Path.Combine(directory, "Lang", element + ".en-GB.xaml");
-            }
+
+            return Path.Combine(directory, "Lang", "en-GB", element + ".en-GB.xaml");
+
+            // MASTER BRANCH NOT READY FOR LANGUAGES YET
+            //
+            //if (File.Exists(Path.Combine(directory, "Lang", locXamlFile)))
+            //{
+            //    return Path.Combine(directory, "Lang", locXamlFile);
+            //}
+            //else
+            //{
+            //    return Path.Combine(directory, "Lang", element + ".en-GB.xaml");
+            //}
         }
         /// <summary>  
         /// Sets or replaces the ResourceDictionary by dynamically loading  

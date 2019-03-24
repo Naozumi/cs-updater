@@ -6,7 +6,7 @@
       <Value Profile="(Default)">cs.json</Value>
     </Setting>
     <Setting Name="urls" Type="(Web Service URL)" Scope="Application">
-      <Value Profile="(Default)">https://odin.nordinvasion.com/mod/,http://thor.nordinvasion.com/mod/</Value>
+      <Value Profile="(Default)">https://forseti.nordinvasion.com/mod/,https://thor.nordinvasion.com/mod/</Value>
     </Setting>
     <Setting Name="newsUrl" Type="(Web Service URL)" Scope="Application">
       <Value Profile="(Default)">https://forum-api.nordinvasion.com/news.php</Value>
@@ -39,7 +39,7 @@
       <Value Profile="(Default)">https://nordinvasion.com/download.php</Value>
     </Setting>
     <Setting Name="Version" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">3.1.1</Value>
+      <Value Profile="(Default)">3.1.7</Value>
     </Setting>
     <Setting Name="Threads_Check" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">20</Value>

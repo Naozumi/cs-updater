@@ -26,14 +26,24 @@ namespace cs_updater
             this.Installs = installs;
             InitializeComponent();
             LocUtil.SetDefaultLanguage(this);
-            data.ItemsSource = this.Installs;
-            data.Items.Refresh();
+            //foreach (InstallPath install in Installs)
+            //{
+            //    if (install.IsDefault)
+            //    {
+            //        dataList.Items.Add(install.Name + " (Default)");
+            //    }
+            //    else
+            //    {
+            //        dataList.Items.Add(install.Name);
+            //    }
+            //}
+            dataList.ItemsSource = this.Installs;
+            dataList.Items.Refresh();
             cb_verify.IsChecked = Properties.Settings.Default.AutoVerify;
             cb_update.IsChecked = Properties.Settings.Default.AutoUpdate;
             tb_threads_ch.Text = Properties.Settings.Default.Threads_Check.ToString();
             tb_threads_dl.Text = Properties.Settings.Default.Threads_Download.ToString();
-
-            if (this.Installs.Count == 0) Help_Click(null, null);
+            help = new OptionsHelp();
         }
 
         public List<InstallPath> Installs { get; set; }
@@ -236,6 +246,35 @@ namespace cs_updater
             this.Close();
         }
 
+        private void Add_Installation(object sender, RoutedEventArgs e)
+        {
+            InstallPath newInstallPath = new InstallPath();
+            OptionsEditorWindow installWindow = new OptionsEditorWindow(newInstallPath);
+            installWindow.ShowDialog();
+
+            if ((bool)installWindow.DialogResult)
+            {
+                Installs.Add(newInstallPath);
+            }
+            newInstallPath = null;
+            installWindow = null;
+        }
+
+        private void Edit_Installation(object sender, RoutedEventArgs e)
+        {
+            if (dataList.SelectedIndex < 0) return;
+            InstallPath editInstallPath = Installs[dataList.SelectedIndex];
+            OptionsEditorWindow installWindow = new OptionsEditorWindow(editInstallPath);
+            installWindow.Show();
+
+            if ((bool)installWindow.DialogResult)
+            {
+                Installs[dataList.SelectedIndex] = installWindow.Install;
+            }
+            editInstallPath = null;
+            installWindow = null;
+        }
+
         private void AutomaticallyAddInstalls(Object sender, RoutedEventArgs e)
         {
             try
@@ -381,7 +420,6 @@ namespace cs_updater
 
         private void Help_Click(object sender, RoutedEventArgs e)
         {
-            help = new OptionsHelp();
             help.Show();
         }
 
@@ -593,6 +631,11 @@ namespace cs_updater
         {
             Regex regex = new Regex("[^0-9]+");
             e.Handled = regex.IsMatch(e.Text);
+        }
+
+        private void Grid_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (this.Installs.Count == 0) help.Show();
         }
     }
 }
