@@ -8,17 +8,17 @@
         Title="{DynamicResource ResourceKey=Title}" 
         Height="330"
         Width="500"
-        WindowStartupLocation="CenterOwner"
-        Closing="Window_Closing">
+        WindowStartupLocation="CenterOwner">
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Lang/en-GB/OptionsWindow.en-GB.xaml" />
             </ResourceDictionary.MergedDictionaries>
+            <BooleanToVisibilityConverter x:Key="ConvertVisibility" />
         </ResourceDictionary>
     </Window.Resources>
     
-    <Grid Loaded="Grid_Loaded">
+    <Grid>
         <Grid.Background>
             <ImageBrush ImageSource="Resources/ni_parch_body_mobile.jpg" TileMode="Tile" Viewport="0,0,828,314" ViewportUnits="Absolute"/>
         </Grid.Background>
@@ -81,7 +81,7 @@
                         <GridViewColumn Width="50" Header="{DynamicResource ResourceKey=Default}" >
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
-                                    <CheckBox IsChecked="{Binding IsDefault}" />
+                                    <CheckBox IsChecked="{Binding IsDefault}" IsEnabled="False" Visibility="{Binding IsDefault, Converter={StaticResource ConvertVisibility}, FallbackValue=Hidden}" />
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
@@ -93,52 +93,7 @@
                     </Style>
                 </ListView.Style>
             </ListView>
-            <DataGrid x:Name="data"  ItemsSource="{Binding Installs}" AutoGenerateColumns="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" SelectionMode="Single" Visibility="Hidden">
-                <DataGrid.Columns>
-                    <DataGridTextColumn Header="{DynamicResource ResourceKey=Name}"  Binding="{Binding Name}" MinWidth="100"/>
-                    <DataGridCheckBoxColumn Header="{DynamicResource ResourceKey=Default}" Binding="{Binding IsDefault}" />
-                    <DataGridTemplateColumn Header="{DynamicResource ResourceKey=Folder}" MinWidth="200">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding Path}"/>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                        <DataGridTemplateColumn.CellEditingTemplate>
-                            <DataTemplate>
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="20" />
-                                    </Grid.ColumnDefinitions>
-                                    <TextBlock Text="{Binding Path}" Grid.Column="0" />
-                                    <Button Width="Auto" Height="Auto" Grid.Column="1" FontSize="10px" Tag="{Binding Path}" Click="Browse_Click">...</Button>
-                                </Grid>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellEditingTemplate>
-                    </DataGridTemplateColumn>
-                    <DataGridTemplateColumn Header="{DynamicResource ResourceKey=Launcher}" MinWidth="200">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding Executable}"/>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                        <DataGridTemplateColumn.CellEditingTemplate>
-                            <DataTemplate>
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="20" />
-                                    </Grid.ColumnDefinitions>
-                                    <TextBlock Text="{Binding Executable}" Grid.Column="0" />
-                                    <Button Width="Auto" Height="Auto" Grid.Column="1" FontSize="10px" Tag="{Binding Executable}" Click="BrowseLauncher_Click">...</Button>
-                                </Grid>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellEditingTemplate>
-                    </DataGridTemplateColumn>
-                    <DataGridTextColumn Header="{DynamicResource ResourceKey=Password}" Binding="{Binding Password}" />
-                </DataGrid.Columns>
-            </DataGrid>
-
+            
             <Grid Grid.Column="2">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*" />
@@ -209,7 +164,7 @@
                         </Style>
                     </Button.Style>
                 </Button>
-                <Button Grid.Row="5" Click="Cancel_Click" Foreground="White" FontSize="16" FontFamily="{StaticResource FontAwesome}" Content="&#xf00c;" ToolTip="Set the selected installation as default." >
+                <Button Grid.Row="5" Click="Set_Default_Installation" Foreground="White" FontSize="16" FontFamily="{StaticResource FontAwesome}" Content="&#xf00c;" ToolTip="Set the selected installation as default." >
                     <Button.Style>
                         <Style TargetType="{x:Type Button}">
                             <Setter Property="Background" Value="#FF830606"/>
@@ -238,7 +193,7 @@
                         </Style>
                     </Button.Style>
                 </Button>
-                <Button Grid.Row="7" Click="Cancel_Click" Foreground="White" FontSize="16" FontFamily="{StaticResource FontAwesome}" Content="&#xf2ed;" ToolTip="Delete the selected installation." >
+                <Button Grid.Row="7" Click="Delete_Installation" Foreground="White" FontSize="16" FontFamily="{StaticResource FontAwesome}" Content="&#xf2ed;" ToolTip="Delete the selected installation." >
                     <Button.Style>
                         <Style TargetType="{x:Type Button}">
                             <Setter Property="Background" Value="#FF830606"/>
@@ -309,35 +264,7 @@
                     </Style>
                 </Button.Style>
             </Button>
-            <Button Grid.Column="2" Content="{DynamicResource ResourceKey=Help}" Click="Help_Click" Foreground="White">
-                <Button.Style>
-                    <Style TargetType="{x:Type Button}">
-                        <Setter Property="Background" Value="#FF830606"/>
-                        <Setter Property="BorderBrush" Value="#FFA2760A"/>
-                        <Setter Property="Template">
-                            <Setter.Value>
-                                <ControlTemplate TargetType="{x:Type Button}">
-                                    <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}">
-                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                    </Border>
-                                </ControlTemplate>
-                            </Setter.Value>
-                        </Setter>
-                        <Style.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="#FFA80303"/>
-                            </Trigger>
-                            <Trigger Property="IsPressed"  Value="True">
-                                <Setter Property="BorderBrush" Value="#FF915252"/>
-                            </Trigger>
-                            <Trigger Property="IsEnabled"  Value="False">
-                                <Setter Property="Background" Value="#FF976B6B"/>
-                                <Setter Property="Foreground" Value="#888"/>
-                            </Trigger>
-                        </Style.Triggers>
-                    </Style>
-                </Button.Style>
-            </Button>
+            
             <Button Grid.Column="4" Content="{DynamicResource ResourceKey=OK}" Click="OK_Click" Foreground="White">
                 <Button.Style>
                     <Style TargetType="{x:Type Button}">

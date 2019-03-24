@@ -21,6 +21,7 @@
     <sys:String x:Key="Error_Server_Connection">Unable to connect to download servers.</sys:String>
     <sys:String x:Key="Error_Server_Files">Unable to find a server to download file(s).</sys:String>
     <sys:String x:Key="Error_No_Dir">Install directory not set.</sys:String>
+    <sys:String x:Key="Error_No_Drive">Installation path is on a drive that does not exist. Please check that the configured installation path is correct and retry.</sys:String>
 
     <sys:String x:Key="Error_UAC_Denied">Cannot update. Permission was denied when making the files writable.</sys:String>
     <sys:String x:Key="Error_UAC_Unknown">Cannot update. Unknown error occured when trying to make the files writable.</sys:String>

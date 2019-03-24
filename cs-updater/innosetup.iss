@@ -1,7 +1,7 @@
 #include <idp.iss>
 
 #define MyAppName "NordInvasion Launcher"
-#define MyAppVersion "3.1.5"
+#define MyAppVersion "3.1.8"
 #define MyAppPublisher "NordInvasion"
 #define MyAppURL "https://nordinvasion.com"
 #define MyAppExeName "NordInvasion_Launcher.exe"
@@ -37,27 +37,7 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "C:\Users\andy\source\repos\cs-updater\cs-updater\bin\Release\NordInvasion_Launcher.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Users\andy\source\repos\cs-updater\cs-updater\bin\Release\Microsoft.WindowsAPICodePack.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Users\andy\source\repos\cs-updater\cs-updater\bin\Release\Microsoft.WindowsAPICodePack.Shell.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Users\andy\source\repos\cs-updater\cs-updater\bin\Release\Microsoft.WindowsAPICodePack.Shell.xml"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Users\andy\source\repos\cs-updater\cs-updater\bin\Release\Microsoft.WindowsAPICodePack.xml"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Users\andy\source\repos\cs-updater\cs-updater\bin\Release\Newtonsoft.Json.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Users\andy\source\repos\cs-updater\cs-updater\bin\Release\Newtonsoft.Json.xml"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Users\andy\source\repos\cs-updater\cs-updater\bin\Release\NLog.config"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Users\andy\source\repos\cs-updater\cs-updater\bin\Release\NLog.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Users\andy\source\repos\cs-updater\cs-updater\bin\Release\NLog.xml"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Users\andy\source\repos\cs-updater\cs-updater\bin\Release\NordInvasion_Launcher.exe.config"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Users\andy\source\repos\cs-updater\cs-updater\bin\Release\NordInvasion_Launcher.pdb"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Users\andy\source\repos\cs-updater\cs-updater\bin\Release\updater-lib.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Users\andy\source\repos\cs-updater\cs-updater\bin\Release\updater-lib.pdb"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Users\andy\source\repos\cs-updater\cs-updater\bin\Release\updater-permissions.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Users\andy\source\repos\cs-updater\cs-updater\bin\Release\updater-permissions.exe.config"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Users\andy\source\repos\cs-updater\cs-updater\bin\Release\updater-permissions.pdb"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Users\andy\source\repos\cs-updater\cs-updater\bin\Release\Lang\en-GB\MainWindow.en-GB.xaml"; DestDir: "{app}\Lang\en-GB\"; Flags: ignoreversion
-Source: "C:\Users\andy\source\repos\cs-updater\cs-updater\bin\Release\Lang\en-GB\NotificationWindow.en-GB.xaml"; DestDir: "{app}\Lang\en-GB\"; Flags: ignoreversion
-Source: "C:\Users\andy\source\repos\cs-updater\cs-updater\bin\Release\Lang\en-GB\OptionsHelp.en-GB.xaml"; DestDir: "{app}\Lang\en-GB\"; Flags: ignoreversion
-Source: "C:\Users\andy\source\repos\cs-updater\cs-updater\bin\Release\Lang\en-GB\OptionsWindow.en-GB.xaml"; DestDir: "{app}\Lang\en-GB\"; Flags: ignoreversion
+Source: "C:\Users\andy\source\repos\cs-updater\cs-updater\bin\x86\Release\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]

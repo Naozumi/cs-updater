@@ -37,6 +37,7 @@ namespace cs_updater
                 }
                 textblock.HorizontalAlignment = HorizontalAlignment.Center;
                 textblock.TextWrapping = TextWrapping.Wrap;
+                textblock.TextAlignment = TextAlignment.Center;
                 TextArea.Children.Add(textblock);
             }
 

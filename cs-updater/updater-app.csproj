@@ -156,12 +156,6 @@
     <Compile Include="OptionsWindow.xaml.cs">
       <DependentUpon>OptionsWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Page_Options.xaml.cs">
-      <DependentUpon>Page_Options.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Page_OptionsEdit.xaml.cs">
-      <DependentUpon>Page_OptionsEdit.xaml</DependentUpon>
-    </Compile>
     <Compile Include="UpdaterVersion.cs" />
     <Content Include="Lang\en-GB\MainWindow.en-GB.xaml">
       <SubType>Designer</SubType>
@@ -227,7 +221,19 @@
     <Content Include="Lang\da-DK\OptionsWindow.da-DK.xaml">
       <SubType>Designer</SubType>
     </Content>
-    <Page Include="Lang\en-GB\OptionsEditor.en-GB.xaml">
+    <Content Include="Lang\en-GB\OptionsEditor.en-GB.xaml">
+      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Page Include="Lang\es-ES\OptionsEditor.es-ES.xaml">
+      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Page>
+    <Page Include="Lang\it-IT\OptionsEditor.it-IT.xaml">
+      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Page>
+    <Page Include="Lang\tr-TR\OptionsEditor.tr-TR.xaml">
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Page>
@@ -256,14 +262,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="OptionsHelp.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Page_Options.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Page_OptionsEdit.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

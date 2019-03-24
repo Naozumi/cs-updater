@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Windows;
+using System.Windows.Media;
 using System.Windows.Forms;
 using System.Windows.Input;
 using cs_updater_lib;
@@ -14,18 +15,21 @@ using System.Text.RegularExpressions;
 namespace cs_updater
 {
     /// <summary>
-    /// Interaction logic for Window1.xaml
+    /// Interaction logic for OptionsEditorWindow.xaml
     /// </summary>
     public partial class OptionsEditorWindow : Window
     {
         private static Logger logger = LogManager.GetCurrentClassLogger();
+        private InstallPath install;
 
         public OptionsEditorWindow(InstallPath install)
         {
-            this.tb_name.Text = install.Name;
-            this.tb_path.Text = install.Path;
-            this.tb_executable.Text = install.Executable;
-            this.tb_password.Text = install.Password;
+            InitializeComponent();
+            this.install = install;
+            tb_name.Text = install.Name;
+            tb_path.Text = install.Path;
+            tb_executable.Text = install.Executable;
+            tb_password.Text = install.Password;
         }
 
         public InstallPath Install { get; set; }
@@ -38,8 +42,41 @@ namespace cs_updater
 
         private void Save_Click(object sender, RoutedEventArgs e)
         {
-            DialogResult = true;
-            this.Close();
+            bool valid = true;
+
+            if (tb_name.Text.Length < 1)
+            {
+                tb_name.BorderBrush = Brushes.Red;
+                valid = false;
+            }
+            if (tb_path.Text.Length < 1)
+            {
+                tb_path.BorderBrush = Brushes.Red;
+                valid = false;
+            }
+            if ((bool)cb_beta.IsChecked && tb_password.Text.Length < 1)
+            {
+                tb_password.BorderBrush = Brushes.Red;
+                valid = false;
+            }
+
+
+            if (valid)
+            {
+                install.Name = tb_name.Text;
+                install.Path = tb_path.Text;
+                install.Executable = tb_executable.Text;
+                if ((bool)cb_beta.IsChecked)
+                {
+                    install.Password = tb_password.Text;
+                }
+                else
+                {
+                    install.Password = "";
+                }
+                DialogResult = true;
+                this.Close();
+            }
         }
 
         private void Path_Click(object sender, RoutedEventArgs e)
@@ -103,7 +140,7 @@ namespace cs_updater
                 path = dir.FullName;
             }
             tb_path.Text = path;
-            this.Install.Path = path;
+            this.Activate();
         }
 
         private void Executable_Click(object sender, RoutedEventArgs e)
@@ -204,8 +241,8 @@ namespace cs_updater
                     this.Activate();
                     return;
                 }
-
                 tb_executable.Text = file.FullName;
+                this.Activate();
             }
         }
 
@@ -278,10 +315,9 @@ namespace cs_updater
             return "";
         }
 
-        private void NumberValidationTextBox(object sender, TextCompositionEventArgs e)
+        public InstallPath GetInstall()
         {
-            Regex regex = new Regex("[^0-9]+");
-            e.Handled = regex.IsMatch(e.Text);
+            return install;
         }
     }
 }

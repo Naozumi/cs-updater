@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:cs_updater"
         mc:Ignorable="d"
         Title="{DynamicResource ResourceKey=Title}" 
-        Height="200"
+        Height="204"
         Width="500"
         WindowStartupLocation="CenterOwner">
     <Window.Resources>
@@ -29,7 +29,7 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             <Label Grid.Row="0" Content="{DynamicResource ResourceKey=Name}" Margin="0" Padding="5,0" VerticalAlignment="Top" />
-            <TextBox Grid.Row="0" Grid.Column="2" Name="tb_name" PreviewTextInput="NumberValidationTextBox" Margin="1,0,1,0" Height="18" VerticalAlignment="Center" TextAlignment="Right" />
+            <TextBox Grid.Row="0" Grid.Column="2" Name="tb_name" Margin="1,0,1,0" Height="18" VerticalAlignment="Center" TextAlignment="Left" />
         </Grid>
 
         <Grid Grid.Column="1" Grid.Row="1" Margin="0,0,0,5">
@@ -41,7 +41,7 @@
                 <ColumnDefinition Width="30"/>
             </Grid.ColumnDefinitions>
             <Label Grid.Row="0" Content="{DynamicResource ResourceKey=Path}" Margin="0" Padding="5,0" VerticalAlignment="Top" />
-            <TextBox Grid.Row="0" Grid.Column="2" Name="tb_path" PreviewTextInput="NumberValidationTextBox" Margin="1,0,1,0" Height="18" VerticalAlignment="Center" TextAlignment="Right" />
+            <TextBox Grid.Row="0" Grid.Column="2" Name="tb_path" Margin="1,0,1,0" Height="18" VerticalAlignment="Center" TextAlignment="Left" />
             <Button Grid.Column="4" Content="..." Click="Path_Click" Foreground="White">
                 <Button.Style>
                     <Style TargetType="{x:Type Button}">
@@ -82,7 +82,7 @@
                 <ColumnDefinition Width="30"/>
             </Grid.ColumnDefinitions>
             <Label Grid.Row="0" Content="{DynamicResource ResourceKey=Executable}" Margin="0" Padding="5,0" VerticalAlignment="Top" />
-            <TextBox Grid.Row="0" Grid.Column="2" Name="tb_executable" PreviewTextInput="NumberValidationTextBox" Margin="1,0,1,0" Height="18" VerticalAlignment="Center" TextAlignment="Right" />
+            <TextBox Grid.Row="0" Grid.Column="2" Name="tb_executable" Margin="1,0,1,0" Height="18" VerticalAlignment="Center" TextAlignment="Left" />
             <Button Grid.Column="4" Content="..." Click="Executable_Click" Foreground="White">
                 <Button.Style>
                     <Style TargetType="{x:Type Button}">
@@ -131,7 +131,7 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             <Label Grid.Row="0" Content="{DynamicResource ResourceKey=Password}" Margin="0" Padding="5,0" VerticalAlignment="Top" />
-            <TextBox Grid.Row="0" Grid.Column="2" Name="tb_password" PreviewTextInput="NumberValidationTextBox" Margin="1,0,1,0" Height="18" VerticalAlignment="Center" TextAlignment="Right" IsEnabled="False" />
+            <TextBox Grid.Row="0" Grid.Column="2" Name="tb_password" Margin="1,0,1,0" Height="18" VerticalAlignment="Center" TextAlignment="Left" IsEnabled="{Binding IsChecked, ElementName=cb_beta}" />
         </Grid>
 
         <Grid Grid.Column="1" Grid.Row="3" Height="30">
