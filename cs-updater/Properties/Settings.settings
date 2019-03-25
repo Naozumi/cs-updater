@@ -39,7 +39,7 @@
       <Value Profile="(Default)">https://nordinvasion.com/download.php</Value>
     </Setting>
     <Setting Name="Version" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">3.1.10</Value>
+      <Value Profile="(Default)">3.2.0</Value>
     </Setting>
     <Setting Name="Threads_Check" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">20</Value>
@@ -51,7 +51,7 @@
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="Beta" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">True</Value>
+      <Value Profile="(Default)">False</Value>
     </Setting>
   </Settings>
 </SettingsFile>

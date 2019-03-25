@@ -1,11 +1,10 @@
 #include <idp.iss>
 
 #define MyAppName "NordInvasion Launcher"
-#define MyAppVersion "3.1.10"
+#define MyAppVersion "3.2.0"
 #define MyAppPublisher "NordInvasion"
 #define MyAppURL "https://nordinvasion.com"
 #define MyAppExeName "NordInvasion_Launcher.exe"
-#define RepoPath "C:\Users\andy\source\repos"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application.
@@ -14,20 +13,19 @@
 AppId={{F8906AF0-A0EE-4C47-A499-01F305FF0AA4}
 AppName={#MyAppName}
 AppVersion={#MyAppVersion}
-;AppVerName={#MyAppName} {#MyAppVersion}
 AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
 DefaultDirName={pf}\{#MyAppName}
 DisableProgramGroupPage=yes
-LicenseFile={#RepoPath}\gpl-3.0.txt
-InfoAfterFile={#RepoPath}\postinstall.txt
+LicenseFile={#SourcePath}\gpl-3.0.txt
+InfoAfterFile={#SourcePath}\postinstall.txt
 OutputDir={#RepoPath}
 OutputBaseFilename=ni_launcher_{#MyAppVersion}
 VersionInfoVersion={#MyAppVersion}
-SetupIconFile={#RepoPath}\cs-updater\cs-updater\ni-badge.ico
-UninstallDisplayIcon={#RepoPath}\cs-updater\cs-updater\ni-badge.ico
+SetupIconFile={#SourcePath}\ni-badge.ico
+UninstallDisplayIcon={#SourcePath}\ni-badge.ico
 Compression=lzma
 SolidCompression=yes
 
@@ -38,8 +36,8 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "C:\Users\andy\source\repos\cs-updater\cs-updater\bin\x86\Release\*"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Users\andy\source\repos\cs-updater\cs-updater\bin\x86\Release\Lang\en-GB\*"; DestDir: "{app}\Lang\en-GB\"; Flags: ignoreversion
+Source: "{#SourcePath}\bin\x86\Release\*"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#SourcePath}\bin\x86\Release\Lang\en-GB\*"; DestDir: "{app}\Lang\en-GB\"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]

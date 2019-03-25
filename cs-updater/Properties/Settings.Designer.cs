@@ -154,7 +154,7 @@ namespace cs_updater.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("3.1.10")]
+        [global::System.Configuration.DefaultSettingValueAttribute("3.2.0")]
         public string Version {
             get {
                 return ((string)(this["Version"]));
@@ -199,7 +199,7 @@ namespace cs_updater.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
         public bool Beta {
             get {
                 return ((bool)(this["Beta"]));

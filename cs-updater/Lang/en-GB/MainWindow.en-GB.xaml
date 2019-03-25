@@ -36,7 +36,6 @@
     <sys:String x:Key="B_update">Update files</sys:String>
     <sys:String x:Key="B_updateProgress">Updating...</sys:String>
     <sys:String x:Key="B_play">Play</sys:String>
-    <sys:String x:Key="B_stop">Stop update</sys:String>
 
     <!-- Others -->
     <sys:String x:Key="ActiveInstall">Active Installation:</sys:String>
