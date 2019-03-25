@@ -32,7 +32,7 @@
     <sys:String x:Key="Error_UAC_Denied">Cannot update. Permission was denied when making the files writable.</sys:String>
     <sys:String x:Key="Error_UAC_Unknown">Cannot update. Unknown error occured when trying to make the files writable.</sys:String>
 
-    <sys:String x:Key="Error_Beta_Auth">Unabled to authenticate with download server.</sys:String>
+    <sys:String x:Key="Error_Beta_Auth">Unable to authenticate with download server.</sys:String>
     <sys:String x:Key="Error_Beta_Pw">Beta password is incorrect.</sys:String>
 
 

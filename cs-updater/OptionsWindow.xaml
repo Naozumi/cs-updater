@@ -69,6 +69,11 @@
             </Grid.ColumnDefinitions>
 
             <ListView ItemsSource="{Binding installs}" x:Name="dataList" >
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="ListViewItem">
+                        <EventSetter Event="MouseDoubleClick" Handler="Edit_Installation"/>
+                    </Style>
+                </ListView.ItemContainerStyle>
                 <ListView.Resources>
                     <GridView x:Key="one">
                         <GridViewColumn Width="350" Header="{DynamicResource ResourceKey=Name}" >

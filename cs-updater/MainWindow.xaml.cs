@@ -535,16 +535,7 @@ namespace cs_updater
                         }
                     }
                 }
-                if (!master.Url.EndsWith("/")) master.Url += "/";
-                servers.Add(master);
-                foreach (HostServer host in hosts)
-                {
-                    if (host.Working && host != master && (Version.Parse(host.Json.ModuleVersion) == Version.Parse(master.Json.ModuleVersion)))
-                    {
-                        if (!host.Url.EndsWith("/")) host.Url += "/";
-                        servers.Add(host);
-                    }
-                }
+                
                 if (!master.Working)
                 {
                     foreach (HostServer host in hosts)
@@ -556,6 +547,16 @@ namespace cs_updater
                     }
                     logger.Error("Unable to connect to download servers.");
                     throw new Exception("Error_Server_Connection");
+                }
+                if (!master.Url.EndsWith("/")) master.Url += "/";
+                servers.Add(master);
+                foreach (HostServer host in hosts)
+                {
+                    if (host.Working && host != master && (Version.Parse(host.Json.ModuleVersion) == Version.Parse(master.Json.ModuleVersion)))
+                    {
+                        if (!host.Url.EndsWith("/")) host.Url += "/";
+                        servers.Add(host);
+                    }
                 }
 
                 hashObject = master.Json;
@@ -1023,6 +1024,7 @@ namespace cs_updater
             var jsonString = "";
             try
             {
+                //If not beta, use default filename. Otherwise, get the beta filename.
                 if (password == "" || password == null)
                 {
                     filename = Properties.Settings.Default.updateFile;
@@ -1033,6 +1035,7 @@ namespace cs_updater
                     var betaInfo = JsonConvert.DeserializeObject<BetaInfo>(jsonStringBeta);
                     filename = betaInfo.filename;
                 }
+                //Download the relevant filename
                 jsonString = (await Task.Run(() => Download_JSON_File(url + filename)));
             }
             catch (Exception ex)
@@ -1116,7 +1119,7 @@ namespace cs_updater
                 {
                     Exception e = new Exception("Beta password is incorrect.", ex);
                     logger.Error(e);
-                    throw new Exception("Error_Beta_Pw");
+                    throw new Exception("401");
                 }
                 else if (count <= 1)
                 {

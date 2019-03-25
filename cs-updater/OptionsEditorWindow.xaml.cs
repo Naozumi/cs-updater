@@ -29,6 +29,7 @@ namespace cs_updater
             tb_name.Text = install.Name;
             tb_path.Text = install.Path;
             tb_executable.Text = install.Executable;
+            if (install.Password != "") cb_beta.IsChecked = true;
             tb_password.Text = install.Password;
         }
 
