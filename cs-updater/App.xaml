@@ -4,7 +4,6 @@
              xmlns:local="clr-namespace:cs_updater"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-
-        
+        <FontFamily x:Key="FontAwesome">/Resources/fal.otf#Font Awesome 5 Pro Light</FontFamily>
     </Application.Resources>
 </Application>

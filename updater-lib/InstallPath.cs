@@ -14,7 +14,12 @@ namespace cs_updater_lib
         public Boolean IsDefault { get; set; }
         public String Executable { get; set; }
 
-        public InstallPath() { }
+        public InstallPath() {
+            this.Name = "";
+            this.Path = "";
+            this.Password = "";
+            this.IsDefault = false;
+        }
 
         public InstallPath(String Name, String Path, String Password, Boolean IsDefault)
         {

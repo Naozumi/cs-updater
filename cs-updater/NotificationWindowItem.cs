@@ -11,10 +11,15 @@ namespace cs_updater
         public String text { get; set; }
         public Boolean reference { get; set; }
 
-        public NotificationWindowItem(string text, bool reference = true)
+        public NotificationWindowItem(string text, bool reference)
         {
             this.text = text;
             this.reference = reference;
+        }
+        public NotificationWindowItem(string text)
+        {
+            this.text = text;
+            this.reference = true;
         }
     }
 }

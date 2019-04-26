@@ -13,6 +13,10 @@ using NLog;
 using System.Windows.Input;
 using cs_updater_lib;
 using System.Windows.Threading;
+using System.Windows.Controls;
+using System.Reflection;
+using System.Runtime.InteropServices;
+using System.Windows.Navigation;
 
 namespace cs_updater
 {
@@ -43,31 +47,27 @@ namespace cs_updater
         public MainWindow()
         {
             InitializeComponent();
-            logger.Info("Current Version: " + Properties.Settings.Default.Version);
+
+            logger.Error("Current Version: " + Properties.Settings.Default.Version);
             System.Net.ServicePointManager.DefaultConnectionLimit = 20;
 
-            //LocUtil.SetDefaultLanguage(this);
             SetProgressBarText("PB_loading");
 
-            //foreach (System.Windows.Controls.MenuItem item in menuItemLanguages.Items)
-            //{
-            //    if (item.Tag.ToString().Equals(LocUtil.GetCurrentCultureName(this)))
-            //        item.IsChecked = true;
-            //}
 
             if (Properties.Settings.Default.UpgradeRequired)
             {
                 Properties.Settings.Default.Upgrade();
                 Properties.Settings.Default.UpgradeRequired = false;
                 Properties.Settings.Default.Save();
+                logger.Error("Current Version (Updated Properties): " + Properties.Settings.Default.Version);
             }
-
+            
             if (Properties.Settings.Default.Dev == true)
             {
                 DevMenu.Visibility = Visibility.Visible;
             }
 
-            SetNews(this.FindResource("NewsLoading") as string);
+            SetNewsString(this.FindResource("NewsLoading") as string);
             CheckForUpdate();
         }
 
@@ -228,25 +228,30 @@ namespace cs_updater
                     news = await Task.Run(() => JsonConvert.DeserializeObject<List<News>>(newsString));
                     foreach (var item in news)
                     {
-                        list_news.Items.Add(item.subject);
+                        list_news.Items.Add(item);
                     }
                     list_news.SelectedItem = list_news.Items.GetItemAt(0);
                 }
             }
             catch (Exception ex)
             {
-                SetNews(this.FindResource("NewsFailed") as string);
+                SetNewsString(this.FindResource("NewsFailed") as string);
                 logger.Error("Unable to load news.");
                 logger.Error(ex);
             }
         }
 
-        private void SetNews(string body)
+        private void SetNewsString(string body)
         {
             allowWebNavigation = true;
             Web_News.NavigateToString("<html><head><style>html{background-color:'#fff'; font-family: Tahoma, Verdana, Arial, Sans-Serif; font-size: 14px;} a:link {color: #d97b33;" +
                 "text-decoration: none;}a:visited{color:#d97b33;text-decoration:none;}a:hover,a:active{color: #886203;text-decoration: underline;}img{border:none}</style>" +
                 "</head><body oncontextmenu='return false; '>" + body + "</body></html>");
+        }
+        private void SetNewsTid(int tid)
+        {
+            allowWebNavigation = true;
+            Web_News.Navigate("https://forum-api.nordinvasion.com/item.php?tid=" + tid.ToString());
         }
 
         private void Web_News_Navigating(object sender, System.Windows.Navigation.NavigatingCancelEventArgs e)
@@ -273,7 +278,7 @@ namespace cs_updater
         {
             if (list_news.SelectedIndex > -1 && list_news.SelectedIndex < news.Count)
             {
-                SetNews(news[list_news.SelectedIndex].message);
+                SetNewsTid(news[list_news.SelectedIndex].tid);
             }
         }
 
@@ -281,7 +286,7 @@ namespace cs_updater
         {
             if (list_news.SelectedIndex > -1 && list_news.SelectedIndex < news.Count)
             {
-                System.Diagnostics.Process.Start("http://forum.nordinvasion.com/showthread.php?tid=" + news[list_news.SelectedIndex].tid);
+                System.Diagnostics.Process.Start("https://forum.nordinvasion.com/showthread.php?tid=" + news[list_news.SelectedIndex].tid);
             }
         }
         #endregion
@@ -401,16 +406,19 @@ namespace cs_updater
                     filesVerified = false;
                     updateRequired = false;
 
-                    if (ex.InnerException.Message.StartsWith("Error_"))
+                    if (ex.InnerException != null && ex.InnerException.Message.StartsWith("Error_"))
                     {
-                        NotificationWindow nw = new NotificationWindow("Error",
-                            new List<NotificationWindowItem> {
-                                new NotificationWindowItem(errMessage),
-                                new NotificationWindowItem("", false),
-                                new NotificationWindowItem(ex.InnerException.Message),
-                                new NotificationWindowItem("", false),
-                                new NotificationWindowItem("Error_Contact") },
-                            0)
+                        List<NotificationWindowItem> errorList = new List<NotificationWindowItem>();
+                        errorList.Add(new NotificationWindowItem(errMessage));
+                        foreach (string message in ex.InnerException.Message.Split(','))
+                        {
+                            errorList.Add(new NotificationWindowItem("", false));
+                            errorList.Add(new NotificationWindowItem(message));
+                        }
+                        errorList.Add(new NotificationWindowItem("", false));
+                        errorList.Add(new NotificationWindowItem("Error_Contact"));
+
+                        NotificationWindow nw = new NotificationWindow("Error", errorList, 0)
                         {
                             Owner = this
                         };
@@ -418,14 +426,17 @@ namespace cs_updater
                     }
                     else if (ex.Message.StartsWith("Error_"))
                     {
-                        NotificationWindow nw = new NotificationWindow("Error",
-                            new List<NotificationWindowItem> {
-                                new NotificationWindowItem(errMessage),
-                                new NotificationWindowItem("", false),
-                                new NotificationWindowItem(ex.Message),
-                                new NotificationWindowItem("", false),
-                                new NotificationWindowItem("Error_Contact") },
-                            0)
+                        List<NotificationWindowItem> errorList = new List<NotificationWindowItem>();
+                        errorList.Add(new NotificationWindowItem(errMessage));
+                        foreach (string message in ex.Message.Split(','))
+                        {
+                            errorList.Add(new NotificationWindowItem("", false));
+                            errorList.Add(new NotificationWindowItem(message));
+                        }
+                        errorList.Add(new NotificationWindowItem("", false));
+                        errorList.Add(new NotificationWindowItem("Error_Contact"));
+
+                        NotificationWindow nw = new NotificationWindow("Error", errorList, 0)
                         {
                             Owner = this
                         };
@@ -456,7 +467,6 @@ namespace cs_updater
         /// <returns></returns>
         private async Task<Boolean> VerifyGameFiles()
         {
-
             filesVerified = false;
             updateRequired = false;
             progress = 0;
@@ -468,13 +478,28 @@ namespace cs_updater
             });
             var failed = false;
 
+            //Check path is set
+            if (ActiveInstall.Path == "")
+            {
+                throw new Exception("Error_No_Dir,Error_Check_Path");
+            }
+            //Check path is valid
+            System.IO.FileInfo fi = null;
             try
             {
-                if (ActiveInstall.Path == "")
-                {
-                    throw new Exception("Error_No_Dir");
-                }
+                fi = new System.IO.FileInfo(ActiveInstall.Path);
+            }
+            catch (ArgumentException) { }
+            catch (System.IO.PathTooLongException) { }
+            catch (NotSupportedException) { }
+            if (ReferenceEquals(fi, null) || !System.IO.Path.IsPathRooted(ActiveInstall.Path))
+            {
+                // file name is not valid
+                throw new Exception("Error_Invalid_Dir,Error_Check_Path");
+            }
 
+            try
+            {
                 SetProgressBarText("PB_downloadHash");
 
                 //Download JSON and decide on best host
@@ -510,16 +535,7 @@ namespace cs_updater
                         }
                     }
                 }
-                if (!master.Url.EndsWith("/")) master.Url += "/";
-                servers.Add(master);
-                foreach (HostServer host in hosts)
-                {
-                    if (host.Working && host != master && (Version.Parse(host.Json.ModuleVersion) == Version.Parse(master.Json.ModuleVersion)))
-                    {
-                        if (!host.Url.EndsWith("/")) host.Url += "/";
-                        servers.Add(host);
-                    }
-                }
+                
                 if (!master.Working)
                 {
                     foreach (HostServer host in hosts)
@@ -531,6 +547,16 @@ namespace cs_updater
                     }
                     logger.Error("Unable to connect to download servers.");
                     throw new Exception("Error_Server_Connection");
+                }
+                if (!master.Url.EndsWith("/")) master.Url += "/";
+                servers.Add(master);
+                foreach (HostServer host in hosts)
+                {
+                    if (host.Working && host != master && (Version.Parse(host.Json.ModuleVersion) == Version.Parse(master.Json.ModuleVersion)))
+                    {
+                        if (!host.Url.EndsWith("/")) host.Url += "/";
+                        servers.Add(host);
+                    }
                 }
 
                 hashObject = master.Json;
@@ -700,7 +726,26 @@ namespace cs_updater
             });
             if (!hasWriteAccessToFolder(ActiveInstall.Path))
             {
-                //Generate the folder & set permissions to allow us to update the files
+                if (!Directory.Exists(Directory.GetParent(ActiveInstall.Path).ToString()))
+                {
+                    NotificationWindow nw = new NotificationWindow("Dir_Path_Check",
+                    new List<NotificationWindowItem> {
+                        new NotificationWindowItem("Error_Path_Parent_Existance1"),
+                        new NotificationWindowItem(ActiveInstall.Path, false),
+                        new NotificationWindowItem(""),
+                        new NotificationWindowItem("Error_Path_Parent_Existance2"),
+                    }, 3)
+                    {
+                        Owner = this
+                    };
+                    nw.ShowDialog();
+
+                    if (nw.Result != 1)
+                    {
+                        return;
+                    }
+                }
+                //Generate the folder & set permissions to allow us to update the 
                 MakeFilesWriteable();
                 WritableAttempted = false;
             }
@@ -901,6 +946,12 @@ namespace cs_updater
 
         private bool hasWriteAccessToFolder(string folderPath)
         {
+            if (!Directory.Exists(Path.GetPathRoot(folderPath)))
+            {
+                Exception e = new Exception("Error_No_Drive,Error_Check_Path");
+                throw e;
+            }
+
             try
             {
                 // Attempt to get a list of security permissions from the folder. 
@@ -928,10 +979,6 @@ namespace cs_updater
             if (WritableAttempted) return false;
             WritableAttempted = true;
             Process updater = new Process();
-            if (System.Environment.OSVersion.Version.Major >= 6)
-            {
-                updater.StartInfo.Verb = "runas"; //Run as admin, for UAC prompts
-            }
             updater.StartInfo.Verb = "runas"; //Run as admin, for UAC prompts
             updater.StartInfo.FileName = "updater-permissions.exe";
             updater.StartInfo.Arguments = "\"" + ActiveInstall.Path.Replace("\\", "\\\\") + "\"";
@@ -977,6 +1024,7 @@ namespace cs_updater
             var jsonString = "";
             try
             {
+                //If not beta, use default filename. Otherwise, get the beta filename.
                 if (password == "" || password == null)
                 {
                     filename = Properties.Settings.Default.updateFile;
@@ -987,6 +1035,7 @@ namespace cs_updater
                     var betaInfo = JsonConvert.DeserializeObject<BetaInfo>(jsonStringBeta);
                     filename = betaInfo.filename;
                 }
+                //Download the relevant filename
                 jsonString = (await Task.Run(() => Download_JSON_File(url + filename)));
             }
             catch (Exception ex)
@@ -1154,6 +1203,7 @@ namespace cs_updater
             mi.IsChecked = true;
             activeInstallText.Content = " " + ActiveInstall.Name;
             SetProgressBarText("PB_verify");
+            progress = 0;
         }
 
         private void Menu_OptionsClick(Object sender, RoutedEventArgs e)
@@ -1177,11 +1227,12 @@ namespace cs_updater
 
         private void Menu_About_Click(object sender, RoutedEventArgs e)
         {
-
+            string version = Properties.Settings.Default.Version;
+            if (Properties.Settings.Default.Beta) version += " Beta";
             NotificationWindow nw = new NotificationWindow("About",
                 new List<NotificationWindowItem> {
                     new NotificationWindowItem("About1"),
-                    new NotificationWindowItem(Properties.Settings.Default.Version + "\n", false),
+                    new NotificationWindowItem(version, false),
                     new NotificationWindowItem("", false),
                     new NotificationWindowItem("About2"),
                     new NotificationWindowItem("About3"), },
@@ -1220,6 +1271,13 @@ namespace cs_updater
         }
 
         #endregion
+
+        private void List_news_Scroll(object sender, System.Windows.Controls.Primitives.ScrollEventArgs e)
+        {
+
+        }
+
     }
 }
+
 

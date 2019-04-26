@@ -21,7 +21,16 @@ namespace updater_permissions
                 string destinationDirectory = args[0];
                 if (!Directory.Exists(destinationDirectory))
                 {
-                    Directory.CreateDirectory(destinationDirectory);
+                    try
+                    {
+                        Directory.CreateDirectory(destinationDirectory);
+                    }catch(Exception ex)
+                    {
+                        Exception e = new Exception("Unable to create a directory at: " + destinationDirectory);
+                        logger.Error(e);
+                        throw e;
+                    }
+                    
                 }
                 //set to root directory first
                 SetPermissions(destinationDirectory);

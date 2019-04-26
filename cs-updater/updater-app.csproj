@@ -14,6 +14,8 @@
     <WarningLevel>4</WarningLevel>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <IsWebBootstrapper>false</IsWebBootstrapper>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
     <PublishUrl>C:\cstest5\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -36,7 +38,7 @@
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <PlatformTarget>x86</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -47,7 +49,7 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <PlatformTarget>x86</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -80,6 +82,25 @@
   <PropertyGroup>
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.WindowsAPICodePack, Version=1.1.2.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\WindowsAPICodePack-Core.1.1.2\lib\Microsoft.WindowsAPICodePack.dll</HintPath>
@@ -91,7 +112,8 @@
       <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
-      <HintPath>..\packages\NLog.4.5.3\lib\net45\NLog.dll</HintPath>
+      <HintPath>..\packages\NLog.4.5.11\lib\net45\NLog.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
@@ -128,18 +150,18 @@
       <DependentUpon>NotificationWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="NotificationWindowItem.cs" />
+    <Compile Include="OptionsEditorWindow.xaml.cs">
+      <DependentUpon>OptionsEditorWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="OptionsWindow.xaml.cs">
       <DependentUpon>OptionsWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="OptionsInstallWindow.xaml.cs">
-      <DependentUpon>OptionsInstallWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="UpdaterVersion.cs" />
     <Content Include="Lang\en-GB\MainWindow.en-GB.xaml">
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Lang\MainWindow.es-ES.xaml">
+    <Content Include="Lang\es-ES\MainWindow.es-ES.xaml">
       <SubType>Designer</SubType>
     </Content>
     <Content Include="Lang\en-GB\OptionsWindow.en-GB.xaml">
@@ -150,58 +172,74 @@
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Lang\OptionsHelp.es-ES.xaml">
+    <Content Include="Lang\es-ES\OptionsHelp.es-ES.xaml">
       <SubType>Designer</SubType>
     </Content>
-    <Content Include="Lang\OptionsWindow.es-ES.xaml">
+    <Content Include="Lang\es-ES\OptionsWindow.es-ES.xaml">
       <SubType>Designer</SubType>
     </Content>
     <Content Include="Lang\en-GB\NotificationWindow.en-GB.xaml">
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Lang\MainWindow.tr-TR.xaml">
+    <Content Include="Lang\tr-TR\MainWindow.tr-TR.xaml">
       <SubType>Designer</SubType>
     </Content>
-    <Content Include="Lang\OptionsHelp.tr-TR.xaml">
+    <Content Include="Lang\tr-TR\OptionsHelp.tr-TR.xaml">
       <SubType>Designer</SubType>
     </Content>
-    <Content Include="Lang\OptionsWindow.tr-TR.xaml">
+    <Content Include="Lang\tr-TR\OptionsWindow.tr-TR.xaml">
       <SubType>Designer</SubType>
     </Content>
-    <Content Include="Lang\NotificationWindow.tr-TR.xaml">
+    <Content Include="Lang\tr-TR\NotificationWindow.tr-TR.xaml">
       <SubType>Designer</SubType>
     </Content>
-    <Content Include="Lang\NotificationWindow.es-ES.xaml">
+    <Content Include="Lang\es-ES\NotificationWindow.es-ES.xaml">
       <SubType>Designer</SubType>
     </Content>
-    <Content Include="Lang\MainWindow.it-IT.xaml">
+    <Content Include="Lang\it-IT\MainWindow.it-IT.xaml">
       <SubType>Designer</SubType>
     </Content>
-    <Content Include="Lang\NotificationWindow.it-IT.xaml">
+    <Content Include="Lang\it-IT\NotificationWindow.it-IT.xaml">
       <SubType>Designer</SubType>
     </Content>
-    <Content Include="Lang\OptionsHelp.it-IT.xaml">
+    <Content Include="Lang\it-IT\OptionsHelp.it-IT.xaml">
       <SubType>Designer</SubType>
     </Content>
-    <Content Include="Lang\OptionsWindow.it-IT.xaml">
+    <Content Include="Lang\it-IT\OptionsWindow.it-IT.xaml">
       <SubType>Designer</SubType>
     </Content>
-    <Content Include="Lang\MainWindow.da-DK.xaml">
+    <Content Include="Lang\da-DK\MainWindow.da-DK.xaml">
       <SubType>Designer</SubType>
     </Content>
-    <Content Include="Lang\NotificationWindow.da-DK.xaml">
+    <Content Include="Lang\da-DK\NotificationWindow.da-DK.xaml">
       <SubType>Designer</SubType>
     </Content>
-    <Content Include="Lang\OptionsHelp.da-DK.xaml">
+    <Content Include="Lang\da-DK\OptionsHelp.da-DK.xaml">
       <SubType>Designer</SubType>
     </Content>
-    <Content Include="Lang\OptionsWindow.da-DK.xaml">
+    <Content Include="Lang\da-DK\OptionsWindow.da-DK.xaml">
       <SubType>Designer</SubType>
     </Content>
-    <Page Include="Lang\en-GB\OptionsInstallWindow.en-GB.xaml">
+    <Content Include="Lang\en-GB\OptionsEditor.en-GB.xaml">
       <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Page Include="Lang\da-DK\OptionsEditor.da-DK.xaml">
+      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Page>
+    <Page Include="Lang\es-ES\OptionsEditor.es-ES.xaml">
+      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Page>
+    <Page Include="Lang\it-IT\OptionsEditor.it-IT.xaml">
+      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Page>
+    <Page Include="Lang\tr-TR\OptionsEditor.tr-TR.xaml">
+      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -219,15 +257,15 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="OptionsEditorWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="OptionsWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="OptionsHelp.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="OptionsInstallWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -253,12 +291,14 @@
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <None Include="app.manifest" />
     <None Include="cs-updater_TemporaryKey.pfx" />
     <Content Include="NLog.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Resource Include="Resources\fal.otf" />
     <None Include="NLog.xsd">
       <SubType>Designer</SubType>
     </None>
@@ -310,6 +350,8 @@
       <Name>updater-permissions</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Fonts\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

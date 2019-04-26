@@ -10,6 +10,7 @@ using System.Windows.Input;
 using cs_updater_lib;
 using NLog;
 using System.Text.RegularExpressions;
+using System.Globalization;
 
 namespace cs_updater
 {
@@ -18,7 +19,6 @@ namespace cs_updater
     /// </summary>
     public partial class OptionsWindow : Window
     {
-        private OptionsHelp help = null;
         private static Logger logger = LogManager.GetCurrentClassLogger();
 
         public OptionsWindow(List<InstallPath> installs)
@@ -26,110 +26,15 @@ namespace cs_updater
             this.Installs = installs;
             InitializeComponent();
             LocUtil.SetDefaultLanguage(this);
-            data.ItemsSource = this.Installs;
-            data.Items.Refresh();
+            dataList.ItemsSource = this.Installs;
+            dataList.Items.Refresh();
             cb_verify.IsChecked = Properties.Settings.Default.AutoVerify;
             cb_update.IsChecked = Properties.Settings.Default.AutoUpdate;
             tb_threads_ch.Text = Properties.Settings.Default.Threads_Check.ToString();
             tb_threads_dl.Text = Properties.Settings.Default.Threads_Download.ToString();
-            help = new OptionsHelp();
         }
 
         public List<InstallPath> Installs { get; set; }
-
-        private void Browse_Click(object sender, RoutedEventArgs e)
-        {
-            System.Windows.Controls.Button btn = sender as System.Windows.Controls.Button;
-            string initialPath = null;
-            if (btn.Tag == null || (string)btn.Tag == "")
-            {
-                initialPath = @"C:\";
-            }
-            else
-            {
-                initialPath = (string)btn.Tag;
-            }
-            DirectoryInfo dir = null;
-
-            CommonOpenFileDialog dialog = new CommonOpenFileDialog
-            {
-                InitialDirectory = initialPath,
-                IsFolderPicker = true,
-                Title = this.FindResource("Warband_Modules") as string
-            };
-            if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
-            {
-                dir = new DirectoryInfo(dialog.FileName);
-            }
-
-            if (dir == null)
-            {
-                this.Activate();
-                return;
-            }
-
-            if (!(dir.FullName.ToUpper().Contains(@"\MODULES") || dir.FullName.ToUpper().EndsWith(@"\MODULES\NORDINVASION")))
-            {
-                NotificationWindow nw = new NotificationWindow("Download_Confim_Title",
-                    new List<NotificationWindowItem> {
-                        new NotificationWindowItem("Download_Confim1"),
-                        new NotificationWindowItem("", false),
-                        new NotificationWindowItem("Download_Confim2") },
-                    3)
-                {
-                    Owner = this
-                };
-                nw.ShowDialog();
-
-                if (nw.Result < 1)
-                {
-                    this.Activate();
-                    return;
-                }
-            }
-
-            string path = "";
-            if (dir.FullName.ToUpper().EndsWith(@"\MODULES"))
-            {
-                path = dir.FullName + @"\NordInvasion";
-            }
-            else
-            {
-                path = dir.FullName;
-            }
-
-            InstallPath selected = (InstallPath)data.CurrentCell.Item;
-            selected.Path = path;
-
-            //Sends the enter event - on a datagrid, this auto adds a new blank row. Generally, it just looks a bit better.
-            this.data.CommitEdit();
-            var key = Key.Enter;
-            var target = Keyboard.FocusedElement;
-            var routedEvent = Keyboard.KeyDownEvent;
-
-            target.RaiseEvent(
-              new System.Windows.Input.KeyEventArgs(
-                Keyboard.PrimaryDevice,
-                PresentationSource.FromVisual(this),
-                0,
-                key)
-              { RoutedEvent = routedEvent }
-            );
-
-            this.data.CommitEdit();
-            key = Key.Up;
-            target = Keyboard.FocusedElement;
-            routedEvent = Keyboard.KeyDownEvent;
-            target.RaiseEvent(
-              new System.Windows.Input.KeyEventArgs(
-                Keyboard.PrimaryDevice,
-                PresentationSource.FromVisual(this),
-                0,
-                key)
-              { RoutedEvent = routedEvent }
-            );
-            this.Activate();
-        }
 
         private void OK_Click(object sender, RoutedEventArgs e)
         {
@@ -235,32 +140,96 @@ namespace cs_updater
             this.Close();
         }
 
+        private void Add_Installation(object sender, RoutedEventArgs e)
+        {
+            InstallPath newInstallPath = new InstallPath();
+            OptionsEditorWindow installWindow = new OptionsEditorWindow(newInstallPath);
+            installWindow.Left = this.Left + (this.Width - installWindow.Width) / 2;
+            installWindow.Top = this.Top + (this.Height - installWindow.Height) / 2;
+            installWindow.ShowDialog();
+
+            if ((bool)installWindow.DialogResult)
+            {
+                Installs.Add(installWindow.GetInstall());
+                dataList.Items.Refresh();
+            }
+            newInstallPath = null;
+            installWindow = null;
+        }
+
+        private void Edit_Installation(object sender, RoutedEventArgs e)
+        {
+            if (dataList.SelectedIndex < 0) return;
+            InstallPath editInstallPath = Installs[dataList.SelectedIndex];
+            OptionsEditorWindow installWindow = new OptionsEditorWindow(editInstallPath);
+            installWindow.Left = this.Left + (this.Width - installWindow.Width) / 2;
+            installWindow.Top = this.Top + (this.Height - installWindow.Height) / 2;
+            installWindow.ShowDialog();
+
+            if ((bool)installWindow.DialogResult)
+            {
+                Installs[dataList.SelectedIndex] = installWindow.GetInstall();
+            }
+            editInstallPath = null;
+            installWindow = null;
+            dataList.Items.Refresh();
+        }
+
+        private void Set_Default_Installation(object sender, RoutedEventArgs e)
+        {
+            if (dataList.SelectedIndex < 0) return;
+            InstallPath activeInstallPath = Installs[dataList.SelectedIndex];
+            foreach (InstallPath i in Installs)
+            {
+                i.IsDefault = false;
+            }
+            activeInstallPath.IsDefault = true;
+            dataList.Items.Refresh();
+        }
+
+        private void Delete_Installation(object sender, RoutedEventArgs e)
+        {
+            if (dataList.SelectedIndex < 0) return;
+            Installs.RemoveAt(dataList.SelectedIndex);
+            dataList.Items.Refresh();
+        }
+
         private void AutomaticallyAddInstalls(Object sender, RoutedEventArgs e)
         {
             try
             {
-                List<InstallPath> foundInstalls = getInstallationDirectories();
-                List<InstallPath> newInstalls = new List<InstallPath>();
-                foreach (InstallPath foundInstall in foundInstalls)
+                List<InstallPath> foundInstallsReg = getInstallationDirectoriesViaRegistry();
+                List<InstallPath> foundInstallsSteam = getSteamInstalls();
+                int newInstalls = 0;
+                foreach (InstallPath foundInstall in foundInstallsReg)
                 {
                     var item = Installs.FirstOrDefault(o => o.Path == foundInstall.Path);
                     if (item == null)
                     {
-                        newInstalls.Add(foundInstall);
+                        Installs.Add(foundInstall);
+                        newInstalls++;
                     }
                 }
-                if (newInstalls.Count > 0)
+                foreach (InstallPath foundInstall in foundInstallsSteam)
+                {
+                    var item = Installs.FirstOrDefault(o => o.Path == foundInstall.Path);
+                    if (item == null)
+                    {
+                        Installs.Add(foundInstall);
+                        newInstalls++;
+                    }
+                }
+                if (newInstalls > 0)
                 {
                     NotificationWindow nw = new NotificationWindow("Installs_Found_Title",
                     new List<NotificationWindowItem> {
                         new NotificationWindowItem("Installs_Found_Text"),
-                        new NotificationWindowItem(newInstalls.Count.ToString(), false)
+                        new NotificationWindowItem(newInstalls.ToString(), false)
                     }, 0)
                     {
                         Owner = this
                     };
                     nw.ShowDialog();
-                    Installs.AddRange(newInstalls);
                 }
                 else
                 {
@@ -273,8 +242,6 @@ namespace cs_updater
                     };
                     nw.ShowDialog();
                 }
-
-                data.Items.Refresh();
             }
             catch (Exception ex)
             {
@@ -289,9 +256,10 @@ namespace cs_updater
                 };
                 nw.ShowDialog();
             }
+            dataList.Items.Refresh();
         }
 
-        private List<InstallPath> getInstallationDirectories()
+        private List<InstallPath> getInstallationDirectoriesViaRegistry()
         {
             var installs = new List<InstallPath>();
             List<String> registry_key = new List<string>
@@ -376,146 +344,47 @@ namespace cs_updater
             return installs;
         }
 
-
-
-        private void Help_Click(object sender, RoutedEventArgs e)
+        private List<InstallPath> getSteamInstalls()
         {
-            help.Show();
-        }
-
-        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
-        {
-            if (help != null)
+            List <InstallPath> steamInstalls = new List<InstallPath>(); //just incase we find multiple, somehow...
+            string steamexe = GetSteamPath();
+            if (File.Exists(steamexe.Replace(@"\steam.exe", @"\steamapps\libraryfolders.vdf")))
             {
-                help.Close();
-            }
-        }
-
-        private void BrowseLauncher_Click(object sender, RoutedEventArgs e)
-        {
-            InstallPath selected = (InstallPath)data.CurrentCell.Item;
-
-            NotificationWindow nw = new NotificationWindow("Steam_Check_Title",
-                new List<NotificationWindowItem> {
-                    new NotificationWindowItem("Steam_Check_Text")
-                }, 3)
-            {
-                Owner = this
-            };
-            nw.ShowDialog();
-
-            bool need2find = true;
-            bool steam = false;
-            if (nw.Result == 1)
-            {
-                steam = true;
                 try
                 {
-                    var spath = GetSteamPath();
-                    if (spath != "")
+                    List<string> steamFolders = new List<string>();
+                    if (Directory.Exists(steamexe.Replace(@"\steam.exe",@"\steamapps\common"))) steamFolders.Add(steamexe.Replace(@"\steam.exe", @"\steamapps\common"));
+                    string[] steamLibraryFile = File.ReadAllLines(steamexe.Replace(@"\steam.exe", @"\steamapps\libraryfolders.vdf"));
+                    foreach (string line in steamLibraryFile)
                     {
-                        selected.Executable = spath;
-                        need2find = false;
-                    }
-                    else
-                    {
-                        nw = new NotificationWindow("Steam_Find_Title",
-                            new List<NotificationWindowItem> {
-                                new NotificationWindowItem("Steam_Find_Text")
-                            }, 0)
+                        if (line.Contains(@":\\"))
                         {
-                            Owner = this
-                        };
-                        nw.ShowDialog();
+                            string subline = line.Replace("\"", "");
+                            string[] blocks = subline.Trim().Split();
+                            for (int i = blocks.Count()-1; i > -1; i--)
+                            {
+                                if (blocks[i].Length > 2 && !int.TryParse(blocks[i], out int n))
+                                {
+                                    steamFolders.Add(blocks[i] + @"\steamapps\common");
+                                    break;
+                                }
+                            }
+                        }
                     }
-                }
-                catch
+                    foreach (string library in steamFolders)
+                    {
+                        if (Directory.Exists(library+ @"\MountBlade Warband"))
+                        {
+                            steamInstalls.Add(new InstallPath("Mount & Blade Warband (Steam) ", library + @"\MountBlade Warband\Modules\NordInvasion\", "", false, steamexe));
+                        }
+                    }
+                }catch(Exception e)
                 {
-                    //something went wrong with autofind - just continue as if all is well. Probably a permissions issue - we will use file finder instead.
+                    logger.Error("Steam checking error");
+                    logger.Error(e);
                 }
             }
-
-            if (need2find)
-            {
-                System.Windows.Controls.Button btn = sender as System.Windows.Controls.Button;
-
-                string initialPath = null;
-                if (btn.Tag == null || (string)btn.Tag == "" || (string)btn.Tag == @"steam://rungameid/48700")
-                {
-                    if (selected.Path != null && selected.Path != "")
-                    {
-                        initialPath = selected.Path;
-                    }
-                    else
-                    {
-                        initialPath = @"C:\";
-                    }
-                }
-                else
-                {
-                    initialPath = (string)btn.Tag;
-                }
-
-                FileInfo file = null;
-                string dialogTitle = "";
-                if (steam)
-                {
-                    dialogTitle = this.FindResource("Select_Steam") as string;
-                }
-                else
-                {
-                    dialogTitle = this.FindResource("Select_Warband") as string;
-                }
-                CommonOpenFileDialog dialog = new CommonOpenFileDialog
-                {
-                    InitialDirectory = initialPath,
-                    IsFolderPicker = false,
-                    Title = dialogTitle
-                };
-                dialog.Filters.Add(new CommonFileDialogFilter(this.FindResource("Executables") as string, "*.exe"));
-                if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
-                {
-                    file = new FileInfo(dialog.FileName);
-                }
-
-                if (file == null)
-                {
-                    this.Activate();
-                    return;
-                }
-
-                selected.Executable = file.FullName;
-            }
-
-            //Sends the enter event - on a datagrid, this auto adds a new blank row. Generally, it just looks a bit better.
-            this.data.CommitEdit();
-            var key = Key.Enter;
-            var target = Keyboard.FocusedElement;
-            var routedEvent = Keyboard.KeyDownEvent;
-
-            target.RaiseEvent(
-              new System.Windows.Input.KeyEventArgs(
-                Keyboard.PrimaryDevice,
-                PresentationSource.FromVisual(this),
-                0,
-                key)
-              { RoutedEvent = routedEvent }
-            );
-
-            this.data.CommitEdit();
-            key = Key.Up;
-            target = Keyboard.FocusedElement;
-            routedEvent = Keyboard.KeyDownEvent;
-            target.RaiseEvent(
-              new System.Windows.Input.KeyEventArgs(
-                Keyboard.PrimaryDevice,
-                PresentationSource.FromVisual(this),
-                0,
-                key)
-              { RoutedEvent = routedEvent }
-            );
-            this.Activate();
-
+            return steamInstalls;
         }
 
         private string GetSteamPath()
@@ -593,9 +462,19 @@ namespace cs_updater
             e.Handled = regex.IsMatch(e.Text);
         }
 
-        private void Grid_Loaded(object sender, RoutedEventArgs e)
+        public object ConvertVisibility(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (this.Installs.Count == 0) help.Show();
+            bool flag = false;
+            if (value is bool)
+            {
+                flag = (bool)value;
+            }
+            else if (value is bool?)
+            {
+                bool? nullable = (bool?)value;
+                flag = nullable.HasValue ? nullable.Value : false;
+            }
+            return (flag ? Visibility.Visible : Visibility.Hidden);
         }
     }
 }
